@@ -46,7 +46,7 @@ public class UserService {
     // saves the given entity but data is only persisted in the database once
     // flush() is called
     newUser = userRepository.save(newUser);
-    userRepository.flush();
+    //userRepository.flush();
 
     log.debug("Created Information for User: {}", newUser);
     return newUser;
@@ -64,7 +64,7 @@ public class UserService {
    */
   private void checkIfUserExists(User userToBeCreated) {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-    User userByName = userRepository.findByName(userToBeCreated.getUsername());
+    User userByName = userRepository.findByUsername(userToBeCreated.getUsername());
 
     String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
     if (userByUsername != null && userByName != null) {

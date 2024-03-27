@@ -1,35 +1,32 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
-import javax.persistence.*;
+// import javax.persistence.*;
 import java.io.Serializable;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 
-@Entity
-@Table(name = "STATISTICS")
+@Document(collection = "STATISTICS")
 public class Statistics implements Serializable{
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue
     private Long Index;
 
-    @Column(nullable = false)
+    @Indexed(unique = true)
     private Long userId;
 
-    @Column(nullable = false)
     private Integer gameID;
 
-    @Column(nullable = false)
     private Boolean win;
 
-    @Column(nullable = false)
     private Boolean loss;
 
-    @Column(nullable = false)
     private Boolean aborted;
 
-    @Column(nullable = false)
     private Integer setsWon;
 
     public Long getIndex() {
