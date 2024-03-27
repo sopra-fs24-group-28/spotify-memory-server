@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import org.hibernate.stat.Statistics;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -23,34 +24,23 @@ public class User implements Serializable {
 
   @Id
   @GeneratedValue
-  private Long id;
-
-  @Column(nullable = false)
-  private String name;
+  private Long userId;
 
   @Column(nullable = false, unique = true)
   private String username;
 
   @Column(nullable = false, unique = true)
-  private String token;
+  private String sessionToken;
 
   @Column(nullable = false)
-  private UserStatus status;
+  private UserStatus state;
 
-  public Long getId() {
-    return id;
+  public Long getUserId() {
+    return userId;
   }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
+  public void setUserId(Long id) {
+    this.userId = id;
   }
 
   public String getUsername() {
@@ -61,19 +51,21 @@ public class User implements Serializable {
     this.username = username;
   }
 
-  public String getToken() {
-    return token;
+  public String getSessionToken() {
+      return sessionToken;
   }
 
-  public void setToken(String token) {
-    this.token = token;
-  }
+    public UserStatus getState() {
+        return state;
+    }
 
-  public UserStatus getStatus() {
-    return status;
-  }
+    public void setSessionToken(String sessionToken) {
+        this.sessionToken = sessionToken;
+    }
 
-  public void setStatus(UserStatus status) {
-    this.status = status;
-  }
+    public void setState(UserStatus state) {
+        this.state = state;
+    }
+
+
 }
