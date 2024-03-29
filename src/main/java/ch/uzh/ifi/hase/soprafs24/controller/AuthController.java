@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthPostCodeDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthTokensDTO;
 import ch.uzh.ifi.hase.soprafs24.service.AuthService;
@@ -11,7 +12,7 @@ import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCrede
 
 import java.util.HashMap;
 
-import static ch.uzh.ifi.hase.soprafs24.service.AuthService.getAuthorizationCodeCredentials;
+//import static ch.uzh.ifi.hase.soprafs24.service.AuthService.getAuthorizationCodeCredentials;
 
 
 /**
@@ -27,31 +28,31 @@ import static ch.uzh.ifi.hase.soprafs24.service.AuthService.getAuthorizationCode
 public class AuthController {
 
     private final SpotifyService spotifyService;
+    private final AuthService authService;
 
-    public AuthController(SpotifyService spotifyService) {
+    public AuthController(SpotifyService spotifyService, AuthService authService) {
         this.spotifyService = spotifyService;
+        this.authService = authService;
     }
 
     @PostMapping("/auth/token")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AuthTokensDTO getAccessTokenFromCode(@RequestBody AuthPostCodeDTO AuthPostCodeDTO) {
-        AuthorizationCodeCredentials authorizationCodeCredentials = getAuthorizationCodeCredentials(AuthPostCodeDTO.getCode());
-        HashMap<String,String> spotifyUserData = AuthService.getSpotifyUserData(authorizationCodeCredentials.getAccessToken());
+        AuthorizationCodeCredentials authorizationCodeCredentials = authService.getAuthorizationCodeCredentials(AuthPostCodeDTO.getCode());
+        HashMap<String,String> spotifyUserData = authService.getSpotifyUserData(authorizationCodeCredentials.getAccessToken());
 
         // make sure user has a premium account
         if(!spotifyUserData.get("product").equals("premium")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Missing premium account.");
         }
 
-        // add method to check whether user exists in DB
+        // create and/or login the user
+        User user = authService.createOrLogin(spotifyUserData.get("id"), spotifyUserData.get("display_name"));
 
-        // create user if not exists
-
-        // get user session token
 
         AuthTokensDTO response = new AuthTokensDTO();
-        response.setSessionToken("sessionToken");
+        response.setSessionToken(user.getSessionToken());
 
         return response;
     }

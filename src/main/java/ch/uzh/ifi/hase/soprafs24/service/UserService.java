@@ -52,6 +52,19 @@ public class UserService {
     return newUser;
   }
 
+  public User loginUser(String spotifyUserId) {
+      User user = userRepository.findBySpotifyUserId(spotifyUserId);
+      user.setState(UserStatus.ONLINE);
+      user = userRepository.save(user);
+      return user;
+  }
+
+  public User logoutUser(User user) {
+      user.setState(UserStatus.OFFLINE);
+      user = userRepository.save(user);
+      return user;
+  }
+
   /**
    * This is a helper method that will check the uniqueness criteria of the
    * username and the name
@@ -63,17 +76,18 @@ public class UserService {
    * @see User
    */
   private void checkIfUserExists(User userToBeCreated) {
-    User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-    User userByName = userRepository.findByUsername(userToBeCreated.getUsername());
+    User userBySpotifyId = userRepository.findBySpotifyUserId(userToBeCreated.getSpotifyUserId());
 
     String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-    if (userByUsername != null && userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-          String.format(baseErrorMessage, "username and the name", "are"));
-    } else if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
-    } else if (userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
+    if (userBySpotifyId != null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "spotifyuserid", "is"));
     }
+  }
+
+  public boolean userExists(User user) {
+      User userBySpotifyId = userRepository.findBySpotifyUserId(user.getSpotifyUserId());
+
+      // returns true if user exists
+      return userBySpotifyId != null;
   }
 }
