@@ -27,7 +27,9 @@ public class User implements Serializable {
   @Id
   private Long userId;
 
-  @Indexed(unique = true) // nullable false
+  @Indexed(unique = true)
+  private String spotifyUserId;
+
   private String username;
 
   @Indexed(unique = true) // nullable false
@@ -35,6 +37,14 @@ public class User implements Serializable {
 
   // nullable NOT able in mongoDB => validation needed
   private UserStatus state;
+
+  public String getSpotifyUserId() {
+    return spotifyUserId;
+  }
+
+  public void setSpotifyUserId(String spotifyUserId) {
+    this.spotifyUserId = spotifyUserId;
+  }
 
   public Long getUserId() {
     return userId;
