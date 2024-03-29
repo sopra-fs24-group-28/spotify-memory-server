@@ -1,5 +1,10 @@
 # SoPra RESTful Service Template FS24
 
+## Group 28: Necessary Additional Setup
+To run the server locally, it is necessary to save the clientSecret and the redirectURL in the system environment variables so that it can be extracted by SpotifyService.
+
+Additionally, make sure that your spotify account is listed in the Spotify "App" (maintained by Nicolas).
+
 ## Getting started with Spring Boot
 -   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 -   Guides: http://spring.io/guides
