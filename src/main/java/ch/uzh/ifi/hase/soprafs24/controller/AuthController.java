@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthPostCodeDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthTokensDTO;
@@ -47,9 +48,15 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Missing premium account.");
         }
 
-        // create and/or login the user
-        User user = authService.createOrLogin(spotifyUserData.get("id"), spotifyUserData.get("display_name"));
+        SpotifyJWT spotifyJWT = new SpotifyJWT();
+        spotifyJWT.setAccessToken(authorizationCodeCredentials.getAccessToken());
+        spotifyJWT.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
+        spotifyJWT.setScope(authorizationCodeCredentials.getScope());
+        spotifyJWT.setTokenType(authorizationCodeCredentials.getTokenType());
+        spotifyJWT.setExpiresln(authorizationCodeCredentials.getExpiresIn());
 
+        // create and/or login the user
+        User user = authService.createOrLogin(spotifyUserData.get("id"), spotifyUserData.get("display_name"), spotifyJWT);
 
         AuthTokensDTO response = new AuthTokensDTO();
         response.setSessionToken(user.getSessionToken());

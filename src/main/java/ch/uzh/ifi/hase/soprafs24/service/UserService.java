@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import org.slf4j.Logger;
@@ -52,15 +53,17 @@ public class UserService {
     return newUser;
   }
 
-  public User loginUser(String spotifyUserId) {
+  public User loginUser(String spotifyUserId, SpotifyJWT spotifyJWT) {
       User user = userRepository.findBySpotifyUserId(spotifyUserId);
       user.setState(UserStatus.ONLINE);
+      user.setSpotifyJWT(spotifyJWT);
       user = userRepository.save(user);
       return user;
   }
 
   public User logoutUser(User user) {
       user.setState(UserStatus.OFFLINE);
+      user.setSpotifyJWT(null);
       user = userRepository.save(user);
       return user;
   }

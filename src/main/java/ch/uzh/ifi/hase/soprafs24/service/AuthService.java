@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 
+import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import org.apache.hc.core5.http.ParseException;
@@ -42,17 +43,17 @@ public class AuthService {
         return SpotifyService.getUserData(accessToken);
     }
 
-    public User createOrLogin(String spotifyUserId, String username) {
+    public User createOrLogin(String spotifyUserId, String username, SpotifyJWT spotifyJWT) {
         User userToCreateOrLogin = new User();
         userToCreateOrLogin.setSpotifyUserId(spotifyUserId);
         userToCreateOrLogin.setUsername(username);
 
         if (userService.userExists(userToCreateOrLogin)) {
-            return userService.loginUser(userToCreateOrLogin.getSpotifyUserId());
+            return userService.loginUser(userToCreateOrLogin.getSpotifyUserId(), spotifyJWT);
         } else {
             userToCreateOrLogin.setUserId(1L);
             User createdUser = userService.createUser(userToCreateOrLogin);
-            return userService.loginUser(createdUser.getSpotifyUserId());
+            return userService.loginUser(createdUser.getSpotifyUserId(), spotifyJWT);
         }
     }
 }

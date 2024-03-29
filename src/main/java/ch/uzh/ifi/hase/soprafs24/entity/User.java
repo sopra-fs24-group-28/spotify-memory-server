@@ -38,6 +38,8 @@ public class User implements Serializable {
   // nullable NOT able in mongoDB => validation needed
   private UserStatus state;
 
+  private SpotifyJWT spotifyJWT;
+
   public String getSpotifyUserId() {
     return spotifyUserId;
   }
@@ -78,5 +80,11 @@ public class User implements Serializable {
         this.state = state;
     }
 
+    public void setSpotifyJWT(SpotifyJWT spotifyJWT) {
+      this.spotifyJWT = spotifyJWT;
+    }
 
+    public SpotifyJWT getSpotifyJWT() {
+        return spotifyJWT;
+    }
 }
