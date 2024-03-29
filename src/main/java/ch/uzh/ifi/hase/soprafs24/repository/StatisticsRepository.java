@@ -10,6 +10,6 @@ import java.util.List;
 @Repository("StatisticsRepository")
 public interface StatisticsRepository extends MongoRepository<Statistics, Long> {
 
-    List<Statistics> findallbyUserId(Long userId);
+    //List<Statistics> findallbyUserId(Long userId);
 
 }
