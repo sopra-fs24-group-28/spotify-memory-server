@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PostGameStartDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,8 +16,7 @@ public class GameController {
     @PostMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
-    public GameParameters startGame(@RequestBody GameParameters gameParameters) {
-
-        return gameParameters;
+    public PostGameStartDTO startGame(@RequestBody GameParameters gameParameters) {
+        return new PostGameStartDTO(1, gameParameters);
     }
 }
