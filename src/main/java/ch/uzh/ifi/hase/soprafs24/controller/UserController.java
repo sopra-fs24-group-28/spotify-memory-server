@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 public class UserController {
 
-  private final UserService userService;
+/*  private final UserService userService;
 
   UserController(UserService userService) {
     this.userService = userService;
@@ -53,5 +53,5 @@ public class UserController {
     User createdUser = userService.createUser(userInput);
     // convert internal representation of user back to API
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
-  }
+  }*/
 }
