@@ -32,6 +32,7 @@ import java.util.HashMap;
  */
 @Service
 @Transactional
+@AllArgsConstructor
 public class SpotifyService {
 
     private final Logger log = LoggerFactory.getLogger(SpotifyService.class);
