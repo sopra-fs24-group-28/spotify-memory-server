@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
@@ -72,4 +73,17 @@ public class AuthService {
             return userService.loginUser(createdUser.getSpotifyUserId(), spotifyJWT);
         }
     }
+
+    public void logout(String sessionHeader) {
+        try{
+            String sessionToken = sessionHeader.substring(7);
+            User logoutUser = userRepository.findBySessionToken(sessionToken);
+            logoutUser.setState(UserStatus.OFFLINE);
+            logoutUser.setSessionToken(null);
+            logoutUser.setSpotifyJWT(null);
+            userRepository.save(logoutUser);
+            userRepository.flush();
+        } catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The unexpected error: " + e.getMessage());
+        }}
 }
