@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.model.game;
 
+import ch.uzh.ifi.hase.soprafs24.constant.GameCategory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
