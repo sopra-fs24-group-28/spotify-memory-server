@@ -22,7 +22,6 @@ import java.util.HashMap;
  */
 @Service
 @Transactional
-@AllArgsConstructor
 public class AuthService {
 
     private final Logger log = LoggerFactory.getLogger(AuthService.class);

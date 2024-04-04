@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,11 +49,7 @@ public class SpotifyService {
             .setRedirectUri(redirectUri)
             .build();
 
-    private final UserRepository userRepository;
-    @Autowired
-    public SpotifyService(@Qualifier("userRepository") UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private UserRepository userRepository;
 
     public static AuthorizationCodeCredentials authorizationCode_Sync(String code) {
         final AuthorizationCodeRequest authorizationCodeRequest = spotifyApiAuth.authorizationCode(code).build();
