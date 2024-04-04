@@ -4,14 +4,13 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import org.apache.hc.core5.http.ParseException;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 
 import java.util.HashMap;
@@ -23,27 +22,45 @@ import java.util.HashMap;
  */
 @Service
 @Transactional
+@AllArgsConstructor
 public class AuthService {
 
     private final Logger log = LoggerFactory.getLogger(AuthService.class);
 
-    private final UserRepository userRepository;
-    private final UserService userService;
-    @Autowired
-    public AuthService(@Qualifier("userRepository") UserRepository userRepository, UserService userService) {
-        this.userRepository = userRepository;
-        this.userService = userService;
+    private UserRepository userRepository;
+    private UserService userService;
+
+    public User authenticateFromCode(String code) {
+        AuthorizationCodeCredentials authorizationCodeCredentials = getAuthorizationCodeCredentials(code);
+        HashMap<String,String> spotifyUserData = getSpotifyUserData(authorizationCodeCredentials.getAccessToken());
+
+        // make sure user has a premium account
+        if(!spotifyUserData.get("product").equals("premium")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Missing premium account.");
+        }
+
+        SpotifyJWT spotifyJWT = new SpotifyJWT();
+        spotifyJWT.setAccessToken(authorizationCodeCredentials.getAccessToken());
+        spotifyJWT.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
+        spotifyJWT.setScope(authorizationCodeCredentials.getScope());
+        spotifyJWT.setTokenType(authorizationCodeCredentials.getTokenType());
+        spotifyJWT.setExpiresln(authorizationCodeCredentials.getExpiresIn());
+
+        // create and/or login the user
+        User user = createOrLogin(spotifyUserData.get("id"), spotifyUserData.get("display_name"), spotifyJWT);
+
+        return user;
     }
 
-    public AuthorizationCodeCredentials getAuthorizationCodeCredentials(String code){
+    private AuthorizationCodeCredentials getAuthorizationCodeCredentials(String code){
         return SpotifyService.authorizationCode_Sync(code);
     }
 
-    public HashMap<String,String> getSpotifyUserData(String accessToken){
+    private HashMap<String,String> getSpotifyUserData(String accessToken){
         return SpotifyService.getUserData(accessToken);
     }
 
-    public User createOrLogin(String spotifyUserId, String username, SpotifyJWT spotifyJWT) {
+    private User createOrLogin(String spotifyUserId, String username, SpotifyJWT spotifyJWT) {
         User userToCreateOrLogin = new User();
         userToCreateOrLogin.setSpotifyUserId(spotifyUserId);
         userToCreateOrLogin.setUsername(username);
@@ -51,7 +68,6 @@ public class AuthService {
         if (userService.userExists(userToCreateOrLogin)) {
             return userService.loginUser(userToCreateOrLogin.getSpotifyUserId(), spotifyJWT);
         } else {
-            userToCreateOrLogin.setUserId(1L);
             User createdUser = userService.createUser(userToCreateOrLogin);
             return userService.loginUser(createdUser.getSpotifyUserId(), spotifyJWT);
         }
