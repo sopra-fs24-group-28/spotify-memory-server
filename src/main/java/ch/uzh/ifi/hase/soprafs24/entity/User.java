@@ -1,10 +1,15 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
+import lombok.Getter;
+import lombok.Setter;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import org.hibernate.stat.Statistics;
 import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 
 /**
@@ -19,9 +24,9 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "USER")
+@Getter
+@Setter
 public class User implements Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue
@@ -41,51 +46,4 @@ public class User implements Serializable {
   @Transient
   private SpotifyJWT spotifyJWT;
 
-  public String getSpotifyUserId() {
-    return spotifyUserId;
-  }
-
-  public void setSpotifyUserId(String spotifyUserId) {
-    this.spotifyUserId = spotifyUserId;
-  }
-
-  public Long getUserId() {
-    return userId;
-  }
-
-  public void setUserId(Long id) {
-    this.userId = id;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getSessionToken() {
-      return sessionToken;
-  }
-
-    public UserStatus getState() {
-        return state;
-    }
-
-    public void setSessionToken(String sessionToken) {
-        this.sessionToken = sessionToken;
-    }
-
-    public void setState(UserStatus state) {
-        this.state = state;
-    }
-
-    public void setSpotifyJWT(SpotifyJWT spotifyJWT) {
-      this.spotifyJWT = spotifyJWT;
-    }
-
-    public SpotifyJWT getSpotifyJWT() {
-        return spotifyJWT;
-    }
 }
