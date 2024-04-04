@@ -33,6 +33,9 @@ jobs:
     name: Deploying to Google Cloud
     runs-on: ubuntu-latest
     needs: test
+    env:
+      clientSecret: ${{ secrets.CLIENTSECRET }}
+      redirectURL: ${{ secrets.REDIRECTURL }}
 
     steps:
       - name: Checkout
@@ -45,6 +48,9 @@ jobs:
           deliverables: app.yaml
           version: v1
           credentials: ${{ secrets.GCP_SERVICE_CREDENTIALS }}
+          env_vars: |-
+            clientSecret=${{ secrets.CLIENTSECRET }}
+            redirectURL=${{ secrets.REDIRECTURL }}
 
       - name: Test
         run: curl "${{ steps.deploy.outputs.url }}"
