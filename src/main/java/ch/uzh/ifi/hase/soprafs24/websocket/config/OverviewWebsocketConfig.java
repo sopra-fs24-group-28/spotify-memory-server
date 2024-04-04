@@ -18,7 +18,7 @@ public class OverviewWebsocketConfig implements WebSocketMessageBrokerConfigurer
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-overview");
+        registry.addEndpoint("/ws");
     }
 
 
