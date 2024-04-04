@@ -41,13 +41,12 @@ public class UserService {
   }
 
   public User createUser(User newUser) {
-    newUser.setSessionToken(UUID.randomUUID().toString());
     newUser.setState(UserStatus.OFFLINE);
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
     // flush() is called
     newUser = userRepository.save(newUser);
-    //userRepository.flush();
+    userRepository.flush();
 
     log.debug("Created Information for User: {}", newUser);
     return newUser;
@@ -55,9 +54,11 @@ public class UserService {
 
   public User loginUser(String spotifyUserId, SpotifyJWT spotifyJWT) {
       User user = userRepository.findBySpotifyUserId(spotifyUserId);
+      user.setSessionToken(UUID.randomUUID().toString());
       user.setState(UserStatus.ONLINE);
       user.setSpotifyJWT(spotifyJWT);
       user = userRepository.save(user);
+      userRepository.flush();
       return user;
   }
 
@@ -65,6 +66,7 @@ public class UserService {
       user.setState(UserStatus.OFFLINE);
       user.setSpotifyJWT(null);
       user = userRepository.save(user);
+      userRepository.flush();
       return user;
   }
 
