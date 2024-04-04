@@ -1,14 +1,10 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class AuthPostCodeDTO {
 
   private String code;
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
-  }
 }
