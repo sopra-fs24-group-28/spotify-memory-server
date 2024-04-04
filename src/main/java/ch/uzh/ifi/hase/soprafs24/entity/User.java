@@ -2,11 +2,16 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import org.hibernate.stat.Statistics;
+import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.Transient;
 import java.io.Serializable;
 
 /**
@@ -27,6 +32,20 @@ public class User implements Serializable {
 
   @Id
   @GeneratedValue
-  private Long id;
+  private Long userId;
+
+  @Column(nullable = false, unique = true)
+  private String spotifyUserId;
+
+  @Column(nullable = false, unique = true)
+  private String username;
+
+  @Column(nullable = true, unique = true)
+  private String sessionToken;
+
+  private UserStatus state;
+
+  @Transient
+  private SpotifyJWT spotifyJWT;
 
 }
