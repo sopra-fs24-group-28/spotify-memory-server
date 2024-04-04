@@ -2,10 +2,8 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import org.hibernate.stat.Statistics;
+import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.index.Indexed;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -19,25 +17,28 @@ import java.io.Serializable;
  * - unique = true -> this value must be unqiue across the database -> composes
  * the primary key
  */
-@Document(collection = "USER")
+@Entity
+@Table(name = "USER")
 public class User implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   @Id
+  @GeneratedValue
   private Long userId;
 
-  @Indexed(unique = true)
+  @Column(nullable = false, unique = true)
   private String spotifyUserId;
 
+  @Column(nullable = false, unique = true)
   private String username;
 
-  @Indexed(unique = true) // nullable false
+  @Column(nullable = false)
   private String sessionToken;
 
-  // nullable NOT able in mongoDB => validation needed
   private UserStatus state;
 
+  @Transient
   private SpotifyJWT spotifyJWT;
 
   public String getSpotifyUserId() {
