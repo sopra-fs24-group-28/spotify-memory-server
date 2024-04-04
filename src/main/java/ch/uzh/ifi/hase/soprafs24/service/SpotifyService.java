@@ -39,10 +39,10 @@ public class SpotifyService {
 
     private static final String clientId = "5aac3ff5093942be92372c19a12fdecd";
 
-    //private static final String clientSecret = "clientSecret";
-    private static final String clientSecret = System.getenv("clientSecret");
-    //private static final URI redirectUri = SpotifyHttpManager.makeUri("redirectURL");
-    private static final URI redirectUri = SpotifyHttpManager.makeUri(System.getenv("redirectURL"));
+    private static final String clientSecret = "clientSecret";
+    //private static final String clientSecret = System.getenv("clientSecret");
+    private static final URI redirectUri = SpotifyHttpManager.makeUri("redirectURL");
+    //private static final URI redirectUri = SpotifyHttpManager.makeUri(System.getenv("redirectURL"));
 
     private static final SpotifyApi spotifyApiAuth = new SpotifyApi.Builder()
             .setClientId(clientId)
