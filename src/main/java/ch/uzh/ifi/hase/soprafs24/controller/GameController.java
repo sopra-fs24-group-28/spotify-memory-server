@@ -7,16 +7,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("/game")
+@RestController
+@RequestMapping("/game")
 @RequiredArgsConstructor
 public class GameController {
 
     private final GameService gameService;
 
-    @PostMapping
-    @ResponseBody
+    @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public PostGameStartDTO startGame(@RequestBody GameParameters gameParameters) {
-        return new PostGameStartDTO(1, gameParameters);
+        return new PostGameStartDTO(1L, gameParameters);
     }
 }

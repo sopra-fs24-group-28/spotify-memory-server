@@ -41,7 +41,6 @@ dependencies {
     implementation 'org.springframework:spring-messaging'
     implementation 'org.springframework:spring-websocket'
 
-
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
