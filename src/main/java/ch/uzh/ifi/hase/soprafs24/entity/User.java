@@ -6,12 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import org.hibernate.stat.Statistics;
 import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Column;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -45,7 +40,8 @@ public class User implements Serializable {
 
   private UserStatus state;
 
-  @Transient
+  @OneToOne(mappedBy = "user")
+  @PrimaryKeyJoinColumn
   private SpotifyJWT spotifyJWT;
 
 }

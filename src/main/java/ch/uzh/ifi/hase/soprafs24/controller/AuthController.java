@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthPostCodeDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthTokensDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GetAccessTokenDTO;
 import ch.uzh.ifi.hase.soprafs24.service.AuthService;
 import ch.uzh.ifi.hase.soprafs24.service.SpotifyService;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
@@ -37,6 +38,16 @@ public class AuthController {
 
         AuthTokensDTO response = new AuthTokensDTO();
         response.setSessionToken(user.getSessionToken());
+
+        return response;
+    }
+
+    @GetMapping("/auth/token")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GetAccessTokenDTO getAccessToken(@RequestHeader("Authorization") String sessionHeader) {
+        GetAccessTokenDTO response = new GetAccessTokenDTO();
+        response.setAccessToken(authService.getAccessToken(sessionHeader));
 
         return response;
     }
