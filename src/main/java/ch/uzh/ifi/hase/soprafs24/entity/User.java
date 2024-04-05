@@ -2,9 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
-import org.hibernate.stat.Statistics;
-import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
+import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,7 +38,7 @@ public class User implements Serializable {
   @Column(nullable = false, unique = true)
   private String username;
 
-  @Column(nullable = true, unique = true)
+  @Column(unique = true)
   private String sessionToken;
 
   private UserStatus state;

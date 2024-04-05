@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PostGameStartDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
@@ -16,7 +17,9 @@ public class GameController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public PostGameStartDTO startGame(@RequestBody GameParameters gameParameters) {
-        return new PostGameStartDTO(1L, gameParameters);
+    public PostGameStartDTO createGame(@RequestBody GameParameters gameParameters) {
+
+        Game game = gameService.createGame(gameParameters, 1L);
+        return new PostGameStartDTO(game.getGameId(), game.getGameParameters());
     }
 }

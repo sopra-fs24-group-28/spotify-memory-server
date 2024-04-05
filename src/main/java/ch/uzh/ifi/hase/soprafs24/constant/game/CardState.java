@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs24.model.game;
+package ch.uzh.ifi.hase.soprafs24.constant.game;
 
 public enum CardState {
     FACEDOWN,

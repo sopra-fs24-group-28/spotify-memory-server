@@ -1,9 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.model.game;
 
+import ch.uzh.ifi.hase.soprafs24.constant.game.CardState;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.HashMap;
 
 @Getter
 @Setter

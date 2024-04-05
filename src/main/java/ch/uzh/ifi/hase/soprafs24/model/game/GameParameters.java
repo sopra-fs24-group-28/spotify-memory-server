@@ -1,6 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.model.game;
 
-import ch.uzh.ifi.hase.soprafs24.constant.GameCategory;
+import ch.uzh.ifi.hase.soprafs24.constant.game.GameCategory;
 import lombok.*;
 
 @Getter
