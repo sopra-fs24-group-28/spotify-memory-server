@@ -61,6 +61,7 @@ public class UserService {
 
   public User logoutUser(User user) {
       user.setState(UserStatus.OFFLINE);
+      user.setSessionToken(null);
       user.setSpotifyJWT(null);
       user = userRepository.save(user);
       userRepository.flush();

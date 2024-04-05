@@ -53,6 +53,17 @@ public class AuthService {
         return user;
     }
 
+    public String getAccessToken(String sessionHeader) {
+        String sessionToken = sessionHeader.substring(7);
+        User user = userRepository.findBySessionToken(sessionToken);
+
+        try {
+            return user.getSpotifyJWT().getAccessToken();
+        } catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The unexpected error: " + e.getMessage());
+        }
+    }
+
     private AuthorizationCodeCredentials getAuthorizationCodeCredentials(String code){
         return SpotifyService.authorizationCode_Sync(code);
     }
@@ -78,11 +89,8 @@ public class AuthService {
         try{
             String sessionToken = sessionHeader.substring(7);
             User logoutUser = userRepository.findBySessionToken(sessionToken);
-            logoutUser.setState(UserStatus.OFFLINE);
-            logoutUser.setSessionToken(null);
-            logoutUser.setSpotifyJWT(null);
-            userRepository.save(logoutUser);
-            userRepository.flush();
+
+            userService.logoutUser(logoutUser);
         } catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The unexpected error: " + e.getMessage());
         }}
