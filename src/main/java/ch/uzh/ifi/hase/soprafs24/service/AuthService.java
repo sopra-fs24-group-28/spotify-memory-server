@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
@@ -52,6 +53,17 @@ public class AuthService {
         return user;
     }
 
+    public String getAccessToken(String sessionHeader) {
+        String sessionToken = sessionHeader.substring(7);
+        User user = userRepository.findBySessionToken(sessionToken);
+
+        try {
+            return user.getSpotifyJWT().getAccessToken();
+        } catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The unexpected error: " + e.getMessage());
+        }
+    }
+
     private AuthorizationCodeCredentials getAuthorizationCodeCredentials(String code){
         return SpotifyService.authorizationCode_Sync(code);
     }
@@ -72,4 +84,14 @@ public class AuthService {
             return userService.loginUser(createdUser.getSpotifyUserId(), spotifyJWT);
         }
     }
+
+    public void logout(String sessionHeader) {
+        try{
+            String sessionToken = sessionHeader.substring(7);
+            User logoutUser = userRepository.findBySessionToken(sessionToken);
+
+            userService.logoutUser(logoutUser);
+        } catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The unexpected error: " + e.getMessage());
+        }}
 }
