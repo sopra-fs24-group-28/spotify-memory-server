@@ -1,6 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
-import ch.uzh.ifi.hase.soprafs24.constant.PlayerState;
+import ch.uzh.ifi.hase.soprafs24.constant.user.PlayerState;
 import lombok.Getter;
 import lombok.Setter;
 

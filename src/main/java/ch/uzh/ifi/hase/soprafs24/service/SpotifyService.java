@@ -3,22 +3,19 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import se.michaelthelin.spotify.model_objects.specification.User;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
-import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
-import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 
 import java.io.IOException;
@@ -41,7 +38,7 @@ public class SpotifyService {
 
     //private static final String clientSecret = "clientSecret";
     private static final String clientSecret = System.getenv("clientSecret");
-    //private static final URI redirectUri = SpotifyHttpManager.makeUri("redirectURL");
+    //private static final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:8080/");
     private static final URI redirectUri = SpotifyHttpManager.makeUri(System.getenv("redirectURL"));
 
     private static final SpotifyApi spotifyApiAuth = new SpotifyApi.Builder()
