@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.repository.SpotifyJWTRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ public class UserService {
   private final Logger log = LoggerFactory.getLogger(UserService.class);
 
   private UserRepository userRepository;
+  private SpotifyJWTRepository spotifyJWTRepository;
 
   public List<User> getUsers() {
     return this.userRepository.findAll();
@@ -49,6 +51,13 @@ public class UserService {
 
   public User loginUser(String spotifyUserId, SpotifyJWT spotifyJWT) {
       User user = userRepository.findBySpotifyUserId(spotifyUserId);
+
+      // save the spotifyJWT first
+      spotifyJWT.setUser(user);
+      spotifyJWT = spotifyJWTRepository.save(spotifyJWT);
+      spotifyJWTRepository.flush();
+
+      // save the user with the spotifyJWT
       user.setSessionToken(UUID.randomUUID().toString());
       user.setState(UserStatus.ONLINE);
       user.setSpotifyJWT(spotifyJWT);
@@ -58,7 +67,13 @@ public class UserService {
   }
 
   public User logoutUser(User user) {
+      // delete the spotifyJWT
+      SpotifyJWT spotifyJWTToDelete = spotifyJWTRepository.findByUserId(user.getUserId());
+      spotifyJWTRepository.delete(spotifyJWTToDelete);
+
+      // change user state
       user.setState(UserStatus.OFFLINE);
+      user.setSessionToken(null);
       user.setSpotifyJWT(null);
       user = userRepository.save(user);
       userRepository.flush();

@@ -4,12 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Column;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -43,7 +38,8 @@ public class User implements Serializable {
 
   private UserStatus state;
 
-  @Transient
+  @OneToOne(mappedBy = "user")
+  @PrimaryKeyJoinColumn
   private SpotifyJWT spotifyJWT;
 
 }
