@@ -26,11 +26,11 @@ public class Game {
 
     private List<Turn> history = new ArrayList<>();
 
-    private HashMap<String, Long> scoreBoard = new HashMap<>();
+    private HashMap<Long, Long> scoreBoard = new HashMap<>();
 
     private List<User> players = new ArrayList<>();
 
-    private HashMap<String, Long> quickTurn = new HashMap<>();
+    private HashMap<Long, Long> quickTurn = new HashMap<>();
 
     private Boolean quickTurnActive = false;
 

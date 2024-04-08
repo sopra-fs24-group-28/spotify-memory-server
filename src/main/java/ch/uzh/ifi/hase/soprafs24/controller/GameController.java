@@ -18,8 +18,7 @@ public class GameController {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public PostGameStartDTO createGame(@RequestBody GameParameters gameParameters) {
-
-        Game game = gameService.createGame(gameParameters, 1L);
+        Game game = gameService.createGame(gameParameters, 1L); // TODO: remove id and get User from SecContext in Service
         return new PostGameStartDTO(game.getGameId(), game.getGameParameters());
     }
 }

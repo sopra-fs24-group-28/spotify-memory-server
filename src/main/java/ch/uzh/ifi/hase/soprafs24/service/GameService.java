@@ -19,7 +19,7 @@ public class GameService {
     public UserRepository userRepository;
 
      public Game createGame(GameParameters gameParameters, Long hostId) {
-         User host = userRepository.findByUserId(hostId);
+         User host = userRepository.findByUserId(hostId); //TODO: needs to be changed to method of retrieving from SecContext
          Game newGame = new Game(gameParameters, host);
          return inMemoryGameRepository.save(newGame);
      }
