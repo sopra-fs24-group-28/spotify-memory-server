@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,5 +38,10 @@ public class InMemoryGameRepository implements GameRepository {
     @Override
     public void deleteById(Integer id) {
         games.remove(id);
+    }
+
+    @Override
+    public List<Game> findAll() {
+        return new ArrayList<>(games.values());
     }
 }

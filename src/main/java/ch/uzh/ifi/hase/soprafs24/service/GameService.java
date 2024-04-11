@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 @AllArgsConstructor
@@ -22,5 +24,9 @@ public class GameService {
          User host = userRepository.findByUserId(hostId); //TODO: needs to be changed to method of retrieving from SecContext
          Game newGame = new Game(gameParameters, host);
          return inMemoryGameRepository.save(newGame);
+     }
+
+     public List<Game> getGames() {
+         return inMemoryGameRepository.findAll();
      }
 }
