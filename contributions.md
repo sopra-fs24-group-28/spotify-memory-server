@@ -3,6 +3,13 @@
 ## Diyar
 
 ## Elias
+### Week 1
+* [#89](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/89) Changes As Requested (Game related Objects and Game creation)
+* [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) changes ws endpoints (rough setup and first trials)
+
+
+### Week 2
+* [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) websocket for lobby overview somewhat works
 
 ## Henry
 
