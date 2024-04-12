@@ -4,6 +4,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +53,8 @@ public class AuthService {
         return user;
     }
 
-    public String getAccessToken(String sessionHeader) {
-        String sessionToken = sessionHeader.substring(7);
-        User user = userRepository.findBySessionToken(sessionToken);
+    public String getAccessToken() {
+        User user = UserContextHolder.getCurrentUser();
 
         try {
             return user.getSpotifyJWT().getAccessToken();
@@ -84,21 +84,18 @@ public class AuthService {
         }
     }
 
-    public void logout(String sessionHeader) {
+    public void logout() {
         try{
-            String sessionToken = sessionHeader.substring(7);
-            User logoutUser = userRepository.findBySessionToken(sessionToken);
-
-            userService.logoutUser(logoutUser);
+            userService.logoutUser(UserContextHolder.getCurrentUser());
         } catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The unexpected error: " + e.getMessage());
         }
     }
 
-    public Boolean validateUserBySessionTokenAndSetContext(String sessionHeader) {
-        String sessionToken = sessionHeader.substring(7);
-
-        return true;
+    public User getUserBySessionToken(String authHeader) {
+        return userService.getUserBySessionToken(authHeader);
     }
+
+
 
 }

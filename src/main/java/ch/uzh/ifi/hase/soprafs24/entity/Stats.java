@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;

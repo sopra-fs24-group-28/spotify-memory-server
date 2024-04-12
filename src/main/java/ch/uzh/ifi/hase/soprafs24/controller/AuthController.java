@@ -6,7 +6,6 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthTokensDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GetAccessTokenDTO;
 import ch.uzh.ifi.hase.soprafs24.service.AuthService;
 import ch.uzh.ifi.hase.soprafs24.service.SpotifyService;
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -43,9 +42,9 @@ public class AuthController {
     @GetMapping("/token")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GetAccessTokenDTO getAccessToken(@RequestHeader("Authorization") String sessionHeader) {
+    public GetAccessTokenDTO getAccessToken() {
         GetAccessTokenDTO response = new GetAccessTokenDTO();
-        response.setAccessToken(authService.getAccessToken(sessionHeader));
+        response.setAccessToken(authService.getAccessToken());
 
         return response;
     }
@@ -53,7 +52,7 @@ public class AuthController {
     @DeleteMapping("/token")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void revokeSessionToken(@RequestHeader("Authorization") String sessionHeader) {
-        authService.logout(sessionHeader);
+    public void revokeSessionToken() {
+        authService.logout();
     }
 }

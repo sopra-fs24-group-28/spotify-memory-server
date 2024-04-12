@@ -105,4 +105,9 @@ public class UserService {
       // returns true if user exists
       return userBySpotifyId != null;
   }
+
+  public User getUserBySessionToken(String sessionToken) {
+      return userRepository.findBySessionToken(sessionToken);
+  }
+
 }
