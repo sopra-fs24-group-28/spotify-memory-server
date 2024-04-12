@@ -44,7 +44,7 @@ public class SpotifyService {
 
     //private static final String clientSecret = "clientSecret";
     private static final String clientSecret = System.getenv("clientSecret");
-    //private static final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:8080/");
+    //private static final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:3000/auth_callback");
     private static final URI redirectUri = SpotifyHttpManager.makeUri(System.getenv("redirectURL"));
 
     private static final SpotifyApi spotifyApiAuth = new SpotifyApi.Builder()
@@ -68,7 +68,7 @@ public class SpotifyService {
             return authorizationCodeCredentials;
         }
         catch (IOException | SpotifyWebApiException | ParseException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The authorization code is invalid: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The authorization code is invalid: " + e.getMessage());
         }
     }
 
