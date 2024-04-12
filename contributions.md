@@ -21,6 +21,13 @@
 
 ## Henry
 
+### Week 1
+* [#88](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/88) Create and persist the user object
+
+### Week 3
+* [#55] Prepare game state (e.g. Scoreboard, Turn object) (IN progress)
+* [#56] Upon valid request to start game, close lobby to new players and start Game (IN Progress)
+
 ## Nicolas
 ### Week 1
 
