@@ -17,20 +17,20 @@ public class Stats {
     private Long id;
 
     @NonNull
-    private int userId;
+    private Integer userId;
 
     @NonNull
-    private int gameId;
+    private Integer gameId;
 
     @NonNull
-    private int setsWon;
+    private Integer setsWon;
 
     @NonNull
-    private boolean win;
+    private Boolean win;
 
     @NonNull
-    private boolean loss;
+    private Boolean loss;
 
     @NonNull
-    private boolean aborted;
+    private Boolean aborted;
 }
