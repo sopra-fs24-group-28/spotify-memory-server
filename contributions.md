@@ -1,6 +1,14 @@
 # Contributions of the Team Members Group 28
 
 ## Diyar
+### Week 1
+* [client-#35](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/35) Spotify Authentication
+* [client-#34](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/34) Routing and Basic Error Screens
+* [client-#33](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/33) =
+* [client-#32](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/32) =
+
+### Week 3
+* [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) websocket for lobby overview somewhat works
 
 ## Elias
 ### Week 1
@@ -8,7 +16,7 @@
 * [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) changes ws endpoints (rough setup and first trials)
 
 
-### Week 2
+### Week 3
 * [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) websocket for lobby overview somewhat works
 
 ## Henry
