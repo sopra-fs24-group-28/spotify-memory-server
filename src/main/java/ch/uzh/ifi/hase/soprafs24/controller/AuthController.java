@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.GetAccessTokenDTO;
 import ch.uzh.ifi.hase.soprafs24.service.AuthService;
 import ch.uzh.ifi.hase.soprafs24.service.SpotifyService;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,17 +21,14 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
+@RequestMapping("/auth")
+@AllArgsConstructor
 public class AuthController {
 
     private final SpotifyService spotifyService;
     private final AuthService authService;
 
-    public AuthController(SpotifyService spotifyService, AuthService authService) {
-        this.spotifyService = spotifyService;
-        this.authService = authService;
-    }
-
-    @PostMapping("/auth/token")
+    @PostMapping("/token")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AuthTokensDTO getAccessTokenFromCode(@RequestBody AuthPostCodeDTO AuthPostCodeDTO) {
@@ -42,7 +40,7 @@ public class AuthController {
         return response;
     }
 
-    @GetMapping("/auth/token")
+    @GetMapping("/token")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GetAccessTokenDTO getAccessToken(@RequestHeader("Authorization") String sessionHeader) {
@@ -52,7 +50,7 @@ public class AuthController {
         return response;
     }
 
-    @DeleteMapping("/auth/token")
+    @DeleteMapping("/token")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void revokeSessionToken(@RequestHeader("Authorization") String sessionHeader) {

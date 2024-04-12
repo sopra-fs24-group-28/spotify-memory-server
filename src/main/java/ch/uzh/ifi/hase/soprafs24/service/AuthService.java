@@ -92,5 +92,13 @@ public class AuthService {
             userService.logoutUser(logoutUser);
         } catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The unexpected error: " + e.getMessage());
-        }}
+        }
+    }
+
+    public Boolean validateUserBySessionTokenAndSetContext(String sessionHeader) {
+        String sessionToken = sessionHeader.substring(7);
+
+        return true;
+    }
+
 }
