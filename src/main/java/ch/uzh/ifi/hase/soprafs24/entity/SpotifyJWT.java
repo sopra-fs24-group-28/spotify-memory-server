@@ -1,4 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,8 +30,9 @@ public class SpotifyJWT {
     @Column(nullable = false)
     private String scope;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "userId")
+    @JsonBackReference
     private User user;
 }
