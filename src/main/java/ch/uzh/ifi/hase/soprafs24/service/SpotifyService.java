@@ -104,7 +104,7 @@ public class SpotifyService {
                 .setAccessToken(accessToken)
                 .build();
         final String userid = getUserData(accessToken).get("id");
-        if (userid!= null){
+        if (userid == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Userid could not be fetched");
         }
         final GetListOfUsersPlaylistsRequest playlistsRequest = spotifyApi.getListOfUsersPlaylists(userid).build();
