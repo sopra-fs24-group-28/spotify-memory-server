@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
@@ -24,7 +25,7 @@ import java.io.Serializable;
 public class User implements Serializable {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long userId;
 
   @Column(nullable = false, unique = true)
@@ -36,10 +37,12 @@ public class User implements Serializable {
   @Column(unique = true)
   private String sessionToken;
 
+  @Enumerated(EnumType.STRING)
   private UserStatus state;
 
-  @OneToOne(mappedBy = "user")
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   @PrimaryKeyJoinColumn
+  @JsonManagedReference
   private SpotifyJWT spotifyJWT;
 
 }
