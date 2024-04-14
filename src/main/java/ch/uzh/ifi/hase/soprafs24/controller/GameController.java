@@ -1,29 +1,38 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyOverviewDto;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PostGameStartDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.helper.LobbyGame;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.LobbyGame;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
+import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/game")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class GameController {
 
     private final GameService gameService;
 
+    private ApplicationEventPublisher eventPublisher;
+
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public PostGameStartDTO createGame(@RequestBody GameParameters gameParameters) {
-        Game game = gameService.createGame(gameParameters, 1L); // TODO: remove id and get User from SecContext in Service
+        Game game = gameService.createGame(gameParameters);
+
+        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, game));
+
         return new PostGameStartDTO(game.getGameId(), game.getGameParameters());
     }
 
@@ -35,8 +44,11 @@ public class GameController {
         LobbyOverviewDto lobbyOverviewDto = new LobbyOverviewDto();
 
         for (Game game : games) {
-            LobbyGame lobbyGame = new LobbyGame(game.getGameParameters(), game.getPlayers(), game.getGameState(), game.getHostId());
-
+            List<PlayerDTO> players = new ArrayList<>();
+            for (User user: game.getPlayers()) {
+                players.add(new PlayerDTO(user));
+            }
+            LobbyGame lobbyGame = new LobbyGame(game.getGameParameters(), players, game.getGameState(), game.getHostId());
             lobbyOverviewDto.getGames().put(game.getGameId(), lobbyGame);
         }
 
