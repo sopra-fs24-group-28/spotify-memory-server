@@ -33,8 +33,11 @@ public class LobbyGameChanges {
         hostId = Change.of(true, Optional.ofNullable(game.getHostId()));
     }
 
-    public LobbyGameChanges (User user) {
-        users = Change.of(true, Optional.of(Collections.singletonList(new PlayerDTO(user))));
+    public LobbyGameChanges (List<User> newUsers) {
+        List<PlayerDTO> playerDTOList = newUsers.stream()
+                .map(PlayerDTO::new)
+                .toList();
+        users = Change.of(true, Optional.of(playerDTOList));
 
     }
 

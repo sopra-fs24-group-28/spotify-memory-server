@@ -27,4 +27,23 @@ public class GameService {
      public List<Game> getGames() {
          return inMemoryGameRepository.findAll();
      }
+
+     public List<User> addPlayerToGame(Integer gameId) {
+         User newUser = UserContextHolder.getCurrentUser();
+         Game game = inMemoryGameRepository.findById(gameId).orElseThrow();
+         game.getPlayers().add(newUser);
+         return inMemoryGameRepository.save(game).getPlayers();
+     }
+
+     public List<User> removePlayerFromGame(Integer gameId) {
+         User userToRemove = UserContextHolder.getCurrentUser();
+         Game game = inMemoryGameRepository.findById(gameId).orElseThrow();
+         if (game.getHostId().equals(userToRemove.getUserId())) {
+             inMemoryGameRepository.deleteById(gameId);
+             return null;
+         } else {
+             game.getPlayers().remove(userToRemove);
+             return inMemoryGameRepository.save(game).getPlayers();
+         }
+     }
 }

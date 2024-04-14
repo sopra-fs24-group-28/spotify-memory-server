@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
@@ -53,6 +54,27 @@ public class GameController {
         }
 
         return lobbyOverviewDto;
+    }
+
+    @PatchMapping("/{gameId}/player")
+    @ResponseStatus(HttpStatus.OK)
+    public void addPlayerToGame(@PathVariable Integer gameId) {
+        List<User> users = gameService.addPlayerToGame(gameId);
+
+        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId ,users));
+    }
+
+    @DeleteMapping("/{gameId}/player")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removePlayerFromGame(@PathVariable Integer gameId) {
+        List<User> users = gameService.removePlayerFromGame(gameId);
+
+        if (users == null) {
+            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, GameState.FINISHED));
+        } else {
+            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId , users));
+        }
+
     }
 
 
