@@ -1,7 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
@@ -53,26 +51,16 @@ public class SpotifyService {
             .setRedirectUri(redirectUri)
             .build();
 
-    private UserRepository userRepository;
-
     public static AuthorizationCodeCredentials authorizationCode_Sync(String code) {
         final AuthorizationCodeRequest authorizationCodeRequest = spotifyApiAuth.authorizationCode(code).build();
         try {
-            final AuthorizationCodeCredentials authorizationCodeCredentials = authorizationCodeRequest.execute();
-
-            // Set access and refresh token for further "spotifyApi" object usage
-            // spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
-            // spotifyApi.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
-            // System.out.println("Expires in: " + authorizationCodeCredentials.getExpiresIn());
-
-            return authorizationCodeCredentials;
+            return authorizationCodeRequest.execute();
         }
         catch (IOException | SpotifyWebApiException | ParseException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The authorization code is invalid: " + e.getMessage());
         }
     }
-
-
+    
     public static HashMap<String, String> getUserData(String accessToken) {
 
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
@@ -105,7 +93,6 @@ public class SpotifyService {
                 .build();
 
         final GetPlaylistsItemsRequest playlistRequest = spotifyApi.getPlaylistsItems(playlistId).build();
-
 
         ArrayList<String> songs = null;
         try {
