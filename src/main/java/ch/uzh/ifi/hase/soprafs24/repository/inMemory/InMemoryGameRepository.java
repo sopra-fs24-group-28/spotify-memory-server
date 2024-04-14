@@ -29,7 +29,7 @@ public class InMemoryGameRepository implements GameRepository {
     }
 
     @Override
-    public Optional<Game> findById(Integer id) {
+    public Game findById(Integer id) {
         return Optional.ofNullable(games.get(id));
     }
 
