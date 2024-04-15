@@ -48,22 +48,26 @@ public class CardCollection {
     }
 
     public Boolean checkMatch(List<Integer> picks) {
+        boolean result = true;
         if (picks.size() >= 2) {
             // get the list of matching cards for the first pick
             List<Integer> matching = this.matchingCards.get(picks.get(0));
-            for (int i = 1; i < picks.size() - 1; i++) {
-                if (! matching.contains(picks.get(i))) {
-                    return false;
+            for (int i = 1; i < picks.size(); i++) {
+                if (!matching.contains(picks.get(i))) {
+                    result = false;
+                    break;
                 }
             }
         }
         // return true if all picks match or less than 2 picks have been recorded
-        return true;
+        return result;
     }
 
     public Card getCardById(Integer cardId) {
-        for (int i = 0; i<this.cards.size()-1; i++) {
-            if (this.cards.get(i).getCardId() == cardId) { return this.cards.get(i); }
+        for (Card card : this.cards) {
+            if (card.getCardId() == cardId) {
+                return card;
+            }
         }
         return null;
     }
