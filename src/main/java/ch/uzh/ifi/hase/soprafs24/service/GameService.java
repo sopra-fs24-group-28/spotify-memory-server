@@ -50,7 +50,7 @@ public class GameService {
              inMemoryGameRepository.deleteById(gameId);
              return null;
          } else {
-             System.out.println(game.getPlayers().indexOf(userToRemove));
+             game.getPlayers().removeIf(u -> u.getUserId().equals(userToRemove.getUserId()));
              return inMemoryGameRepository.save(game).getPlayers();
          }
      }
