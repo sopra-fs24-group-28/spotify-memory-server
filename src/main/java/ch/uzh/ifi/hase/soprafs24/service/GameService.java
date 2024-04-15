@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.model.game.Game;
@@ -46,11 +45,12 @@ public class GameService {
      public List<User> removePlayerFromGame(Integer gameId) {
          User userToRemove = UserContextHolder.getCurrentUser();
          Game game = inMemoryGameRepository.findById(gameId).orElseThrow();
+         userService.setPlayerState(userToRemove, UserStatus.ONLINE);
          if (game.getHostId().equals(userToRemove.getUserId())) {
              inMemoryGameRepository.deleteById(gameId);
              return null;
          } else {
-             game.getPlayers().remove(userToRemove);
+             System.out.println(game.getPlayers().indexOf(userToRemove));
              return inMemoryGameRepository.save(game).getPlayers();
          }
      }

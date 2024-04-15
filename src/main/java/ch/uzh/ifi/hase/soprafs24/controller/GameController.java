@@ -56,7 +56,7 @@ public class GameController {
         return lobbyOverviewDto;
     }
 
-    @PatchMapping("/{gameId}/player")
+    @PutMapping("/{gameId}/player")
     @ResponseStatus(HttpStatus.OK)
     public void addPlayerToGame(@PathVariable Integer gameId) {
         List<User> users = gameService.addPlayerToGame(gameId);

@@ -18,7 +18,7 @@ import java.util.Optional;
 @NoArgsConstructor
 public class LobbyGameChanges {
     private Pair<Boolean, Optional<GameParameters>> gameParameter =  Pair.of(false, Optional.empty());
-    private Pair<Boolean, Optional<List<User>>> users =  Pair.of(false, Optional.empty());
+    private Pair<Boolean, Optional<List<User>>> playerList =  Pair.of(false, Optional.empty());
     private Pair<Boolean, Optional<GameState>> gameState =  Pair.of(false, Optional.empty());
     private Pair<Boolean, Optional<Long>> hostId =  Pair.of(false, Optional.empty());
 }

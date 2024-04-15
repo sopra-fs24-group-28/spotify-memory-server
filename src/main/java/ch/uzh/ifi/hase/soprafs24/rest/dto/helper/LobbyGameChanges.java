@@ -20,15 +20,15 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LobbyGameChanges {
-    private Change<GameParameters> gameParameter;
-    private Change<List<PlayerDTO>> users;
+    private Change<GameParameters> gameParameters;
+    private Change<List<PlayerDTO>> playerList;
     private Change<GameState> gameState;
     private Change<Long> hostId;
 
     // only to be used for game creation
     public LobbyGameChanges (Game game) {
-        gameParameter = Change.of(true, Optional.ofNullable(game.getGameParameters()));
-        users = Change.of(true, Optional.of(Collections.singletonList(new PlayerDTO(game.getPlayers().get(0)))));
+        gameParameters = Change.of(true, Optional.ofNullable(game.getGameParameters()));
+        playerList = Change.of(true, Optional.of(Collections.singletonList(new PlayerDTO(game.getPlayers().get(0)))));
         gameState = Change.of(true, Optional.ofNullable(game.getGameState()));
         hostId = Change.of(true, Optional.ofNullable(game.getHostId()));
     }
@@ -37,12 +37,12 @@ public class LobbyGameChanges {
         List<PlayerDTO> playerDTOList = newUsers.stream()
                 .map(PlayerDTO::new)
                 .toList();
-        users = Change.of(true, Optional.of(playerDTOList));
+        playerList = Change.of(true, Optional.of(playerDTOList));
 
     }
 
-    public LobbyGameChanges (GameParameters gameParameters) {
-        gameParameter = Change.of(true, Optional.ofNullable(gameParameters));
+    public LobbyGameChanges (GameParameters newGameParameters) {
+        gameParameters = Change.of(true, Optional.ofNullable(newGameParameters));
     }
 
     public LobbyGameChanges (Long id) {
