@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
@@ -13,11 +14,11 @@ import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.model_objects.specification.User;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
-import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistRequest;
+import se.michaelthelin.spotify.requests.data.player.PauseUsersPlaybackRequest;
+import se.michaelthelin.spotify.requests.data.player.StartResumeUsersPlaybackRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 
@@ -105,6 +106,29 @@ public class SpotifyService {
             System.out.println("Something went wrong (getPlaylistData)!\n" + e.getMessage());
         }
         return songs;
+    }
+
+    public static void setSong(String accessToken, String trackId) {
+
+        final SpotifyApi spotifyApi = new SpotifyApi.Builder().setAccessToken(accessToken).build();
+
+        final StartResumeUsersPlaybackRequest startResumeUsersPlaybackRequest = spotifyApi
+                .startResumeUsersPlayback()
+                //.device_id("5fbb3ba6aa454b5534c4ba43a8c7e8e45a63ad0e")
+                .uris(JsonParser.parseString("[\"spotify:track:" + trackId + "\"]").getAsJsonArray())
+                .position_ms(0)
+                .build();
+
+        final PauseUsersPlaybackRequest pauseUsersPlaybackRequest = spotifyApi.pauseUsersPlayback()
+                //.device_id("5fbb3ba6aa454b5534c4ba43a8c7e8e45a63ad0e")
+                .build();
+
+        try {
+            startResumeUsersPlaybackRequest.execute(); // also starts execution
+            pauseUsersPlaybackRequest.execute(); // pauses execution
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("\"Something went wrong (setSong)!\\n" + e.getMessage());
+        }
     }
 
     private static ArrayList<String> parsePlaylistTrackPaging(Paging<PlaylistTrack> playlistTrackPaging) {
