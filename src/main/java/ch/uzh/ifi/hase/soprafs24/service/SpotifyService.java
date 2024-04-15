@@ -39,20 +39,19 @@ public class SpotifyService {
 
     private final Logger log = LoggerFactory.getLogger(SpotifyService.class);
 
-    private static final String clientId = "5aac3ff5093942be92372c19a12fdecd";
-
-    //private static final String clientSecret = "clientSecret";
-    private static final String clientSecret = System.getenv("clientSecret");
-    //private static final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:3000/auth_callback");
-    private static final URI redirectUri = SpotifyHttpManager.makeUri(System.getenv("redirectURL"));
-
-    private static final SpotifyApi spotifyApiAuth = new SpotifyApi.Builder()
-            .setClientId(clientId)
-            .setClientSecret(clientSecret)
-            .setRedirectUri(redirectUri)
-            .build();
-
     public static AuthorizationCodeCredentials authorizationCode_Sync(String code) {
+        final String clientId = "5aac3ff5093942be92372c19a12fdecd";
+        //private static final String clientSecret = "clientSecret";
+        final String clientSecret = System.getenv("clientSecret");
+        //private static final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:3000/auth_callback");
+        final URI redirectUri = SpotifyHttpManager.makeUri(System.getenv("redirectURL"));
+
+        final SpotifyApi spotifyApiAuth = new SpotifyApi.Builder()
+                .setClientId(clientId)
+                .setClientSecret(clientSecret)
+                .setRedirectUri(redirectUri)
+                .build();
+
         final AuthorizationCodeRequest authorizationCodeRequest = spotifyApiAuth.authorizationCode(code).build();
         try {
             return authorizationCodeRequest.execute();
@@ -110,7 +109,9 @@ public class SpotifyService {
 
     public static void setSong(String accessToken, String trackId) {
 
-        final SpotifyApi spotifyApi = new SpotifyApi.Builder().setAccessToken(accessToken).build();
+        final SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                .setAccessToken(accessToken)
+                .build();
 
         final StartResumeUsersPlaybackRequest startResumeUsersPlaybackRequest = spotifyApi
                 .startResumeUsersPlayback()
