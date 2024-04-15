@@ -1,15 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 public class PlaylistDTO {
     private String name;
     private String id;
-
-    public PlaylistDTO(String name, String id) {
-        this.name = name;
-        this.id = id;
-    }
-
 }

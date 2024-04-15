@@ -10,22 +10,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user/playlist")
+@RequestMapping("spotify")
 public class SpotifyController {
 
-    @GetMapping("/names")
+    @GetMapping("user/playlist/names")
     public ResponseEntity<PlaylistCollectionDTO> getSpotifyUserId(@RequestParam String accessToken) {
         System.out.println(accessToken);
         // Call the service method and return its response
         PlaylistCollectionDTO dto = SpotifyService.getUserPlaylistNames(accessToken);
 
-        if (dto != null) {
-            // If playlistDTO is not null, return it with HttpStatus.OK
-            return new ResponseEntity<>(dto, HttpStatus.OK);
-        } else {
-            // If there was an error or no playlists were found, return HttpStatus.INTERNAL_SERVER_ERROR
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 }
 
