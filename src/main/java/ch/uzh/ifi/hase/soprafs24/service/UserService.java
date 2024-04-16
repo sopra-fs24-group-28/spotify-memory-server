@@ -53,6 +53,11 @@ public class UserService {
   public User loginUser(String spotifyUserId, SpotifyJWT spotifyJWT) {
       User user = userRepository.findBySpotifyUserId(spotifyUserId);
 
+      // remove old spotifyJWT if already exits (e.g. second login attempt without log out)
+      if (user.getSpotifyJWT() != null) {
+          User loggedOutUser = logoutUser(user);
+      }
+
       // save the spotifyJWT first
       spotifyJWT.setUser(user);
       spotifyJWT = spotifyJWTRepository.save(spotifyJWT);

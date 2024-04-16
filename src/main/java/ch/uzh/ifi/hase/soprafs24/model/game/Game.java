@@ -40,5 +40,6 @@ public class Game {
         this.gameState = GameState.OPEN;
         this.gameParameters = gameParameters;
         this.hostId = host.getUserId();
+        this.cardCollection = new CardCollection(gameParameters, host.getSpotifyJWT().getAccessToken());
     }
 }
