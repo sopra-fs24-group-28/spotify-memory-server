@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.rest.webFilter;
 
-import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.service.AuthService;
 import lombok.AllArgsConstructor;
@@ -31,13 +30,6 @@ public class ManualSecurityFilter  implements Filter {
                 requestUri.startsWith("/auth") && "POST".equalsIgnoreCase(request.getMethod())
                         || requestUri.startsWith("/ws")//TODO: ws endpoint auth?
         ) {
-/*            User user = new User();
-            user.setUserId(1L);
-            user.setUsername("namename");
-            user.setState(UserStatus.ONLINE);
-            user.setSessionToken("toke");
-            user.setSpotifyUserId("userID");
-            UserContextHolder.setCurrentUser(user);*/
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
