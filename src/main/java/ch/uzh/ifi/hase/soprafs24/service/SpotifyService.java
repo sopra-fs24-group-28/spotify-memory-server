@@ -1,7 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlaylistDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlaylistCollectionDTO;
 import lombok.AllArgsConstructor;
@@ -18,9 +16,11 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
+import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.model_objects.specification.User;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetListOfUsersPlaylistsRequest;
+import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 
 import java.io.IOException;
@@ -54,26 +54,16 @@ public class SpotifyService {
             .setRedirectUri(redirectUri)
             .build();
 
-    private UserRepository userRepository;
-
     public static AuthorizationCodeCredentials authorizationCode_Sync(String code) {
         final AuthorizationCodeRequest authorizationCodeRequest = spotifyApiAuth.authorizationCode(code).build();
         try {
-            final AuthorizationCodeCredentials authorizationCodeCredentials = authorizationCodeRequest.execute();
-
-            // Set access and refresh token for further "spotifyApi" object usage
-            // spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
-            // spotifyApi.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
-            // System.out.println("Expires in: " + authorizationCodeCredentials.getExpiresIn());
-
-            return authorizationCodeCredentials;
+            return authorizationCodeRequest.execute();
         }
         catch (IOException | SpotifyWebApiException | ParseException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The authorization code is invalid: " + e.getMessage());
         }
     }
-
-
+    
     public static HashMap<String, String> getUserData(String accessToken) {
 
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
@@ -93,13 +83,13 @@ public class SpotifyService {
             spotifyUserData.put("product", userProfile.getProduct().getType());
 
         } catch (Exception e) {
-            System.out.println("Something went wrong!\n" + e.getMessage());
+            System.out.println("Something went wrong (getUserData)!\n" + e.getMessage());
         }
 
         return spotifyUserData;
     }
 
-    public static PlaylistCollectionDTO getUserPlaylistNames(String accessToken){
+    public static PlaylistCollectionDTO getUserPlaylistNames(String accessToken) {
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();
@@ -123,11 +113,36 @@ public class SpotifyService {
             System.out.println("Error: " + e.getMessage());
             return null;
         }
+    }
 
+    public static ArrayList<String> getPlaylistData(String accessToken, String playlistId) {
 
+        SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                .setAccessToken(accessToken)
+                .build();
 
+        final GetPlaylistsItemsRequest playlistRequest = spotifyApi.getPlaylistsItems(playlistId).build();
 
+        ArrayList<String> songs = null;
+        try {
+            // Execute the request synchronous
+            final Paging<PlaylistTrack> playlistTrackPaging = playlistRequest.execute();
 
+            songs = parsePlaylistTrackPaging(playlistTrackPaging);
 
+        } catch (Exception e) {
+            System.out.println("Something went wrong (getPlaylistData)!\n" + e.getMessage());
+        }
+        return songs;
+    }
+
+    private static ArrayList<String> parsePlaylistTrackPaging(Paging<PlaylistTrack> playlistTrackPaging) {
+        // This function parses only the first page of the paginated PlaylistTrack! (seems to bee 100 songs)
+        ArrayList<String> songIds = new ArrayList<String>();
+
+        for (int i = 0; i < playlistTrackPaging.getItems().length; i++) {
+            songIds.add(playlistTrackPaging.getItems()[i].getTrack().getId());
+        }
+        return songIds;
     }
 }
