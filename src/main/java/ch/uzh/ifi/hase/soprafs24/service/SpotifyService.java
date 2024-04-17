@@ -1,5 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlaylistDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlaylistCollectionDTO;
 import lombok.AllArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
@@ -13,6 +16,11 @@ import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
+import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
+import se.michaelthelin.spotify.model_objects.specification.User;
+import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
+import se.michaelthelin.spotify.requests.data.playlists.GetListOfUsersPlaylistsRequest;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.model_objects.specification.User;
@@ -25,6 +33,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Spotify Service
@@ -84,6 +93,32 @@ public class SpotifyService {
         }
 
         return spotifyUserData;
+    }
+
+    public static PlaylistCollectionDTO getUserPlaylistNames(String accessToken) {
+        SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                .setAccessToken(accessToken)
+                .build();
+        final String userid = getUserData(accessToken).get("id");
+        final GetListOfUsersPlaylistsRequest playlistsRequest = spotifyApi.getListOfUsersPlaylists(userid).build();
+
+        try {
+            final Paging<PlaylistSimplified> playlistSimplifiedPaging = playlistsRequest.execute();
+            List<PlaylistDTO> playlists = new ArrayList<>();
+            for (PlaylistSimplified playlist : playlistSimplifiedPaging.getItems()) {
+                String playlistName = playlist.getName();
+                String playlistId = playlist.getId();
+                playlists.add(new PlaylistDTO(playlistName, playlistId));
+            }
+            PlaylistCollectionDTO playlistCollectionDTO = new PlaylistCollectionDTO();
+            playlistCollectionDTO.setPlaylists(playlists);
+
+            return playlistCollectionDTO;
+
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
     }
 
     public static ArrayList<String> getPlaylistData(String accessToken, String playlistId) {
