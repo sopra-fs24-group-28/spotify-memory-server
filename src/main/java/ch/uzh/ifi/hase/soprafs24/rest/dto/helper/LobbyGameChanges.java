@@ -20,10 +20,10 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LobbyGameChanges {
-    private Change<GameParameters> gameParameters;
-    private Change<List<PlayerDTO>> playerList;
-    private Change<GameState> gameState;
-    private Change<Long> hostId;
+    private Change<GameParameters> gameParameters = Change.of(false, Optional.empty());
+    private Change<List<PlayerDTO>> playerList = Change.of(false, Optional.empty());
+    private Change<GameState> gameState = Change.of(false, Optional.empty());
+    private Change<Long> hostId = Change.of(false, Optional.empty());
 
     // only to be used for game creation
     public LobbyGameChanges (Game game) {
