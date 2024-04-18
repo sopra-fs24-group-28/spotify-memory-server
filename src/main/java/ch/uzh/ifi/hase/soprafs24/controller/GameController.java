@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/game")
+@RequestMapping("/games")
 @AllArgsConstructor
 public class GameController {
 

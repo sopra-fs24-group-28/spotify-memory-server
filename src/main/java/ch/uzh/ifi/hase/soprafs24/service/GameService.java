@@ -60,4 +60,8 @@ public class GameService {
         game.getPlayers().add(user);
         return inMemoryGameRepository.save(game).getPlayers();
     }
+
+    public void runTurn(Integer gameId) {
+
+    }
 }
