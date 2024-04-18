@@ -23,7 +23,7 @@ public class PreflightCorsFilter implements Filter {
         if (request.getMethod().equals("OPTIONS")) {
             response.setHeader("Access-Control-Allow-Origin", "*");
             response.setHeader("Access-Control-Allow-Credentials", "true");
-            response.setHeader("Access-Control-Allow-Methods", "*");
+            response.setHeader("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, PATCH");
             response.setHeader("Access-Control-Allow-Headers", "*");
             response.setStatus(HttpServletResponse.SC_OK);
         } else {

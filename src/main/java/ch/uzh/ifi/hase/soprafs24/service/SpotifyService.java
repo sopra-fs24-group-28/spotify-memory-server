@@ -1,8 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 
-import ch.uzh.ifi.hase.soprafs24.rest.dto.PlaylistDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlaylistCollectionDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlaylistDTO;
 import lombok.AllArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
@@ -21,11 +21,6 @@ import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.model_objects.specification.User;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetListOfUsersPlaylistsRequest;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
-import se.michaelthelin.spotify.model_objects.specification.User;
-import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
-import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 
@@ -69,7 +64,7 @@ public class SpotifyService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The authorization code is invalid: " + e.getMessage());
         }
     }
-    
+
     public static HashMap<String, String> getUserData(String accessToken) {
 
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
