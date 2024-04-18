@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlaylistCollectionDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlaylistDTO;
 import lombok.AllArgsConstructor;
@@ -56,25 +55,15 @@ public class SpotifyService {
             .setRedirectUri(redirectUri)
             .build();
 
-    private UserRepository userRepository;
-
     public static AuthorizationCodeCredentials authorizationCode_Sync(String code) {
         final AuthorizationCodeRequest authorizationCodeRequest = spotifyApiAuth.authorizationCode(code).build();
         try {
-            final AuthorizationCodeCredentials authorizationCodeCredentials = authorizationCodeRequest.execute();
-
-            // Set access and refresh token for further "spotifyApi" object usage
-            // spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
-            // spotifyApi.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
-            // System.out.println("Expires in: " + authorizationCodeCredentials.getExpiresIn());
-
-            return authorizationCodeCredentials;
+            return authorizationCodeRequest.execute();
         }
         catch (IOException | SpotifyWebApiException | ParseException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The authorization code is invalid: " + e.getMessage());
         }
     }
-
 
     public static HashMap<String, String> getUserData(String accessToken) {
 
@@ -95,13 +84,13 @@ public class SpotifyService {
             spotifyUserData.put("product", userProfile.getProduct().getType());
 
         } catch (Exception e) {
-            System.out.println("Something went wrong!\n" + e.getMessage());
+            System.out.println("Something went wrong (getUserData)!\n" + e.getMessage());
         }
 
         return spotifyUserData;
     }
 
-    public static PlaylistCollectionDTO getUserPlaylistNames(String accessToken){
+    public static PlaylistCollectionDTO getUserPlaylistNames(String accessToken) {
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
                 .build();
@@ -125,12 +114,6 @@ public class SpotifyService {
             System.out.println("Error: " + e.getMessage());
             return null;
         }
-
-
-
-
-
-
     }
 
     public static ArrayList<String> getPlaylistData(String accessToken, String playlistId) {
