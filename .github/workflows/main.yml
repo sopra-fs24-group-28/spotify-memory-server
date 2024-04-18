@@ -49,7 +49,7 @@ jobs:
         uses: google-github-actions/deploy-appengine@v2
         with:
           deliverables: app.yaml
-          version: v1
+          version: v2
           env_vars: |-
             clientSecret=${{ secrets.CLIENTSECRET }}
             redirectURL=${{ secrets.REDIRECTURL }}
