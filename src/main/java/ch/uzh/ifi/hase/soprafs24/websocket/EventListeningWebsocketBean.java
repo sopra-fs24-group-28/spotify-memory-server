@@ -19,6 +19,6 @@ public class EventListeningWebsocketBean {
 
     @EventListener
     public void updateGameStatus(GameChangesEvent gameChangesEvent) {
-        template.convertAndSend("/topic/game/" + gameChangesEvent.getGameId(), gameChangesEvent);
+        template.convertAndSend("/queue/games/" + gameChangesEvent.getGameId(), gameChangesEvent);
     }
 }
