@@ -21,6 +21,7 @@ import se.michaelthelin.spotify.requests.authorization.authorization_code.Author
 import se.michaelthelin.spotify.requests.data.playlists.GetListOfUsersPlaylistsRequest;
 import se.michaelthelin.spotify.requests.data.player.PauseUsersPlaybackRequest;
 import se.michaelthelin.spotify.requests.data.player.StartResumeUsersPlaybackRequest;
+import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
@@ -87,6 +88,30 @@ public class SpotifyService {
         }
 
         return spotifyUserData;
+    }
+
+    public static HashMap<String, String> getPlaylistMetadata(String accessToken, String playlistId) {
+
+        SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                .setAccessToken(accessToken)
+                .build();
+
+        final GetPlaylistRequest playlistRequest = spotifyApi.getPlaylist(playlistId).build();
+
+        HashMap<String, String> playlistMetadata = new HashMap<String, String>();
+
+        try {
+            // Execute the request synchronous
+            final Playlist playlist = playlistRequest.execute();
+
+            playlistMetadata.put("playlist_name", playlist.getName());
+            playlistMetadata.put("image_url", playlist.getImages()[0].getUrl());
+
+        } catch (Exception e) {
+            System.out.println("Something went wrong (getPlaylistMetadata)!\n" + e.getMessage());
+        }
+
+        return playlistMetadata;
     }
 
     public static PlaylistCollectionDTO getUserPlaylistNames(String accessToken) {

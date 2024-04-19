@@ -19,6 +19,10 @@ public class GameParameters {
 
     private String playlist;
 
+    private String playlistName = null;
+
+    private String playlistImageUrl = null;
+
     private int streakStart = 3;
 
     private int streakMultiplier = 2;
