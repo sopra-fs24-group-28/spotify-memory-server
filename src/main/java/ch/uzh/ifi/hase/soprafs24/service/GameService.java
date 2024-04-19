@@ -47,11 +47,51 @@ public class GameService {
         }
     }
 
-    public void randomizePlayersIndex(Game currentGame){
-        List<User> players = currentGame.getPlayers();
-        Collections.shuffle(players); // Set players List to random order.
-        currentGame.setPlayers(players);
-        inMemoryGameRepository.save(currentGame);
+    public void terminateGame(Integer gameId, User host) {
+        Game currentGame = inMemoryGameRepository.findById(gameId);
+        Long hostId = host.getUserId();
+        if (Objects.equals(currentGame.getHostId(), hostId)){
+            inMemoryGameRepository.deleteById(currentGame.getGameId());
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to terminate the game.");
+        }
+    }
+
+    public Game addPlayer(Integer gameId, User user){
+        Game currentGame = inMemoryGameRepository.findById(gameId);
+        List<User> currentPlayers = currentGame.getPlayers();
+
+        if (currentPlayers.contains(user)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user is already in the game.");
+        }
+
+        if (currentGame.getGameParameters().getPlayerLimit() > currentPlayers.size()){
+            currentPlayers.add(user);
+        } else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The game is full. Unable to join the game.");
+        }
+        return inMemoryGameRepository.save(currentGame);
+    }
+
+    public Game removePlayer(Integer gameId, User user){
+        Game currentGame = inMemoryGameRepository.findById(gameId);
+        List<User> currentPlayers = currentGame.getPlayers();
+
+        if (currentPlayers.contains(user)){
+            currentPlayers.remove(user);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user is not in the game.");
+        }
+        return inMemoryGameRepository.save(currentGame);
+    }
+
+    public void addPicks(User user, Integer gameId, Integer cardId) {
+        Game currentGame = inMemoryGameRepository.findById(gameId);
+        Turn currentTurn = currentGame.getHistory().get(currentGame.getHistory().size() - 1);
+
+        if (user.getUserId() == currentTurn.getUserId()) {
+            currentTurn.addPick(cardId);
+        }
     }
 
     public void createScoreBoard(Game currentGame){
@@ -63,6 +103,7 @@ public class GameService {
             scoreBoard.put(playerId, 0L);
         }
         currentGame.setScoreBoard(scoreBoard);
+        inMemoryGameRepository.save(currentGame);
     }
 
     public void runTurn(Game currentGame){
@@ -83,6 +124,13 @@ public class GameService {
         currentGame.setActivePlayer(players.get(activePlayerIndex).getUserId());
         Turn turn = new Turn(activePlayer);
         currentGame.getHistory().add(turn);
+        inMemoryGameRepository.save(currentGame);
+    }
+
+    public void randomizePlayersIndex(Game currentGame){
+        List<User> players = currentGame.getPlayers();
+        Collections.shuffle(players); // Set players List to random order.
+        currentGame.setPlayers(players);
         inMemoryGameRepository.save(currentGame);
     }
 
