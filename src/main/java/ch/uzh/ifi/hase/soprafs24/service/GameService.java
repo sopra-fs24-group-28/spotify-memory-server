@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.model.game.Game;
+import ch.uzh.ifi.hase.soprafs24.model.game.GameConstant;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
@@ -33,38 +34,24 @@ public class GameService {
     public Game startGame(Integer gameId, User host) {
         Game currentGame = inMemoryGameRepository.findById(gameId);
         Long hostId = host.getUserId();
-        if (currentGame.getPlayers().size() >=2 && Objects.equals(currentGame.getHostId(), hostId)){
+        if (currentGame.getPlayers().size() >= GameConstant.getMinPlayers() && Objects.equals(currentGame.getHostId(), hostId)){
             currentGame.setGameState(GameState.ONPLAY);
 
-            // randomizePlayers(currentGame) * if needed
+            // randomizePlayersIndex(currentGame) * if needed
             // createCardCollection(currentGame.getGameParameters());
             createScoreBoard(currentGame);
-
-            setActivePlayer(currentGame);
-            beginTurn(currentGame);
-
-            return currentGame;
+            runTurn(currentGame);
+            return inMemoryGameRepository.save(currentGame);
         } else {
          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to start the game.");
         }
     }
 
-    public void randomizePlayers(Game currentGame){
+    public void randomizePlayersIndex(Game currentGame){
         List<User> players = currentGame.getPlayers();
         Collections.shuffle(players); // Set players List to random order.
         currentGame.setPlayers(players);
-    }
-
-    public void setActivePlayer(Game currentGame){
-        List<User> players = currentGame.getPlayers();
-        Long activePlayer = currentGame.getActivePlayer();
-
-        if (activePlayer == null) {
-            currentGame.setActivePlayer(0L); // TODO: activePlayer as a userID or Index of Players?
-        } else {
-            activePlayer++;
-            currentGame.setActivePlayer(activePlayer%players.size()); //Set new activePlayer
-        }
+        inMemoryGameRepository.save(currentGame);
     }
 
     public void createScoreBoard(Game currentGame){
@@ -78,11 +65,25 @@ public class GameService {
         currentGame.setScoreBoard(scoreBoard);
     }
 
-    public void beginTurn(Game currentGame){
+    public void runTurn(Game currentGame){
         List<User> players = currentGame.getPlayers();
         Long activePlayer = currentGame.getActivePlayer();
+        int activePlayerIndex;
 
-        Turn turn = new Turn(players.get(Math.toIntExact(activePlayer)).getUserId());
+        if (activePlayer == null) {
+            activePlayerIndex = 0;
+        } else {
+            activePlayerIndex = players.indexOf(userRepository.findByUserId(activePlayer));
+            activePlayerIndex++;
+            if (activePlayerIndex == players.size()){
+                activePlayerIndex = 0;
+            }
+        }
+
+        currentGame.setActivePlayer(players.get(activePlayerIndex).getUserId());
+        Turn turn = new Turn(activePlayer);
+        currentGame.getHistory().add(turn);
+        inMemoryGameRepository.save(currentGame);
     }
 
 
