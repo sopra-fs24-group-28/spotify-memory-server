@@ -1,14 +1,12 @@
 package ch.uzh.ifi.hase.soprafs24.model.game;
 
+import ch.uzh.ifi.hase.soprafs24.constant.game.CardState;
 import ch.uzh.ifi.hase.soprafs24.constant.game.GameCategory;
 import ch.uzh.ifi.hase.soprafs24.service.SpotifyService;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
@@ -72,6 +70,15 @@ public class CardCollection {
         }
         // return true if all picks match or less than 2 picks have been recorded
         return result;
+    }
+
+    public HashMap<Integer, CardState> getAllCardStates() {
+        // function that returns a hashmap of cardId, CardState pairs
+        HashMap<Integer, CardState> allCardStates = new HashMap<Integer, CardState>();
+        for (Card card: this.cards) {
+            allCardStates.put(card.getCardId(), card.getCardState());
+        }
+        return allCardStates;
     }
 
     public Card getCardById(Integer cardId) {

@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.constant.game.CardState;
 import ch.uzh.ifi.hase.soprafs24.model.game.Card;
 import ch.uzh.ifi.hase.soprafs24.model.game.CardCollection;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
@@ -145,6 +146,38 @@ public class CardCollectionTest {
             // Assert that the function returns false if the cards don't match
             assertFalse(cardCollection.checkMatch(Arrays.asList(new Integer[]{card1.getCardId(), card3_not_matching.getCardId()})));
             assertFalse(cardCollection.checkMatch(Arrays.asList(new Integer[]{card2_matching_card1.getCardId(), card3_not_matching.getCardId()})));
+        }
+    }
+
+    @Test
+    void testGetAllCardStates() {
+        try (MockedStatic<SpotifyService> mockedSpotifyService = mockStatic(SpotifyService.class)) {
+            // Create return Data for SpotifyService.getPlaylistData()
+            ArrayList<ArrayList<String>> returnArray = new ArrayList<ArrayList<String>>() {{
+                add(new ArrayList<String>() {{
+                    add("song1");
+                    add("url1");
+                }});
+                add(new ArrayList<String>() {{
+                    add("song2");
+                    add("url2");
+                }});
+            }};
+
+            // Mock the behavior of SpotifyService.getPlaylistData
+            when(SpotifyService.getPlaylistData("accessToken", "playlist", 2)).thenReturn(returnArray);
+
+            GameParameters gameParameters = new GameParameters(5,2,2, STANDARDSONG,"playlist",1,1,10,15);
+            // Create a CardCollection instance
+            CardCollection cardCollection = new CardCollection(gameParameters, "accessToken");
+
+            // Make sure that getAllCardStates returns a Hashmap of correct length and that first card is FACEDOWN
+            assertEquals(4, cardCollection.getAllCardStates().size());
+            assertEquals(CardState.FACEDOWN, cardCollection.getAllCardStates().get(cardCollection.getCards().get(0).getCardId()));
+
+            // Turn first card and make sure it is now FACEUP
+            cardCollection.getCards().get(0).setCardState(CardState.FACEUP);
+            assertEquals(CardState.FACEUP, cardCollection.getAllCardStates().get(cardCollection.getCards().get(0).getCardId()));
         }
     }
 }
