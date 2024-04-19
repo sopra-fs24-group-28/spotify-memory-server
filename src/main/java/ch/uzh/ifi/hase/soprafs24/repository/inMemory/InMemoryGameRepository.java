@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,20 +25,25 @@ public class InMemoryGameRepository implements GameRepository {
 
     @Override
     public Game save(Game game) {
-        game.setGameId(currentId.getAndIncrement());
+        if (game.getGameId() == null){
+            game.setGameId(currentId.getAndIncrement());
+        }
         games.put(game.getGameId(), game);
         return game;
     }
 
-    // QUESTION: Is setting nullable necessary?
     @Override
     public Game findById(Integer id) {
         return games.get(id);
-        //return Optional.ofNullable(games.get(id));
     }
 
     @Override
     public void deleteById(Integer id) {
         games.remove(id);
+    }
+
+    @Override
+    public List<Game> findAll() {
+        return new ArrayList<>(games.values());
     }
 }
