@@ -28,7 +28,7 @@ public class ManualSecurityFilter  implements Filter {
 
         if (
                 requestUri.startsWith("/auth") && "POST".equalsIgnoreCase(request.getMethod())
-                        || requestUri.startsWith("/ws") //TODO: ws endpoint auth?
+                        || requestUri.startsWith("/ws")//TODO: ws endpoint auth?
         ) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;

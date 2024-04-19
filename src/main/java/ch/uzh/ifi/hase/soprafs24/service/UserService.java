@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.datasource.UserCredentialsDataSourceAdapter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -51,6 +52,11 @@ public class UserService {
 
   public User loginUser(String spotifyUserId, SpotifyJWT spotifyJWT) {
       User user = userRepository.findBySpotifyUserId(spotifyUserId);
+
+      // remove old spotifyJWT if already exits (e.g. second login attempt without log out)
+      if (user.getSpotifyJWT() != null) {
+          User loggedOutUser = logoutUser(user);
+      }
 
       // save the spotifyJWT first
       spotifyJWT.setUser(user);
@@ -108,6 +114,11 @@ public class UserService {
 
   public User getUserBySessionToken(String sessionToken) {
       return userRepository.findBySessionToken(sessionToken);
+  }
+
+  public User setPlayerState(User user, UserStatus userStatus) {
+      user.setState(userStatus);
+      return userRepository.saveAndFlush(user);
   }
 
 }
