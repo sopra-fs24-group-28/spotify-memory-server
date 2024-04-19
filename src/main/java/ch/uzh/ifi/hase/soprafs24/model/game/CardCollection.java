@@ -16,7 +16,7 @@ public class CardCollection {
 
     // cards are created in the constructor
     public CardCollection(GameParameters gameParameters, String accessToken) {
-        ArrayList<ArrayList<String>> songs = SpotifyService.getPlaylistData(accessToken, gameParameters.getPlaylist(), gameParameters.getNumOfSets());
+        ArrayList<ArrayList<String>> songs = SpotifyService.getPlaylistData(accessToken, gameParameters.getPlaylist().getPlaylistId(), gameParameters.getNumOfSets());
 
         // outer loop over the number of sets
         for (int i=0; i<gameParameters.getNumOfSets(); i++) {

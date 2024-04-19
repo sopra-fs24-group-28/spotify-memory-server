@@ -66,11 +66,11 @@ public class GameService {
     private Game setPlaylistNameAndURL(Game game) {
          HashMap<String,String> playlistMetadata = SpotifyService.getPlaylistMetadata(
                  UserContextHolder.getCurrentUser().getSpotifyJWT().getAccessToken(),
-                 game.getGameParameters().getPlaylist()
+                 game.getGameParameters().getPlaylist().getPlaylistId()
          );
 
-        game.getGameParameters().setPlaylistName(playlistMetadata.get("playlist_name"));
-        game.getGameParameters().setPlaylistImageUrl(playlistMetadata.get("image_url"));
+        game.getGameParameters().getPlaylist().setPlaylistName(playlistMetadata.get("playlist_name"));
+        game.getGameParameters().getPlaylist().setPlaylistImageUrl(playlistMetadata.get("image_url"));
 
         return inMemoryGameRepository.save(game);
     }
