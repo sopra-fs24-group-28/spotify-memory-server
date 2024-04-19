@@ -28,16 +28,28 @@
 * [#55] Prepare game state (e.g. Scoreboard, Turn object) (IN progress)
 * [#56] Upon valid request to start game, close lobby to new players and start Game (IN Progress)
 
+### Week 4
+* [#88](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/88) Persistance with Google cloud SQL
+* [#55](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/55) Prepare game state (e.g. Scoreboard, Turn object) (In Progress with helper functions)
+* [#56] Upon valid request to start game, close lobby to new players and start Game (pull request)
+
 ## Nicolas
-### Week 1 (& Easter Break)
+### Week 1
 * [#91](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/91) Get initial Access Token from Spotify
 * [#34](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/34) Check validity of User Keys
+
+### Week 2 (Easter Break)
 * [#87](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/87) Check if user exists in database, create new entry if does not exist
 * [#95](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/95) Create GET auth/token endpoint to send spotify access token to front-end
 
-## Week 3
+### Week 3
 * [#99](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/99) Get card data from Spotify
 * [#100](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/100) Create CardCollection
+
+### Week 4
+* [#63](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/63) Helper functions SpotifyService.setSong() and CardCollection.checkMatch()
+* Wrote tests for CardCollection functions
+* Helped to implement Persistance & get user Playlists
 
 ## Niklas
 ### Week 1
