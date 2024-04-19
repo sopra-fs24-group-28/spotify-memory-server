@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,10 +13,10 @@ import java.util.List;
 @Setter
 public class CardCollection {
     private List<Card> cards = new ArrayList<>();
-    private HashMap<Integer, List<Integer>> matchingCards = new HashMap<Integer, List<Integer>>();;
+    private HashMap<Integer, List<Integer>> matchingCards = new HashMap<Integer, List<Integer>>();
 
     // cards are created in the constructor
-    CardCollection(GameParameters gameParameters, String accessToken) {
+    public CardCollection(GameParameters gameParameters, String accessToken) {
         ArrayList<String> songIds = SpotifyService.getPlaylistData(accessToken, gameParameters.getPlaylist());
 
         // outer loop over the number of sets
@@ -43,5 +44,31 @@ public class CardCollection {
                 this.matchingCards.put(newCardIds.get(j), matching);
             }
         }
+        Collections.shuffle(this.cards);
+    }
+
+    public Boolean checkMatch(List<Integer> picks) {
+        boolean result = true;
+        if (picks.size() >= 2) {
+            // get the list of matching cards for the first pick
+            List<Integer> matching = this.matchingCards.get(picks.get(0));
+            for (int i = 1; i < picks.size(); i++) {
+                if (!matching.contains(picks.get(i))) {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        // return true if all picks match or less than 2 picks have been recorded
+        return result;
+    }
+
+    public Card getCardById(Integer cardId) {
+        for (Card card : this.cards) {
+            if (card.getCardId() == cardId) {
+                return card;
+            }
+        }
+        return null;
     }
 }
