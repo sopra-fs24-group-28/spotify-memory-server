@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.model.game;
 
+import ch.uzh.ifi.hase.soprafs24.constant.game.GameCategory;
 import ch.uzh.ifi.hase.soprafs24.service.SpotifyService;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +18,7 @@ public class CardCollection {
 
     // cards are created in the constructor
     public CardCollection(GameParameters gameParameters, String accessToken) {
-        ArrayList<String> songIds = SpotifyService.getPlaylistData(accessToken, gameParameters.getPlaylist());
+        ArrayList<ArrayList<String>> songs = SpotifyService.getPlaylistData(accessToken, gameParameters.getPlaylist(), gameParameters.getNumOfSets());
 
         // outer loop over the number of sets
         for (int i=0; i<gameParameters.getNumOfSets(); i++) {
@@ -26,7 +27,17 @@ public class CardCollection {
             List<Integer> newCardIds = new ArrayList<>();
             // inner loop over the number of cards per set to create cards
             for (int j=0; j<gameParameters.getNumOfCardsPerSet(); j++) {
-                Card newCard = new Card(songIds.get(i));
+                Card newCard;
+
+                // create new card (content depends on GameCategory)
+                if (gameParameters.getGameCategory() == GameCategory.STANDARDSONG) {
+                    newCard = new Card(songs.get(i).get(0), null);
+                } else if (gameParameters.getGameCategory() == GameCategory.STANDARDALBUMCOVER) {
+                    newCard = new Card(null, songs.get(i).get(1));
+                } else {
+                    newCard = new Card(null, null);
+                }
+
                 newCards.add(newCard);
                 newCardIds.add(newCard.getCardId());
             }

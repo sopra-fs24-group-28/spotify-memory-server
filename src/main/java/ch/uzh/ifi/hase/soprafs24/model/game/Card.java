@@ -10,16 +10,17 @@ import java.util.Random;
 @Setter
 public class Card {
     private int cardId;
-    private String content;
+    private String songId;
+    private String imageUrl;
     private CardState cardState;
 
-    Card(String content) {
+    Card(String songId, String imageUrl) {
         Random random = new Random();
 
         // upper bound in nextInt corresponds to max positive integer
         this.cardId = random.nextInt(2147483647);
-        this.content = content;
+        this.songId = songId;
+        this.imageUrl = imageUrl;
         this.cardState = CardState.FACEDOWN;
-
     }
 }

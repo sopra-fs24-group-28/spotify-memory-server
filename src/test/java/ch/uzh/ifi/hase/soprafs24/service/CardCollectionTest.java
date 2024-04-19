@@ -5,6 +5,8 @@ import ch.uzh.ifi.hase.soprafs24.model.game.CardCollection;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+
+import static ch.uzh.ifi.hase.soprafs24.constant.game.GameCategory.STANDARDALBUMCOVER;
 import static ch.uzh.ifi.hase.soprafs24.constant.game.GameCategory.STANDARDSONG;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -15,18 +17,29 @@ import java.util.Arrays;
 public class CardCollectionTest {
 
     @Test
-    void testConstructor() throws Exception {
+    void testConstructorStandardsong() throws Exception {
         final int numOfSets = 3;
         final int numOfCardsPerSet = 3;
 
         try (MockedStatic<SpotifyService> mocked = mockStatic(SpotifyService.class)) {
-            ArrayList<String> returnArray = new ArrayList<>();
-            returnArray.add("song1");
-            returnArray.add("song2");
-            returnArray.add("song3");
+            // Create return Data for SpotifyService.getPlaylistData()
+            ArrayList<ArrayList<String>> returnArray = new ArrayList<ArrayList<String>>() {{
+                add(new ArrayList<String>() {{
+                    add("song1");
+                    add("url");
+                }});
+                add(new ArrayList<String>() {{
+                    add("song2");
+                    add("url");
+                }});
+                add(new ArrayList<String>() {{
+                    add("song3");
+                    add("url");
+                }});
+            }};
 
             // Mock the behavior of SpotifyService.getPlaylistData
-            when(SpotifyService.getPlaylistData("accessToken", "playlist")).thenReturn(returnArray);
+            when(SpotifyService.getPlaylistData("accessToken", "playlist", 3)).thenReturn(returnArray);
 
             GameParameters gameParameters = new GameParameters(5,numOfSets,numOfCardsPerSet, STANDARDSONG,"playlist",1,1,10,15);
             // Create a CardCollection instance
@@ -40,19 +53,73 @@ public class CardCollectionTest {
             // Assert that the matching cards have the same content
             Card card1 = cardCollection.getCards().get(0);
             Card card2 = cardCollection.getCardById(cardCollection.getMatchingCards().get(card1.getCardId()).get(0));
-            assertEquals(card1.getContent(), card2.getContent());
+            assertEquals(card1.getSongId(), card2.getSongId());
+            assertNull(card1.getImageUrl());
+            assertNull(card2.getImageUrl());
+        }
+    }
+
+    @Test
+    void testConstructorStandardalbumcover() throws Exception {
+        final int numOfSets = 3;
+        final int numOfCardsPerSet = 3;
+
+        try (MockedStatic<SpotifyService> mocked = mockStatic(SpotifyService.class)) {
+            // Create return Data for SpotifyService.getPlaylistData()
+            ArrayList<ArrayList<String>> returnArray = new ArrayList<ArrayList<String>>() {{
+                add(new ArrayList<String>() {{
+                    add("song1");
+                    add("url");
+                }});
+                add(new ArrayList<String>() {{
+                    add("song2");
+                    add("url");
+                }});
+                add(new ArrayList<String>() {{
+                    add("song3");
+                    add("url");
+                }});
+            }};
+
+            // Mock the behavior of SpotifyService.getPlaylistData
+            when(SpotifyService.getPlaylistData("accessToken", "playlist", 3)).thenReturn(returnArray);
+
+            GameParameters gameParameters = new GameParameters(5,numOfSets,numOfCardsPerSet, STANDARDALBUMCOVER,"playlist",1,1,10,15);
+            // Create a CardCollection instance
+            CardCollection cardCollection = new CardCollection(gameParameters, "accessToken");
+
+            // Assert that cards and matchingCards have the right shape
+            assertEquals(numOfSets * numOfCardsPerSet, cardCollection.getCards().size());
+            assertEquals(numOfSets * numOfCardsPerSet, cardCollection.getMatchingCards().size());
+            assertEquals(numOfCardsPerSet - 1, cardCollection.getMatchingCards().get(cardCollection.getCards().get(0).getCardId()).size());
+
+            // Assert that the matching cards have the same content
+            Card card1 = cardCollection.getCards().get(0);
+            Card card2 = cardCollection.getCardById(cardCollection.getMatchingCards().get(card1.getCardId()).get(0));
+            assertEquals(card1.getImageUrl(), card2.getImageUrl());
+            assertEquals("url", card1.getImageUrl());
+            assertNull(card1.getSongId());
+            assertNull(card2.getSongId());
         }
     }
 
     @Test
     void testCheckMatch() {
         try (MockedStatic<SpotifyService> mockedSpotifyService = mockStatic(SpotifyService.class)) {
-            ArrayList<String> returnArray = new ArrayList<>();
-            returnArray.add("song1");
-            returnArray.add("song2");
+            // Create return Data for SpotifyService.getPlaylistData()
+            ArrayList<ArrayList<String>> returnArray = new ArrayList<ArrayList<String>>() {{
+                add(new ArrayList<String>() {{
+                    add("song1");
+                    add("url1");
+                }});
+                add(new ArrayList<String>() {{
+                    add("song2");
+                    add("url2");
+                }});
+            }};
 
             // Mock the behavior of SpotifyService.getPlaylistData
-            when(SpotifyService.getPlaylistData("accessToken", "playlist")).thenReturn(returnArray);
+            when(SpotifyService.getPlaylistData("accessToken", "playlist", 2)).thenReturn(returnArray);
 
             GameParameters gameParameters = new GameParameters(5,2,2, STANDARDSONG,"playlist",1,1,10,15);
             // Create a CardCollection instance

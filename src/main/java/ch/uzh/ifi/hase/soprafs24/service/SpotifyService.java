@@ -16,15 +16,13 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistSimplified;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
-import se.michaelthelin.spotify.model_objects.specification.User;
+import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetListOfUsersPlaylistsRequest;
 import se.michaelthelin.spotify.requests.data.player.PauseUsersPlaybackRequest;
 import se.michaelthelin.spotify.requests.data.player.StartResumeUsersPlaybackRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
+import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 
 import java.io.IOException;
@@ -40,7 +38,6 @@ import java.util.List;
  */
 @Service
 @Transactional
-@AllArgsConstructor
 public class SpotifyService {
 
     private final Logger log = LoggerFactory.getLogger(SpotifyService.class);
@@ -118,7 +115,7 @@ public class SpotifyService {
         }
     }
 
-    public static ArrayList<String> getPlaylistData(String accessToken, String playlistId) {
+    public static ArrayList<ArrayList<String>> getPlaylistData(String accessToken, String playlistId, Integer numOfSongs) {
 
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
                 .setAccessToken(accessToken)
@@ -126,12 +123,12 @@ public class SpotifyService {
 
         final GetPlaylistsItemsRequest playlistRequest = spotifyApi.getPlaylistsItems(playlistId).build();
 
-        ArrayList<String> songs = null;
+        ArrayList<ArrayList<String>> songs = null;
         try {
             // Execute the request synchronous
             final Paging<PlaylistTrack> playlistTrackPaging = playlistRequest.execute();
 
-            songs = parsePlaylistTrackPaging(playlistTrackPaging);
+            songs = parsePlaylistTrackPaging(playlistTrackPaging, accessToken, numOfSongs);
 
         } catch (Exception e) {
             System.out.println("Something went wrong (getPlaylistData)!\n" + e.getMessage());
@@ -164,13 +161,39 @@ public class SpotifyService {
         }
     }
 
-    private static ArrayList<String> parsePlaylistTrackPaging(Paging<PlaylistTrack> playlistTrackPaging) {
+    private static ArrayList<ArrayList<String>> parsePlaylistTrackPaging(Paging<PlaylistTrack> playlistTrackPaging, String accessToken, Integer numOfSongs) {
         // This function parses only the first page of the paginated PlaylistTrack! (seems to bee 100 songs)
-        ArrayList<String> songIds = new ArrayList<String>();
+        ArrayList<ArrayList<String>> songs = new ArrayList<ArrayList<String>>();
 
-        for (int i = 0; i < playlistTrackPaging.getItems().length; i++) {
-            songIds.add(playlistTrackPaging.getItems()[i].getTrack().getId());
+        int numSongs = Math.min(numOfSongs, playlistTrackPaging.getItems().length);
+
+        for (int i = 0; i < numSongs; i++) {
+            ArrayList<String> song = new ArrayList<String>();
+            String trackId = playlistTrackPaging.getItems()[i].getTrack().getId();
+            song.add(trackId);
+            song.add(getTrackAlbumCover(accessToken, trackId));
+            songs.add(song);
         }
-        return songIds;
+        return songs;
+    }
+
+    private static String getTrackAlbumCover(String accessToken, String trackId) {
+
+        SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                .setAccessToken(accessToken)
+                .build();
+
+        final GetTrackRequest trackRequest = spotifyApi.getTrack(trackId).build();
+
+        String trackAlbumCover = null;
+        try {
+            // Execute the request synchronous
+            final Track track = trackRequest.execute();
+            trackAlbumCover = track.getAlbum().getImages()[0].getUrl();
+
+        } catch (Exception e) {
+            System.out.println("Something went wrong (getTrackAlbumCover)!\n" + e.getMessage());
+        }
+        return trackAlbumCover;
     }
 }
