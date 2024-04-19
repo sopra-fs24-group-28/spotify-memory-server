@@ -10,6 +10,11 @@
 ### Week 3
 * [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) websocket for lobby overview somewhat works
 
+### Week 4
+* [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) lobby overview websocket data works and is deployable
+* [client-#28](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/28) lobby overview rest request consumed and displayed
+* [client-#29](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/29) lobby overview ws request consumed and overview updated, minor bug found upon deployment
+
 ## Elias
 ### Week 1
 * [#89](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/89) Changes As Requested (Game related Objects and Game creation)
