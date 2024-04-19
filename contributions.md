@@ -27,8 +27,7 @@
 * [#74](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/74#issue-2203802887) If the host has left the lobby, close the game and WebSocket
 * [#73](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/73#issue-2203802872) If the user leaves the game, remove user from Game
 * [#41](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/41#issue-2203432033) Open a WebSocket connection from the back-end
-* [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) lobby overview websocket deployed (with Diyar)
-
+* [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) lobby overview websocket deployed (with Diyar & Niklas)
 
 ## Henry
 
