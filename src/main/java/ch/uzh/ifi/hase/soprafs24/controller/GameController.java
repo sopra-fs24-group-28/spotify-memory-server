@@ -7,7 +7,7 @@ import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyOverviewDto;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PostGameStartDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.helper.LobbyGame;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGameDto;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
@@ -49,7 +49,7 @@ public class GameController {
             for (User user: game.getPlayers()) {
                 players.add(new PlayerDTO(user));
             }
-            LobbyGame lobbyGame = new LobbyGame(game.getGameParameters(), players, game.getGameState(), game.getHostId());
+            LobbyGameDto lobbyGame = new LobbyGameDto(game.getGameParameters(), players, game.getGameState(), game.getHostId());
             lobbyOverviewDto.getGames().put(game.getGameId(), lobbyGame);
         }
 
@@ -61,7 +61,11 @@ public class GameController {
     public void addPlayerToGame(@PathVariable Integer gameId) {
         List<User> users = gameService.addPlayerToGame(gameId);
 
-        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId ,users));
+        List<PlayerDTO> playerDTOList = users.stream()
+                .map(PlayerDTO::new)
+                .toList();
+
+        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId ,playerDTOList));
     }
 
     @DeleteMapping("/{gameId}/player")
@@ -72,7 +76,10 @@ public class GameController {
         if (users == null) {
             eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, GameState.FINISHED));
         } else {
-            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId , users));
+            List<PlayerDTO> playerDTOList = users.stream()
+                    .map(PlayerDTO::new)
+                    .toList();
+            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId , playerDTOList));
         }
 
     }

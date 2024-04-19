@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-import ch.uzh.ifi.hase.soprafs24.rest.dto.helper.LobbyGame;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,5 +12,5 @@ import java.util.HashMap;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LobbyOverviewDto {
-    private HashMap<Integer, LobbyGame> games = new HashMap<>();
+    private HashMap<Integer, LobbyGameDto> games = new HashMap<>();
 }
