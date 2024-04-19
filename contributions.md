@@ -55,7 +55,7 @@
 ### Week 4
 * no issue: made whole allplication responsive
 * collaborated with elias on getting websockets running for the overview
-* [*18] implemented the Gamescreen including the Gamecards
+* [#18] implemented the Gamescreen including the Gamecards
 * implemented logic in inbetween state of games
 * [#13 / #15] implemented scoreboard
 * no issue: resolved old legacy bugs in frontend
