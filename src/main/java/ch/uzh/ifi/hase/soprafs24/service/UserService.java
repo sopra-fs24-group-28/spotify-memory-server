@@ -105,6 +105,10 @@ public class UserService {
     }
   }
 
+  public User findUserByUserId (Long id) {
+      return userRepository.findByUserId(id);
+  }
+
   public boolean userExists(User user) {
       User userBySpotifyId = userRepository.findBySpotifyUserId(user.getSpotifyUserId());
 
