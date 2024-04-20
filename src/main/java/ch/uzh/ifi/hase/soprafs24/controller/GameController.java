@@ -7,13 +7,13 @@ import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
-import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,7 +22,6 @@ import java.util.List;
 public class GameController {
 
     private final GameService gameService;
-    private final UserService userService;
 
     private ApplicationEventPublisher eventPublisher;
 
@@ -44,11 +43,11 @@ public class GameController {
         LobbyOverviewDto lobbyOverviewDto = new LobbyOverviewDto();
 
         for (Game game : games) {
-            LobbyGameDto lobbyGame = new LobbyGameDto(
-                    game.getGameParameters(),
-                    userService.getPlayerDTOListFromListOfUsers(game.getPlayers()),
-                    game.getGameState(),
-                    game.getHostId());
+            List<PlayerDTO> players = new ArrayList<>();
+            for (User user: game.getPlayers()) {
+                players.add(new PlayerDTO(user));
+            }
+            LobbyGameDto lobbyGame = new LobbyGameDto(game.getGameParameters(), players, game.getGameState(), game.getHostId());
             lobbyOverviewDto.getGames().put(game.getGameId(), lobbyGame);
         }
 
@@ -60,10 +59,11 @@ public class GameController {
     public void addPlayerToGame(@PathVariable Integer gameId) {
         List<User> users = gameService.addPlayerToGame(gameId);
 
-        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(
-                this,
-                gameId,
-                userService.getPlayerDTOListFromListOfUsers(users)));
+        List<PlayerDTO> playerDTOList = users.stream()
+                .map(PlayerDTO::new)
+                .toList();
+
+        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId ,playerDTOList));
     }
 
     @DeleteMapping("/{gameId}/player")
@@ -72,32 +72,22 @@ public class GameController {
         List<User> users = gameService.removePlayerFromGame(gameId);
 
         if (users == null) {
-            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(
-                    this,
-                    gameId,
-                    GameState.FINISHED));
+            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, GameState.FINISHED));
         } else {
-            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(
-                    this,
-                    gameId,
-                    userService.getPlayerDTOListFromListOfUsers(users)));
+            List<PlayerDTO> playerDTOList = users.stream()
+                    .map(PlayerDTO::new)
+                    .toList();
+            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId , playerDTOList));
         }
 
     }
 
-    @GetMapping("/{gameId}")
-    @ResponseStatus(HttpStatus.OK)
-    public LobbyGameDto getGameById(@PathVariable Integer gameId) {
-        Game game = gameService.getGameById(gameId);
-        return new LobbyGameDto(game.getGameParameters(), userService.getPlayerDTOListFromListOfUsers(game.getPlayers()), game.getGameState(), game.getHostId());
-    }
 
 
     @PostMapping("/{gameId}") // TODO: change to websocket
     @ResponseStatus(HttpStatus.OK)
     public GameDTO startGame(@PathVariable Integer gameId) {
-        User host = UserContextHolder.getCurrentUser();
-        Game game = gameService.startGame(gameId, host); // TODO: remove id and get User from SecContext in Service
-        return new GameDTO(userService.getPlayerDTOListFromListOfUsers(game.getPlayers()), game.getActivePlayer(), game.getHostId(), game.getScoreBoard(), game.getGameParameters());
+        Game game = gameService.startGame(gameId);
+        return new GameDTO(game.getPlayers(), game.getActivePlayer(), game.getHostId(), game.getScoreBoard(), game.getGameParameters());
     }
 }
