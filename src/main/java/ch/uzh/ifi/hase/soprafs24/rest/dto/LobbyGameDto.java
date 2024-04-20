@@ -1,8 +1,7 @@
-package ch.uzh.ifi.hase.soprafs24.rest.dto.helper;
+package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class LobbyGame {
+public class LobbyGameDto {
     private GameParameters gameParameters;
     private List<PlayerDTO> playerList;
     private GameState gameState;
