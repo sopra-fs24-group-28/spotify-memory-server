@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.*;
 
 @Service
 @Transactional
@@ -35,6 +36,7 @@ public class GameService {
          }
          Game newGame = new Game(gameParameters, host);
          addPlayerToGame(newGame, host);
+         setPlaylistNameAndURL(newGame);
          return inMemoryGameRepository.save(newGame);
      }
 
@@ -125,6 +127,18 @@ public class GameService {
          userService.setPlayerState(user, UserStatus.INGAME);
         game.getPlayers().add(user);
         return inMemoryGameRepository.save(game).getPlayers();
+    }
+
+    private Game setPlaylistNameAndURL(Game game) {
+         HashMap<String,String> playlistMetadata = SpotifyService.getPlaylistMetadata(
+                 UserContextHolder.getCurrentUser().getSpotifyJWT().getAccessToken(),
+                 game.getGameParameters().getPlaylist().getPlaylistId()
+         );
+
+        game.getGameParameters().getPlaylist().setPlaylistName(playlistMetadata.get("playlist_name"));
+        game.getGameParameters().getPlaylist().setPlaylistImageUrl(playlistMetadata.get("image_url"));
+
+        return inMemoryGameRepository.save(game);
     }
 
     public void runTurn(Integer gameId) {
