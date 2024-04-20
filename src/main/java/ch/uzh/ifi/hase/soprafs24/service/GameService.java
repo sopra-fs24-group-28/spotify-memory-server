@@ -37,7 +37,7 @@ public class GameService {
      }
 
     public Game startGame(Integer gameId, User host) {
-        Game currentGame = inMemoryGameRepository.findById(gameId);
+        Game currentGame = inMemoryGameRepository.findById(gameId).orElseThrow();
         Long hostId = host.getUserId();
         if (currentGame.getPlayers().size() >= GameConstant.getMinPlayers() && Objects.equals(currentGame.getHostId(), hostId)){
             currentGame.setGameState(GameState.ONPLAY);
@@ -45,7 +45,7 @@ public class GameService {
             // randomizePlayersIndex(currentGame) * if needed
             // createCardCollection(currentGame.getGameParameters());
             createScoreBoard(currentGame);
-            runTurn(currentGame);
+            initiateNewTurn(currentGame);
             return inMemoryGameRepository.save(currentGame);
         } else {
          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to start the game.");
@@ -68,9 +68,10 @@ public class GameService {
             scoreBoard.put(playerId, 0L);
         }
         currentGame.setScoreBoard(scoreBoard);
+        inMemoryGameRepository.save(currentGame);
     }
 
-    public void runTurn(Game currentGame){
+    public void initiateNewTurn(Game currentGame){
         List<User> players = currentGame.getPlayers();
         Long activePlayer = currentGame.getActivePlayer();
         int activePlayerIndex;
@@ -100,13 +101,13 @@ public class GameService {
 
      public List<User> addPlayerToGame(Integer gameId) {
          User newUser = UserContextHolder.getCurrentUser();
-         Game game = inMemoryGameRepository.findById(gameId);
+         Game game = inMemoryGameRepository.findById(gameId).orElseThrow();
          return addPlayerToGame(game, newUser);
      }
 
      public List<User> removePlayerFromGame(Integer gameId) {
          User userToRemove = UserContextHolder.getCurrentUser();
-         Game game = inMemoryGameRepository.findById(gameId);
+         Game game = inMemoryGameRepository.findById(gameId).orElseThrow();
          userService.setPlayerState(userToRemove, UserStatus.ONLINE);
          if (game.getHostId().equals(userToRemove.getUserId())) {
              inMemoryGameRepository.deleteById(gameId);
