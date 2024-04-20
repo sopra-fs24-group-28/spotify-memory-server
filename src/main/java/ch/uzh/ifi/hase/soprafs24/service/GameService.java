@@ -3,11 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.model.game.Game;
-import ch.uzh.ifi.hase.soprafs24.model.game.GameConstant;
-import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
-import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.model.game.*;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import lombok.AllArgsConstructor;
@@ -36,14 +32,15 @@ public class GameService {
          return inMemoryGameRepository.save(newGame);
      }
 
-    public Game startGame(Integer gameId, User host) {
+    public Game startGame(Integer gameId) {
         Game currentGame = inMemoryGameRepository.findById(gameId).orElseThrow();
+        User host = UserContextHolder.getCurrentUser();
         Long hostId = host.getUserId();
         if (currentGame.getPlayers().size() >= GameConstant.getMinPlayers() && Objects.equals(currentGame.getHostId(), hostId)){
             currentGame.setGameState(GameState.ONPLAY);
 
-            // randomizePlayersIndex(currentGame) * if needed
-            // createCardCollection(currentGame.getGameParameters());
+            randomizePlayersIndex(currentGame);
+            createCardCollections(currentGame);
             createScoreBoard(currentGame);
             initiateNewTurn(currentGame);
             return inMemoryGameRepository.save(currentGame);
@@ -52,14 +49,14 @@ public class GameService {
         }
     }
 
-    public void randomizePlayersIndex(Game currentGame){
+    private void randomizePlayersIndex(Game currentGame){
         List<User> players = currentGame.getPlayers();
         Collections.shuffle(players); // Set players List to random order.
         currentGame.setPlayers(players);
         inMemoryGameRepository.save(currentGame);
     }
 
-    public void createScoreBoard(Game currentGame){
+    private void createScoreBoard(Game currentGame){
         List<User> players = currentGame.getPlayers();
         HashMap<Long, Long> scoreBoard = currentGame.getScoreBoard();
 
@@ -71,7 +68,7 @@ public class GameService {
         inMemoryGameRepository.save(currentGame);
     }
 
-    public void initiateNewTurn(Game currentGame){
+    private void initiateNewTurn(Game currentGame){
         List<User> players = currentGame.getPlayers();
         Long activePlayer = currentGame.getActivePlayer();
         int activePlayerIndex;
@@ -92,9 +89,6 @@ public class GameService {
         inMemoryGameRepository.save(currentGame);
     }
 
-
-
-
      public List<Game> getGames() {
          return inMemoryGameRepository.findAll();
      }
@@ -103,6 +97,13 @@ public class GameService {
          User newUser = UserContextHolder.getCurrentUser();
          Game game = inMemoryGameRepository.findById(gameId).orElseThrow();
          return addPlayerToGame(game, newUser);
+     }
+
+     private void createCardCollections(Game currentGame){
+        User host = UserContextHolder.getCurrentUser();
+        CardCollection cardCollection = new CardCollection(currentGame.getGameParameters(), host.getSpotifyJWT().getAccessToken());
+        currentGame.setCardCollection(cardCollection);
+        inMemoryGameRepository.save(currentGame);
      }
 
      public List<User> removePlayerFromGame(Integer gameId) {
@@ -120,8 +121,12 @@ public class GameService {
 
     private List<User> addPlayerToGame(Game game, User user) {
          userService.setPlayerState(user, UserStatus.INGAME);
-        game.getPlayers().add(user);
-        return inMemoryGameRepository.save(game).getPlayers();
+         if (game.getGameState() == GameState.OPEN && !game.getPlayers().contains(user)){
+             game.getPlayers().add(user);
+             return inMemoryGameRepository.save(game).getPlayers();
+         } else {
+             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+         }
     }
 
     private Game setPlaylistNameAndURL(Game game) {
