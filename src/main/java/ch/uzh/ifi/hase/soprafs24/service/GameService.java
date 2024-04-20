@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
+import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameConstant;
@@ -8,6 +9,7 @@ import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,26 +23,27 @@ import java.util.*;
 @AllArgsConstructor
 public class GameService {
 
+    private final UserService userService;
     public InMemoryGameRepository inMemoryGameRepository;
 
     public UserRepository userRepository;
 
-     public Game createGame(GameParameters gameParameters, Long hostId) {
-         User host = userRepository.findByUserId(hostId); //TODO: needs to be changed to method of retrieving from SecContext
+     public Game createGame(GameParameters gameParameters) {
+         User host = UserContextHolder.getCurrentUser(); //TODO: needs to be changed to method of retrieving from SecContext
          Game newGame = new Game(gameParameters, host);
          return inMemoryGameRepository.save(newGame);
      }
 
-    public Game startGame(Integer gameId, User host) {
-        Game currentGame = inMemoryGameRepository.findById(gameId);
-        Long hostId = host.getUserId();
-        if (currentGame.getPlayers().size() >= GameConstant.getMinPlayers() && Objects.equals(currentGame.getHostId(), hostId)){
+    public Game startGame(Integer gameId) {
+        Game currentGame = inMemoryGameRepository.findById(gameId).orElseThrow();
+        User host = UserContextHolder.getCurrentUser();
+        if (currentGame.getPlayers().size() >= GameConstant.getMinPlayers() && Objects.equals(currentGame.getHostId(), host.getUserId())){
             currentGame.setGameState(GameState.ONPLAY);
 
             // randomizePlayersIndex(currentGame) * if needed
             // createCardCollection(currentGame.getGameParameters());
             createScoreBoard(currentGame);
-            runTurn(currentGame);
+            activateNewTurn(currentGame.getGameId());
             return inMemoryGameRepository.save(currentGame);
         } else {
          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to start the game.");
@@ -48,7 +51,7 @@ public class GameService {
     }
 
     public void terminateGame(Integer gameId, User host) {
-        Game currentGame = inMemoryGameRepository.findById(gameId);
+        Game currentGame = inMemoryGameRepository.findById(gameId).orElseThrow();
         Long hostId = host.getUserId();
         if (Objects.equals(currentGame.getHostId(), hostId)){
             inMemoryGameRepository.deleteById(currentGame.getGameId());
@@ -58,7 +61,7 @@ public class GameService {
     }
 
     public Game addPlayer(Integer gameId, User user){
-        Game currentGame = inMemoryGameRepository.findById(gameId);
+        Game currentGame = inMemoryGameRepository.findById(gameId).orElseThrow();
         List<User> currentPlayers = currentGame.getPlayers();
 
         if (currentPlayers.contains(user)){
@@ -74,7 +77,7 @@ public class GameService {
     }
 
     public Game removePlayer(Integer gameId, User user){
-        Game currentGame = inMemoryGameRepository.findById(gameId);
+        Game currentGame = inMemoryGameRepository.findById(gameId).orElseThrow();
         List<User> currentPlayers = currentGame.getPlayers();
 
         if (currentPlayers.contains(user)){
@@ -85,14 +88,25 @@ public class GameService {
         return inMemoryGameRepository.save(currentGame);
     }
 
-    public void addPicks(User user, Integer gameId, Integer cardId) {
-        Game currentGame = inMemoryGameRepository.findById(gameId);
+    public void addPicks(Integer gameId, Integer cardId) {
+        User user = UserContextHolder.getCurrentUser();
+        Game currentGame = inMemoryGameRepository.findById(gameId).orElseThrow();
         Turn currentTurn = currentGame.getHistory().get(currentGame.getHistory().size() - 1);
 
         if (user.getUserId() == currentTurn.getUserId()) {
-            currentTurn.addPick(cardId);
+            Boolean turnActive = currentGame.getCardCollection().checkMatch(currentTurn.addPick(cardId));
+            if (!turnActive) {
+                activateNewTurn(gameId); // If turn unmatched -> get to the next Turn
+            }
+            else if () {
+                
+            }
+            {
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Access");
+            }
         }
-    }
 
     public void createScoreBoard(Game currentGame){
         List<User> players = currentGame.getPlayers();
@@ -106,7 +120,12 @@ public class GameService {
         inMemoryGameRepository.save(currentGame);
     }
 
-    public void runTurn(Game currentGame){
+    public void setScore(Turn turn){
+
+    }
+
+    public void activateNewTurn(Integer gameId){
+        Game currentGame = inMemoryGameRepository.findById(gameId).orElseThrow();
         List<User> players = currentGame.getPlayers();
         Long activePlayer = currentGame.getActivePlayer();
         int activePlayerIndex;
@@ -127,13 +146,44 @@ public class GameService {
         inMemoryGameRepository.save(currentGame);
     }
 
+    public List<Game> getGames() {
+        return inMemoryGameRepository.findAll();
+    }
+
+    public List<User> addPlayerToGame(Integer gameId) {
+        User newUser = UserContextHolder.getCurrentUser();
+        Game game = inMemoryGameRepository.findById(gameId).orElseThrow();
+        return addPlayerToGame(game, newUser);
+    }
+
+    public List<User> removePlayerFromGame(Integer gameId) {
+        User userToRemove = UserContextHolder.getCurrentUser();
+        Game game = inMemoryGameRepository.findById(gameId).orElseThrow();
+        userService.setPlayerState(userToRemove, UserStatus.ONLINE);
+        if (game.getHostId().equals(userToRemove.getUserId())) {
+            inMemoryGameRepository.deleteById(gameId);
+            return null;
+        } else {
+            game.getPlayers().removeIf(u -> u.getUserId().equals(userToRemove.getUserId()));
+            return inMemoryGameRepository.save(game).getPlayers();
+        }
+    }
+
+    private List<User> addPlayerToGame(Game game, User user) {
+        userService.setPlayerState(user, UserStatus.INGAME);
+        game.getPlayers().add(user);
+        return inMemoryGameRepository.save(game).getPlayers();
+    }
+
+    public void runTurn(Integer gameId){
+
+    }
+
     public void randomizePlayersIndex(Game currentGame){
         List<User> players = currentGame.getPlayers();
         Collections.shuffle(players); // Set players List to random order.
         currentGame.setPlayers(players);
         inMemoryGameRepository.save(currentGame);
     }
-
-
 
 }
