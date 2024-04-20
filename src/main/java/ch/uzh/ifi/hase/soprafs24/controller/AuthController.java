@@ -33,10 +33,7 @@ public class AuthController {
     public AuthTokensDTO getAccessTokenFromCode(@RequestBody AuthPostCodeDTO AuthPostCodeDTO) {
         User user = authService.authenticateFromCode(AuthPostCodeDTO.getCode());
 
-        AuthTokensDTO response = new AuthTokensDTO();
-        response.setSessionToken(user.getSessionToken());
-
-        return response;
+        return new AuthTokensDTO(user.getSessionToken(), user.getUserId());
     }
 
     @GetMapping("/token")
