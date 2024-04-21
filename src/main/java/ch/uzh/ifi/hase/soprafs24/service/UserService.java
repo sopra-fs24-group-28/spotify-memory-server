@@ -5,11 +5,11 @@ import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.SpotifyJWTRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.datasource.UserCredentialsDataSourceAdapter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -123,6 +123,12 @@ public class UserService {
   public User setPlayerState(User user, UserStatus userStatus) {
       user.setState(userStatus);
       return userRepository.saveAndFlush(user);
+  }
+
+  public List<PlayerDTO> getPlayerDTOListFromListOfUsers(List<User> users) {
+      return users.stream()
+              .map(PlayerDTO::new)
+              .toList();
   }
 
 }
