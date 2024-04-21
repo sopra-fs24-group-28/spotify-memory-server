@@ -29,19 +29,19 @@ public class GameService {
     private final UserService userService;
     public InMemoryGameRepository inMemoryGameRepository;
 
-     public Game createGame(GameParameters gameParameters) {
-         User host = UserContextHolder.getCurrentUser();
-         if (host.getState().equals(UserStatus.INGAME)) {
-             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a game");
-         }
-         Game newGame = new Game(gameParameters, host);
-         addPlayerToGame(newGame, host);
-         setPlaylistNameAndURL(newGame);
-         return inMemoryGameRepository.save(newGame);
-     }
+    public Game createGame(GameParameters gameParameters) {
+        User host = UserContextHolder.getCurrentUser();
+        if (host.getState().equals(UserStatus.INGAME)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a game");
+        }
+        Game newGame = new Game(gameParameters, host);
+        addPlayerToGame(newGame, host);
+        setPlaylistNameAndURL(newGame);
+        return inMemoryGameRepository.save(newGame);
+    }
 
     public Game startGame(Integer gameId, User host) {
-        Game currentGame = inMemoryGameRepository.findById(gameId).orElseThrow();
+        Game currentGame = inMemoryGameRepository.findById(gameId);
         Long hostId = host.getUserId();
         if (currentGame.getPlayers().size() >= GameConstant.getMinPlayers() && Objects.equals(currentGame.getHostId(), hostId)){
             currentGame.setGameState(GameState.ONPLAY);
@@ -49,58 +49,18 @@ public class GameService {
             // randomizePlayersIndex(currentGame) * if needed
             // createCardCollection(currentGame.getGameParameters());
             createScoreBoard(currentGame);
-            initiateNewTurn(currentGame);
+            runTurn(currentGame);
             return inMemoryGameRepository.save(currentGame);
         } else {
-         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to start the game.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to start the game.");
         }
     }
 
-    public void terminateGame(Integer gameId, User host) {
-        Game currentGame = inMemoryGameRepository.findById(gameId);
-        Long hostId = host.getUserId();
-        if (Objects.equals(currentGame.getHostId(), hostId)){
-            inMemoryGameRepository.deleteById(currentGame.getGameId());
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to terminate the game.");
-        }
-    }
-
-    public Game addPlayer(Integer gameId, User user){
-        Game currentGame = inMemoryGameRepository.findById(gameId);
-        List<User> currentPlayers = currentGame.getPlayers();
-
-        if (currentPlayers.contains(user)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user is already in the game.");
-        }
-
-        if (currentGame.getGameParameters().getPlayerLimit() > currentPlayers.size()){
-            currentPlayers.add(user);
-        } else{
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The game is full. Unable to join the game.");
-        }
-        return inMemoryGameRepository.save(currentGame);
-    }
-
-    public Game removePlayer(Integer gameId, User user){
-        Game currentGame = inMemoryGameRepository.findById(gameId);
-        List<User> currentPlayers = currentGame.getPlayers();
-
-        if (currentPlayers.contains(user)){
-            currentPlayers.remove(user);
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user is not in the game.");
-        }
-        return inMemoryGameRepository.save(currentGame);
-    }
-
-    public void addPicks(User user, Integer gameId, Integer cardId) {
-        Game currentGame = inMemoryGameRepository.findById(gameId);
-        Turn currentTurn = currentGame.getHistory().get(currentGame.getHistory().size() - 1);
-
-        if (user.getUserId() == currentTurn.getUserId()) {
-            currentTurn.addPick(cardId);
-        }
+    public void randomizePlayersIndex(Game currentGame){
+        List<User> players = currentGame.getPlayers();
+        Collections.shuffle(players); // Set players List to random order.
+        currentGame.setPlayers(players);
+        inMemoryGameRepository.save(currentGame);
     }
 
     public void createScoreBoard(Game currentGame){
@@ -112,10 +72,9 @@ public class GameService {
             scoreBoard.put(playerId, 0L);
         }
         currentGame.setScoreBoard(scoreBoard);
-        inMemoryGameRepository.save(currentGame);
     }
 
-    public void initiateNewTurn(Game currentGame){
+    public void runTurn(Game currentGame){
         List<User> players = currentGame.getPlayers();
         Long activePlayer = currentGame.getActivePlayer();
         int activePlayerIndex;
@@ -136,52 +95,45 @@ public class GameService {
         inMemoryGameRepository.save(currentGame);
     }
 
-    public void randomizePlayersIndex(Game currentGame){
-        List<User> players = currentGame.getPlayers();
-        Collections.shuffle(players); // Set players List to random order.
-        currentGame.setPlayers(players);
-        inMemoryGameRepository.save(currentGame);
+
+
+
+    public List<Game> getGames() {
+        return inMemoryGameRepository.findAll();
     }
 
+    public Game getGameById(Integer gameId) {return inMemoryGameRepository.findById(gameId);}
 
+    public List<User> addPlayerToGame(Integer gameId) {
+        User newUser = UserContextHolder.getCurrentUser();
+        Game game = inMemoryGameRepository.findById(gameId);
+        return addPlayerToGame(game, newUser);
+    }
 
-
-     public List<Game> getGames() {
-         return inMemoryGameRepository.findAll();
-     }
-
-     public Game getGameById(Integer gameId) {return inMemoryGameRepository.findById(gameId);}
-
-     public List<User> addPlayerToGame(Integer gameId) {
-         User newUser = UserContextHolder.getCurrentUser();
-         Game game = inMemoryGameRepository.findById(gameId).orElseThrow();
-         return addPlayerToGame(game, newUser);
-     }
-
-     public List<User> removePlayerFromGame(Integer gameId) {
-         User userToRemove = UserContextHolder.getCurrentUser();
-         Game game = inMemoryGameRepository.findById(gameId).orElseThrow();
-         userService.setPlayerState(userToRemove, UserStatus.ONLINE);
-         if (game.getHostId().equals(userToRemove.getUserId())) {
-             inMemoryGameRepository.deleteById(gameId);
-             return null;
-         } else {
-             game.getPlayers().removeIf(u -> u.getUserId().equals(userToRemove.getUserId()));
-             return inMemoryGameRepository.save(game).getPlayers();
-         }
-     }
+    public List<User> removePlayerFromGame(Integer gameId) {
+        User userToRemove = UserContextHolder.getCurrentUser();
+        Game game = inMemoryGameRepository.findById(gameId);
+        userService.setPlayerState(userToRemove, UserStatus.ONLINE);
+        if (game.getHostId().equals(userToRemove.getUserId())) {
+            inMemoryGameRepository.deleteById(gameId);
+            return null;
+        } else {
+            game.getPlayers().removeIf(u -> u.getUserId().equals(userToRemove.getUserId()));
+            return inMemoryGameRepository.save(game).getPlayers();
+        }
+    }
 
     private List<User> addPlayerToGame(Game game, User user) {
-         userService.setPlayerState(user, UserStatus.INGAME);
+        userService.setPlayerState(user, UserStatus.INGAME);
         game.getPlayers().add(user);
         return inMemoryGameRepository.save(game).getPlayers();
     }
 
     private Game setPlaylistNameAndURL(Game game) {
-         HashMap<String,String> playlistMetadata = SpotifyService.getPlaylistMetadata(
-                 UserContextHolder.getCurrentUser().getSpotifyJWT().getAccessToken(),
-                 game.getGameParameters().getPlaylist().getPlaylistId()
-         );
+        HashMap<String,String> playlistMetadata = SpotifyService.getPlaylistMetadata(
+                UserContextHolder.getCurrentUser().getSpotifyJWT().getAccessToken(),
+                game.getGameParameters().getPlaylist().getPlaylistId()
+        );
 
         game.getGameParameters().getPlaylist().setPlaylistName(playlistMetadata.get("playlist_name"));
         game.getGameParameters().getPlaylist().setPlaylistImageUrl(playlistMetadata.get("image_url"));
