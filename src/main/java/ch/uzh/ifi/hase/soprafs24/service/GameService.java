@@ -30,16 +30,16 @@ public class GameService {
     private final UserService userService;
     public InMemoryGameRepository inMemoryGameRepository;
 
-    public Game createGame(GameParameters gameParameters) {
-        User host = UserContextHolder.getCurrentUser();
-        if (host.getState().equals(UserStatus.INGAME)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a game");
-        }
-        Game newGame = new Game(gameParameters, host);
-        addPlayerToGame(newGame, host);
-        setPlaylistNameAndURL(newGame);
-        return inMemoryGameRepository.save(newGame);
-    }
+     public Game createGame(GameParameters gameParameters) {
+         User host = UserContextHolder.getCurrentUser();
+         if (host.getState().equals(UserStatus.INGAME)) {
+             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a game");
+         }
+         Game newGame = new Game(gameParameters, host);
+         addPlayerToGame(newGame, host);
+         setPlaylistNameAndURL(newGame);
+         return inMemoryGameRepository.save(newGame);
+     }
 
     public Game startGame(Integer gameId) {
         Game currentGame = inMemoryGameRepository.findById(gameId);
