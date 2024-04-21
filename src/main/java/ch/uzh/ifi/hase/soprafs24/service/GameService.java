@@ -24,6 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.swing.text.html.Option;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.*;
 
 @Service
@@ -107,6 +112,8 @@ public class GameService {
      public List<Game> getGames() {
          return inMemoryGameRepository.findAll();
      }
+
+     public Game getGameById(Integer gameId) {return inMemoryGameRepository.findById(gameId);}
 
      public List<User> addPlayerToGame(Integer gameId) {
          User newUser = UserContextHolder.getCurrentUser();
