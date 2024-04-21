@@ -17,7 +17,7 @@ public class GameParameters {
 
     private GameCategory gameCategory;
 
-    private String playlist;
+    private Playlist playlist;
 
     private int streakStart = 3;
 

@@ -4,10 +4,8 @@ import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyOverviewDto;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.PostGameStartDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.helper.LobbyGame;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
+import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
@@ -19,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/game")
+@RequestMapping("/games")
 @AllArgsConstructor
 public class GameController {
 
@@ -49,7 +47,7 @@ public class GameController {
             for (User user: game.getPlayers()) {
                 players.add(new PlayerDTO(user));
             }
-            LobbyGame lobbyGame = new LobbyGame(game.getGameParameters(), players, game.getGameState(), game.getHostId());
+            LobbyGameDto lobbyGame = new LobbyGameDto(game.getGameParameters(), players, game.getGameState(), game.getHostId());
             lobbyOverviewDto.getGames().put(game.getGameId(), lobbyGame);
         }
 
@@ -61,7 +59,11 @@ public class GameController {
     public void addPlayerToGame(@PathVariable Integer gameId) {
         List<User> users = gameService.addPlayerToGame(gameId);
 
-        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId ,users));
+        List<PlayerDTO> playerDTOList = users.stream()
+                .map(PlayerDTO::new)
+                .toList();
+
+        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId ,playerDTOList));
     }
 
     @DeleteMapping("/{gameId}/player")
@@ -72,10 +74,21 @@ public class GameController {
         if (users == null) {
             eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, GameState.FINISHED));
         } else {
-            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId , users));
+            List<PlayerDTO> playerDTOList = users.stream()
+                    .map(PlayerDTO::new)
+                    .toList();
+            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId , playerDTOList));
         }
 
     }
 
 
+
+    @PostMapping("/{gameId}") // TODO: change to websocket
+    @ResponseStatus(HttpStatus.OK)
+    public GameDTO startGame(@PathVariable Integer gameId) {
+        User host = UserContextHolder.getCurrentUser();
+        Game game = gameService.startGame(gameId, host); // TODO: remove id and get User from SecContext in Service
+        return new GameDTO(game.getPlayers(), game.getActivePlayer(), game.getHostId(), game.getScoreBoard(), game.getGameParameters());
+    }
 }

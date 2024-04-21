@@ -1,8 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.websocket;
 
-import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.service.AuthService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -10,33 +7,42 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor
 public class UserHandshakeInterceptor implements HandshakeInterceptor {
-    private AuthService authService;
 
     @Override
-    public boolean beforeHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        List<String> authHeader = serverHttpRequest.getHeaders().get("Authorization");
+    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
+        Optional<String> token = extractToken(request);
 
-        System.out.println(authHeader);
-
-        System.out.println("here");
-
-        return  true;
-
-/*        if (authHeader != null) {
-            attributes.put("user", authHeader);
-            return true;
+        if (token.isEmpty()) {
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return false;
         }
 
-        serverHttpResponse.setStatusCode(HttpStatus.UNAUTHORIZED);
-        return false;*/
+        try {
+            attributes.put("token", token);
+            return true;
+        } catch (Exception e) {
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return false;
+        }
+    }
+
+    private Optional<String> extractToken(ServerHttpRequest request) {
+        String query = request.getURI().getQuery();
+        if (query != null) {
+            String[] queryParams = query.split("&");
+            for (String param : queryParams) {
+                String[] keyValue = param.split("=");
+                if ("token".equals(keyValue[0]) && keyValue.length > 1) {
+                    return Optional.of(keyValue[1]);
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

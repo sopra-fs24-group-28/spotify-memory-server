@@ -2,7 +2,9 @@ package ch.uzh.ifi.hase.soprafs24.websocket;
 
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
+import ch.uzh.ifi.hase.soprafs24.service.AuthService;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
+import lombok.AllArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -12,8 +14,10 @@ import org.springframework.stereotype.Controller;
 import java.util.Objects;
 
 @Controller
+@AllArgsConstructor
 public class WebSocketController {
     private GameService gameService;
+    private AuthService authService;
 
     @MessageMapping("/overview")
     @SendTo("/topic/overview")
@@ -27,7 +31,8 @@ public class WebSocketController {
         // we do not use the Spring Security Principal Model, rather set a session attribute upon handshake with the websocket
         // via the Authorization header
 
-        User user = (User) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("user");
+        User user = authService.getUserBySessionToken((String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("token"));
+
         try {
             UserContextHolder.setCurrentUser(user);
             gameService.runTurn(gameId);

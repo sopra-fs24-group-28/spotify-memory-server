@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.websocket;
 
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSLobbyOverviewChangesDto;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
@@ -14,11 +15,12 @@ public class EventListeningWebsocketBean {
 
     @EventListener
     public void onLobbyOverviewChangedEvent(LobbyOverviewChangedEvent event) {
-        template.convertAndSend("/topic/overview", event);
+        WSLobbyOverviewChangesDto overviewChangesDTO = new WSLobbyOverviewChangesDto(event.getLobbyOverviewChangesDTO().getGameMap());
+        template.convertAndSend("/topic/overview", overviewChangesDTO);
     }
 
     @EventListener
     public void updateGameStatus(GameChangesEvent gameChangesEvent) {
-        template.convertAndSend("/queue/games/" + gameChangesEvent.getGameId(), gameChangesEvent);
+        template.convertAndSend("/queue/game/" + gameChangesEvent.getGameId(), gameChangesEvent.getGameChangesDto());
     }
 }
