@@ -7,7 +7,7 @@ import java.util.List;
 public interface GameRepository {
     Game save(Game game);
 
-    Optional<Game> findById(Integer id);
+    Game findById(Integer id);
 
     void deleteById(Integer id);
 

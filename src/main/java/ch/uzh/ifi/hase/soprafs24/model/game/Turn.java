@@ -14,8 +14,7 @@ public class Turn {
         this.userId = userId;
     }
 
-    public List<java.lang.Integer> addPick(int pick) {
+    public void addPick(int pick) {
         picks.add(pick);
-        return picks;
     }
 }

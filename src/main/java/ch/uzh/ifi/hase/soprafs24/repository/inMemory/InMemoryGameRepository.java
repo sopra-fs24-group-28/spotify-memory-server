@@ -32,11 +32,9 @@ public class InMemoryGameRepository implements GameRepository {
         return game;
     }
 
-    // QUESTION: Is setting nullable necessary?
     @Override
-    public Optional<Game> findById(Integer id) {
-        //return games.get(id);
-        return Optional.ofNullable(games.get(id));
+    public Game findById(Integer id) {
+        return games.get(id);
     }
 
     @Override
