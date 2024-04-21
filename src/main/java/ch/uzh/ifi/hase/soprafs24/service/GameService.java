@@ -8,7 +8,6 @@ import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameConstant;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
-import ch.uzh.ifi.hase.soprafs24.model.helper.Change;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
@@ -23,12 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.swing.text.html.Option;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
 import java.util.*;
 
 @Service
@@ -152,9 +145,9 @@ public class GameService {
         return inMemoryGameRepository.save(game);
     }
 
-    public void runTurn(Integer gameId) {
+    public void runTurn(Integer gameId, Integer cardId) {
 
-        Map<Integer, CardState> integerCardStateMap = Map.of(1, CardState.EXCLUDED);
+        Map<Integer, CardState> integerCardStateMap = Map.of(cardId, CardState.EXCLUDED);
 
         WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
                 .gameChangesDto(
