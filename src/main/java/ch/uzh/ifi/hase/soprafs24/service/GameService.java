@@ -7,7 +7,6 @@ import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameConstant;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import lombok.AllArgsConstructor;
@@ -15,6 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.*;
 
 @Service
@@ -97,6 +101,8 @@ public class GameService {
      public List<Game> getGames() {
          return inMemoryGameRepository.findAll();
      }
+
+     public Game getGameById(Integer gameId) {return inMemoryGameRepository.findById(gameId);}
 
      public List<User> addPlayerToGame(Integer gameId) {
          User newUser = UserContextHolder.getCurrentUser();
