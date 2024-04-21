@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public record GameDTO(
-        @JsonProperty List<PlayerDTO> players,
+        @JsonProperty List<PlayerDTO> playerDTOList,
         @JsonProperty Long activePlayer,
         @JsonProperty Long host,
         @JsonProperty HashMap<Long, Long> scoreBoard,

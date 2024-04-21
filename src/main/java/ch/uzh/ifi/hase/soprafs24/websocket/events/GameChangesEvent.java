@@ -16,4 +16,9 @@ public class GameChangesEvent extends ApplicationEvent {
     public GameChangesEvent(Object source) {
         super(source);
     }
+
+    public GameChangesEvent(GameController source, Integer gameId, Game game) {
+        super(source);
+        this.gameChangesDto = new WSGameChangesDto(gameChangesDto);
+    }
 }
