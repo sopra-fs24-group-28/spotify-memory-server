@@ -1,24 +1,51 @@
 package ch.uzh.ifi.hase.soprafs24.websocket.dto;
 
 import ch.uzh.ifi.hase.soprafs24.model.helper.Change;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.*;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardContent;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSGameChanges;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSScoreBoardChanges;
 import lombok.Builder;
-import lombok.Getter;
 
 import java.util.Optional;
 
-@Getter
-@Builder
-public class WSGameChangesDto {
-    @Builder.Default
-    private final Change<Optional<WSGameChanges>> gameChangesDto = Change.of(false, Optional.empty());
+public record WSGameChangesDto(Change<WSGameChanges> gameChangesDto,
+                               Change<WSCardContent> cardContent,
+                               Change<WSCardsStates> cardsStates,
+                               Change<WSScoreBoardChanges> scoreBoard) {
 
-    @Builder.Default
-    private final Change<Optional<WSCardContent>> cardContent = Change.of(false, Optional.empty());
+    @Builder
+    public static WSGameChangesDto create(Change<WSGameChanges> gameChangesDto,
+                                          Change<WSCardContent> cardContent,
+                                          Change<WSCardsStates> cardsStates,
+                                          Change<WSScoreBoardChanges> scoreBoard) {
+        return new WSGameChangesDto(gameChangesDto, cardContent, cardsStates, scoreBoard);
+    }
 
-    @Builder.Default
-    private final Change<Optional<WSCardsStates>> cardsStates = Change.of(false, Optional.empty());
+    public static class WSGameChangesDtoBuilder {
+        private Change<WSGameChanges> gameChangesDto = Change.of(false, Optional.empty());
+        private Change<WSCardContent> cardContent = Change.of(false, Optional.empty());
+        private Change<WSCardsStates> cardsStates = Change.of(false, Optional.empty());
+        private Change<WSScoreBoardChanges> scoreBoard = Change.of(false, Optional.empty());
 
-    @Builder.Default
-    private final Change<Optional<WSScoreBoardChanges>> scoreBoard = Change.of(false, Optional.empty());
+        public WSGameChangesDtoBuilder gameChangesDto(WSGameChanges gameChangesDto) {
+            this.gameChangesDto = Change.of(true, Optional.of(gameChangesDto));
+            return this;
+        }
+
+        public WSGameChangesDtoBuilder cardContent(WSCardContent cardContent) {
+            this.cardContent = Change.of(true, Optional.of(cardContent));
+            return this;
+        }
+
+        public WSGameChangesDtoBuilder cardsStates(WSCardsStates cardsStates) {
+            this.cardsStates = Change.of(true, Optional.of(cardsStates));
+            return this;
+        }
+
+        public WSGameChangesDtoBuilder scoreBoard(WSScoreBoardChanges scoreBoard) {
+            this.scoreBoard = Change.of(true, Optional.of(scoreBoard));
+            return this;
+        }
+    }
 }

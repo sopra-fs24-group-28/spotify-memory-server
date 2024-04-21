@@ -29,11 +29,9 @@ public class WebSocketController {
     public void gameOverview(@DestinationVariable Integer gameId, SimpMessageHeaderAccessor headerAccessor) {
         // since we avoid using spring security and implement security and the security context manually (for experience)
         // we do not use the Spring Security Principal Model, rather set a session attribute upon handshake with the websocket
-        // via the Authorization header
-
-        User user = authService.getUserBySessionToken((String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("token"));
 
         try {
+            User user = authService.getUserBySessionToken((String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("token"));
             UserContextHolder.setCurrentUser(user);
             gameService.runTurn(gameId);
         } finally {

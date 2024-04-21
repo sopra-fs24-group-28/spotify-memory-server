@@ -11,7 +11,7 @@ public class GameChangesEvent extends ApplicationEvent {
     private Integer gameId;
     private WSGameChangesDto gameChangesDto;
 
-    public GameChangesEvent(Object source) {
+    public GameChangesEvent(Object source, Integer gameId, WSGameChangesDto gameChangesDto) {
         super(source);
     }
 }
