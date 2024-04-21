@@ -3,10 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.model.game.Game;
-import ch.uzh.ifi.hase.soprafs24.model.game.GameConstant;
-import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
-import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
+import ch.uzh.ifi.hase.soprafs24.model.game.*;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import lombok.AllArgsConstructor;
@@ -40,16 +37,17 @@ public class GameService {
         return inMemoryGameRepository.save(newGame);
     }
 
-    public Game startGame(Integer gameId, User host) {
+    public Game startGame(Integer gameId) {
         Game currentGame = inMemoryGameRepository.findById(gameId);
+        User host = UserContextHolder.getCurrentUser();
         Long hostId = host.getUserId();
         if (currentGame.getPlayers().size() >= GameConstant.getMinPlayers() && Objects.equals(currentGame.getHostId(), hostId)){
             currentGame.setGameState(GameState.ONPLAY);
 
-            // randomizePlayersIndex(currentGame) * if needed
-            // createCardCollection(currentGame.getGameParameters());
+            randomizePlayersIndex(currentGame);
+            createCardCollection(currentGame);
             createScoreBoard(currentGame);
-            runTurn(currentGame);
+            initiateNewTurn(currentGame);
             return inMemoryGameRepository.save(currentGame);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to start the game.");
@@ -63,7 +61,7 @@ public class GameService {
         inMemoryGameRepository.save(currentGame);
     }
 
-    public void createScoreBoard(Game currentGame){
+    private void createScoreBoard(Game currentGame){
         List<User> players = currentGame.getPlayers();
         HashMap<Long, Long> scoreBoard = currentGame.getScoreBoard();
 
@@ -72,9 +70,10 @@ public class GameService {
             scoreBoard.put(playerId, 0L);
         }
         currentGame.setScoreBoard(scoreBoard);
+        inMemoryGameRepository.save(currentGame);
     }
 
-    public void runTurn(Game currentGame){
+    private void initiateNewTurn(Game currentGame){
         List<User> players = currentGame.getPlayers();
         Long activePlayer = currentGame.getActivePlayer();
         int activePlayerIndex;
@@ -95,7 +94,12 @@ public class GameService {
         inMemoryGameRepository.save(currentGame);
     }
 
-
+    private void createCardCollection(Game currentGame){
+        User host = UserContextHolder.getCurrentUser();
+        CardCollection CardCollection = new CardCollection(currentGame.getGameParameters(), host.getSpotifyJWT().getAccessToken());
+        currentGame.setCardCollection(CardCollection);
+        inMemoryGameRepository.save(currentGame);
+    }
 
 
     public List<Game> getGames() {
@@ -107,7 +111,11 @@ public class GameService {
     public List<User> addPlayerToGame(Integer gameId) {
         User newUser = UserContextHolder.getCurrentUser();
         Game game = inMemoryGameRepository.findById(gameId);
-        return addPlayerToGame(game, newUser);
+        if (game.getGameState() == GameState.OPEN && game.getPlayers().size() < game.getGameParameters().getPlayerLimit()){
+            return addPlayerToGame(game, newUser);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to join the game.");
+        }
     }
 
     public List<User> removePlayerFromGame(Integer gameId) {

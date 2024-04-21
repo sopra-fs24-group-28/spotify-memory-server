@@ -96,8 +96,7 @@ public class GameController {
     @PostMapping("/{gameId}") // TODO: change to websocket
     @ResponseStatus(HttpStatus.OK)
     public GameDTO startGame(@PathVariable Integer gameId) {
-        User host = UserContextHolder.getCurrentUser();
-        Game game = gameService.startGame(gameId, host); // TODO: remove id and get User from SecContext in Service
+        Game game = gameService.startGame(gameId); // TODO: remove id and get User from SecContext in Service
         return new GameDTO(userService.getPlayerDTOListFromListOfUsers(game.getPlayers()), game.getActivePlayer(), game.getHostId(), game.getScoreBoard(), game.getGameParameters());
     }
 }
