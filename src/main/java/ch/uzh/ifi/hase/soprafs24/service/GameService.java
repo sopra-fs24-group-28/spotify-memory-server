@@ -107,8 +107,8 @@ public class GameService {
 
 
      public List<Game> getGames() {
-        return inMemoryGameRepository.findAll();
-    }
+         return inMemoryGameRepository.findAll();
+     }
 
      public Game getGameById(Integer gameId) {return inMemoryGameRepository.findById(gameId);}
 
