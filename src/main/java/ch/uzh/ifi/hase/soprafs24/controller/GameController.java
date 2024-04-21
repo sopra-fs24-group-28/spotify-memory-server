@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
+import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -88,6 +89,13 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public GameDTO startGame(@PathVariable Integer gameId) {
         Game game = gameService.startGame(gameId);
-        return new GameDTO(game.getPlayers(), game.getActivePlayer(), game.getHostId(), game.getScoreBoard(), game.getGameParameters());
+
+        List<PlayerDTO> playerDTOList = game.getPlayers().stream()
+                .map(PlayerDTO::new)
+                .toList();
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, game)); // TODO: send playerList(for playerOrder), activePlayer(for currentTurn), scoreboard, cardCollection(cardIds)
+        return new GameDTO(playerDTOList, game.getActivePlayer(), game.getHostId(), game.getScoreBoard(), game.getGameParameters());
+
     }
 }
