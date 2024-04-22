@@ -13,5 +13,7 @@ public class GameChangesEvent extends ApplicationEvent {
 
     public GameChangesEvent(Object source, Integer gameId, WSGameChangesDto gameChangesDto) {
         super(source);
+        this.gameId = gameId;
+        this.gameChangesDto = gameChangesDto;
     }
 }

@@ -5,14 +5,15 @@ import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardContent;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSGameChanges;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSScoreBoardChanges;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 import java.util.Optional;
 
-public record WSGameChangesDto(Change<WSGameChanges> gameChangesDto,
-                               Change<WSCardContent> cardContent,
-                               Change<WSCardsStates> cardsStates,
-                               Change<WSScoreBoardChanges> scoreBoard) {
+public record WSGameChangesDto(@JsonProperty Change<WSGameChanges> gameChangesDto,
+                               @JsonProperty Change<WSCardContent> cardContent,
+                               @JsonProperty Change<WSCardsStates> cardsStates,
+                               @JsonProperty Change<WSScoreBoardChanges> scoreBoard) {
 
     @Builder
     public static WSGameChangesDto create(Change<WSGameChanges> gameChangesDto,
