@@ -119,6 +119,9 @@ public class GameService {
          Game game = inMemoryGameRepository.findById(gameId);
          userService.setPlayerState(userToRemove, UserStatus.ONLINE);
          if (game.getHostId().equals(userToRemove.getUserId())) {
+             for (User user: game.getPlayers()) {
+                 userService.setPlayerState(user, UserStatus.ONLINE);
+             }
              inMemoryGameRepository.deleteById(gameId);
              return null;
          } else {
