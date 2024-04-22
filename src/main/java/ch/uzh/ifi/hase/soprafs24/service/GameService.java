@@ -131,9 +131,13 @@ public class GameService {
      }
 
     private List<User> addPlayerToGame(Game game, User user) {
-         userService.setPlayerState(user, UserStatus.INGAME);
-        game.getPlayers().add(user);
-        return inMemoryGameRepository.save(game).getPlayers();
+        if (game.getGameState().equals(GameState.OPEN)) {
+            userService.setPlayerState(user, UserStatus.INGAME);
+            game.getPlayers().add(user);
+            return inMemoryGameRepository.save(game).getPlayers();
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Game is not open");
+        }
     }
 
     private Game setPlaylistNameAndURL(Game game) {
