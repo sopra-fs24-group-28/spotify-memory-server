@@ -3,11 +3,8 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +23,6 @@ import java.util.HashMap;
 @AllArgsConstructor
 public class AuthService {
 
-    private final Logger log = LoggerFactory.getLogger(AuthService.class);
-
-    private UserRepository userRepository;
     private UserService userService;
 
     public User authenticateFromCode(String code) {
@@ -48,9 +42,7 @@ public class AuthService {
         spotifyJWT.setExpiresln(authorizationCodeCredentials.getExpiresIn());
 
         // create and/or login the user
-        User user = createOrLogin(spotifyUserData.get("id"), spotifyUserData.get("display_name"), spotifyJWT);
-
-        return user;
+        return createOrLogin(spotifyUserData.get("id"), spotifyUserData.get("display_name"), spotifyJWT);
     }
 
     public String getAccessToken() {
@@ -85,7 +77,7 @@ public class AuthService {
     }
 
     public void logout() {
-        try{
+        try {
             userService.logoutUser(UserContextHolder.getCurrentUser());
         } catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The unexpected error: " + e.getMessage());
