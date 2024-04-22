@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.websocket;
 
-import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -14,11 +13,7 @@ import java.util.Map;
 public class UserHandshakeInterceptor implements HandshakeInterceptor {
 
     @Override
-    public boolean beforeHandshake(
-            @NonNull ServerHttpRequest request,
-            @NonNull ServerHttpResponse response,
-            @NonNull WebSocketHandler wsHandler,
-            @NonNull Map<String, Object> attributes) {
+    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
 
         String token = extractToken(request);
 
@@ -46,9 +41,5 @@ public class UserHandshakeInterceptor implements HandshakeInterceptor {
     }
 
     @Override
-    public void afterHandshake(
-            @NonNull ServerHttpRequest request,
-            @NonNull ServerHttpResponse response,
-            @NonNull  WebSocketHandler wsHandler,
-            Exception exception) {}
+    public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {}
 }
