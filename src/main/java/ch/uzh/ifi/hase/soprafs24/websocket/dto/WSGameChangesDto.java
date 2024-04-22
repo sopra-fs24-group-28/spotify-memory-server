@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.websocket.dto;
 
-import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.helper.Change;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.*;
 import lombok.Builder;

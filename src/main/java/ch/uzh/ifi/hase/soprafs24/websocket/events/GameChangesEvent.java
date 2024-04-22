@@ -1,7 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.websocket.events;
 
-import ch.uzh.ifi.hase.soprafs24.controller.GameController;
-import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
 import lombok.Getter;
 import lombok.Setter;
