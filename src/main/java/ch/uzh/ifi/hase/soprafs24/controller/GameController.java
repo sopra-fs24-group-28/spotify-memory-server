@@ -8,6 +8,9 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSGameChanges;
+import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -59,11 +62,21 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public void addPlayerToGame(@PathVariable Integer gameId) {
         List<User> users = gameService.addPlayerToGame(gameId);
+        List<PlayerDTO> players = userService.getPlayerDTOListFromListOfUsers(users);
 
         eventPublisher.publishEvent(new LobbyOverviewChangedEvent(
                 this,
                 gameId,
-                userService.getPlayerDTOListFromListOfUsers(users)));
+                players));
+
+
+        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                .gameChangesDto(
+                        WSGameChanges.builder()
+                        .playerList(players).build())
+                .build();
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
     }
 
     @DeleteMapping("/{gameId}/player")

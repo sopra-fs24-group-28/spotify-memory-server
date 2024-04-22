@@ -20,7 +20,7 @@ public class EventListeningWebsocketBean {
     }
 
     @EventListener
-    public void updateGameStatus(GameChangesEvent gameChangesEvent) {
-        template.convertAndSend("/queue/games/" + gameChangesEvent.getGameId(), gameChangesEvent.getGameChangesDto());
+    public void updateGameStatus(GameChangesEvent event) {
+        template.convertAndSend("/queue/games/" + event.getGameId(), event.getGameChangesDto());
     }
 }

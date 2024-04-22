@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.websocket.dto.helper;
 import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.model.helper.Change;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,9 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-public record WSGameChanges(Change<Long> activePlayer, Change<Long> activePlayerStreak, Change<Boolean> quickTurnActive,
-                            Change<HashMap<Long, Long>> quickTurn, Change<List<PlayerDTO>> playerList,
-                            Change<GameState> gameState, Change<Long> hostId) {
+public record WSGameChanges( @JsonProperty Change<Long> activePlayer,
+                             @JsonProperty Change<Long> activePlayerStreak,
+                             @JsonProperty Change<Boolean> quickTurnActive,
+                             @JsonProperty Change<HashMap<Long, Long>> quickTurn,
+                             @JsonProperty Change<List<PlayerDTO>> playerList,
+                             @JsonProperty Change<GameState> gameState,
+                             @JsonProperty Change<Long> hostId) {
     @Builder
     public WSGameChanges {
     }
