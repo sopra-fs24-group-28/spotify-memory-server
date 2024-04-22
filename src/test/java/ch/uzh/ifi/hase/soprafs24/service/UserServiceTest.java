@@ -80,6 +80,13 @@ public class UserServiceTest {
     public void loginUser_validInputs_noLogout_success() {
         // mock repository functions
         SpotifyJWT spotifyJWT = new SpotifyJWT();
+        spotifyJWT.setUser(testUser);
+        spotifyJWT.setAccessToken("AccessToken");
+        spotifyJWT.setRefreshToken("RefreshToken");
+        spotifyJWT.setScope("Scope");
+        spotifyJWT.setTokenType("Bearer");
+        spotifyJWT.setExpiresln(3600);
+
         Mockito.when(userRepository.findBySpotifyUserId(Mockito.any())).thenReturn(testUser);
         Mockito.when(spotifyJWTRepository.save(Mockito.any())).thenReturn(spotifyJWT);
 
@@ -94,6 +101,13 @@ public class UserServiceTest {
         assertNotNull(loggedInUser.getSpotifyJWT());
         assertNotNull(loggedInUser.getSessionToken());
         assertEquals(UserStatus.ONLINE, loggedInUser.getState());
+        assertEquals(testUser, loggedInUser.getSpotifyJWT().getUser());
+        assertEquals("AccessToken", loggedInUser.getSpotifyJWT().getAccessToken());
+        assertEquals("RefreshToken", loggedInUser.getSpotifyJWT().getRefreshToken());
+        assertEquals("Scope", loggedInUser.getSpotifyJWT().getScope());
+        assertEquals("Bearer", loggedInUser.getSpotifyJWT().getTokenType());
+        assertEquals(3600, loggedInUser.getSpotifyJWT().getExpiresln());
+        assertEquals(testUser.getUserId(), loggedInUser.getSpotifyJWT().getUserId());
     }
 
     @Test
