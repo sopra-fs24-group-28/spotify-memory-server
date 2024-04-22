@@ -93,8 +93,7 @@ public class GameController {
     @PostMapping("/{gameId}/start")
     @ResponseStatus(HttpStatus.OK)
     public void startGame(@PathVariable Integer gameId) {
-        User host = UserContextHolder.getCurrentUser();
-        Game game = gameService.startGame(gameId, host);
+        Game game = gameService.startGame(gameId);
         eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, game.getGameState()));
 
         WSGameChanges wsGameChanges = WSGameChanges.builder()

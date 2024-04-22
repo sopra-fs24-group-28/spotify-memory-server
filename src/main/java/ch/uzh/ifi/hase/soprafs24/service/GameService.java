@@ -8,12 +8,15 @@ import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameConstant;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
+import ch.uzh.ifi.hase.soprafs24.model.game.Card;
+import ch.uzh.ifi.hase.soprafs24.model.game.CardCollection;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardContent;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSGameChanges;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSScoreBoardChanges;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -46,30 +49,31 @@ public class GameService {
          return inMemoryGameRepository.save(newGame);
      }
 
-    public Game startGame(Integer gameId, User host) {
+    public Game startGame(Integer gameId) {
         Game currentGame = inMemoryGameRepository.findById(gameId);
+        User host = UserContextHolder.getCurrentUser();
         Long hostId = host.getUserId();
         if (currentGame.getPlayers().size() >= GameConstant.getMinPlayers() && Objects.equals(currentGame.getHostId(), hostId)){
             currentGame.setGameState(GameState.ONPLAY);
 
-            // randomizePlayersIndex(currentGame) * if needed
-            // createCardCollection(currentGame.getGameParameters());
+            randomizePlayersIndex(currentGame);
+            createCardCollection(currentGame);
             createScoreBoard(currentGame);
-            runTurn(currentGame);
+            initiateNewTurn(currentGame, false);
             return inMemoryGameRepository.save(currentGame);
         } else {
          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to start the game.");
         }
     }
 
-    public void randomizePlayersIndex(Game currentGame){
+    private void randomizePlayersIndex(Game currentGame){
         List<User> players = currentGame.getPlayers();
         Collections.shuffle(players); // Set players List to random order.
         currentGame.setPlayers(players);
         inMemoryGameRepository.save(currentGame);
     }
 
-    public void createScoreBoard(Game currentGame){
+    private void createScoreBoard(Game currentGame){
         List<User> players = currentGame.getPlayers();
         HashMap<Long, Long> scoreBoard = currentGame.getScoreBoard();
 
@@ -80,7 +84,7 @@ public class GameService {
         currentGame.setScoreBoard(scoreBoard);
     }
 
-    public void runTurn(Game currentGame){
+    private void initiateNewTurn(Game currentGame, boolean gameStreak){
         List<User> players = currentGame.getPlayers();
         Long activePlayer = currentGame.getActivePlayer();
         int activePlayerIndex;
@@ -89,9 +93,11 @@ public class GameService {
             activePlayerIndex = 0;
         } else {
             activePlayerIndex = players.indexOf(userService.findUserByUserId(activePlayer));
-            activePlayerIndex++;
-            if (activePlayerIndex == players.size()){
-                activePlayerIndex = 0;
+            if (!gameStreak) {
+                activePlayerIndex++;
+                if (activePlayerIndex == players.size()) {
+                    activePlayerIndex = 0;
+                }
             }
         }
 
@@ -101,6 +107,12 @@ public class GameService {
         inMemoryGameRepository.save(currentGame);
     }
 
+    private void createCardCollection(Game currentGame){
+        User host = UserContextHolder.getCurrentUser();
+        CardCollection CardCollection = new CardCollection(currentGame.getGameParameters(), host.getSpotifyJWT().getAccessToken());
+        currentGame.setCardCollection(CardCollection);
+        inMemoryGameRepository.save(currentGame);
+    }
 
      public List<Game> getGames() {
          return inMemoryGameRepository.findAll();
@@ -111,7 +123,11 @@ public class GameService {
      public List<User> addPlayerToGame(Integer gameId) {
          User newUser = UserContextHolder.getCurrentUser();
          Game game = inMemoryGameRepository.findById(gameId);
-         return addPlayerToGame(game, newUser);
+         if (game.getGameState() == GameState.OPEN && game.getPlayers().size() < game.getGameParameters().getPlayerLimit()){
+             return addPlayerToGame(game, newUser);
+         } else {
+             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to join the game.");
+         }
      }
 
      public List<User> removePlayerFromGame(Integer gameId) {
@@ -152,18 +168,115 @@ public class GameService {
         return inMemoryGameRepository.save(game);
     }
 
-    public void runTurn(Integer gameId, Integer cardId) {
+    public void runTurn(Integer gameId, Integer cardId) throws InterruptedException {
+        Game currentGame = inMemoryGameRepository.findById(gameId);
 
+        if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)){
+            runActiveTurn(currentGame, cardId);
+            inMemoryGameRepository.save(currentGame);
+        }
+        /*
         Map<Integer, CardState> integerCardStateMap = Map.of(cardId, CardState.EXCLUDED);
 
         WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
                 .gameChangesDto(
                         WSGameChanges.builder().gameState(GameState.ONPLAY).build())
                 .cardContent(
-                        new WSCardContent(1L, "sadfgsdfg", "url"))
+                        new WSCardContent(1, "sadfgsdfg", "url"))
                 .cardsStates(
                         new WSCardsStates(integerCardStateMap)).build();
 
         eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
+         */
     }
+
+    private boolean checkActivePlayer(Game currentGame){
+        User currentPlayer = UserContextHolder.getCurrentUser();
+        return Objects.equals(currentGame.getActivePlayer(), currentPlayer.getUserId());
+    }
+
+    private boolean checkActiveCard(Game currentGame, Integer cardId){
+        Card currentCard = currentGame.getCardCollection().getCardById(cardId);
+        return Objects.equals(currentCard.getCardState(), CardState.FACEDOWN);
+    }
+
+    private void runActiveTurn(Game currentGame, Integer cardId) throws InterruptedException {
+        List<Turn> history = currentGame.getHistory();
+        Turn currentTurn = history.get(history.size()-1);
+
+        currentTurn.getPicks().add(cardId);
+        Card card = currentGame.getCardCollection().getCardById(cardId);
+        card.setCardState(CardState.FACEUP);
+
+        publishCardContents(currentGame, card);
+        Thread.sleep(2000);
+
+        handleMatch(currentGame, currentTurn);
+        checkGameEnd(currentGame);
+    }
+
+    private void publishCardContents(Game currentGame, Card card){
+
+        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                .cardContent(new WSCardContent(card.getCardId(), card.getSongId(), card.getImageUrl()))
+                .cardsStates(new WSCardsStates(mapCardsState(currentGame.getCardCollection())))
+                .build();
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
+    }
+
+    private Map<Integer, CardState> mapCardsState(CardCollection cardCollection) {
+        List<Card> cards = cardCollection.getCards();
+        Map<Integer, CardState> cardsState = null;
+
+        for (Card card : cards) {
+            cardsState.put(card.getCardId(), card.getCardState());
+        }
+        return cardsState;
+    }
+
+    private void handleMatch(Game currentGame, Turn currentTurn){
+        if (checkMatch(currentGame, currentTurn)){
+            if (isCompleteSet(currentGame, currentTurn)){
+                winPoints(currentGame);
+                initiateNewTurn(currentGame, true);
+            }
+        } else {
+            initiateNewTurn(currentGame, false);
+        }
+        inMemoryGameRepository.save(currentGame);
+        publishTurnState(currentGame);
+    }
+
+    private boolean checkMatch(Game currentGame, Turn currentTurn){
+        return currentGame.getCardCollection().checkMatch(currentTurn.getPicks());
+    }
+
+    private boolean isCompleteSet(Game currentGame, Turn currentTurn){
+        return currentTurn.getPicks().size() == currentGame.getGameParameters().getNumOfCardsPerSet();
+    }
+
+    private void winPoints(Game currentGame) {
+        Long userId = UserContextHolder.getCurrentUser().getUserId();
+        Long score = currentGame.getScoreBoard().get(userId);
+        currentGame.getScoreBoard().put(userId, score + currentGame.getGameParameters().getNumOfCardsPerSet());
+        inMemoryGameRepository.save(currentGame);
+    }
+
+    private void publishTurnState(Game currentGame){
+
+        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                .gameChangesDto(WSGameChanges.builder()
+                        .activePlayer(currentGame.getActivePlayer()).build())
+                .scoreBoard(
+                        new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()
+                .build();
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
+    }
+
+    private void checkGameEnd(Game currentGame){
+        // TODO: check cards are all turned & terminate Game. send GameState.Finished to frontend.
+    }
+
 }
