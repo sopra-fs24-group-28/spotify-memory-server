@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.constant.game.CardState;
 import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
@@ -8,6 +9,7 @@ import ch.uzh.ifi.hase.soprafs24.model.game.GameConstant;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
 import ch.uzh.ifi.hase.soprafs24.model.game.CardCollection;
+import ch.uzh.ifi.hase.soprafs24.model.game.Card;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import lombok.AllArgsConstructor;
@@ -153,7 +155,55 @@ public class GameService {
         return inMemoryGameRepository.save(game);
     }
 
-    public void runTurn(Integer gameId) {
+    public void runTurn(Integer gameId, int cardId) {
+         Game currentGame = inMemoryGameRepository.findById(gameId);
+         User currentPlayer = UserContextHolder.getCurrentUser();
+         // check IF, Player is activePlayer
+        if (Objects.equals(currentGame.getActivePlayer(), currentPlayer.getUserId())) {
+            List<Turn> history = currentGame.getHistory();
+            Turn currentTurn = history.get(history.size()-1);
 
+            checkValidCardState(gameId, cardId); // need event > make player to pick other card.
+            currentTurn.getPicks().add(cardId);
+            currentGame.getCardCollection().getCardById(cardId).setCardState(CardState.FACEUP);
+            // check IF, current picks are matching
+            if (currentGame.getCardCollection().checkMatch(currentTurn.getPicks())) {
+                // check IF, got all cards
+                if (currentTurn.getPicks().size() == currentGame.getGameParameters().getNumOfCardsPerSet()){
+                    excludeCards(gameId, currentTurn);
+                    winPoints(gameId, currentPlayer.getUserId());
+                    initiateNewTurn(currentGame);
+                    inMemoryGameRepository.save(currentGame);
+                }
+            } else {
+                // need event > let user view card contents & wait time.
+                initiateNewTurn(currentGame);
+                inMemoryGameRepository.save(currentGame);
+            }
+        }
+     }
+
+    private void excludeCards(Integer gameId, Turn turn){
+        Game currentGame = inMemoryGameRepository.findById(gameId);
+        for (int i = 0 ; i < turn.getPicks().size(); i++) {
+            Card card = currentGame.getCardCollection().getCardById(turn.getPicks().get(i));
+            card.setCardState(CardState.EXCLUDED);
+        }
+        inMemoryGameRepository.save(currentGame);
+    }
+
+    private void winPoints(Integer gameId, long userId) {
+        Game currentGame = inMemoryGameRepository.findById(gameId);
+        Long score = currentGame.getScoreBoard().get(userId);
+        currentGame.getScoreBoard().put(userId, score + currentGame.getGameParameters().getNumOfCardsPerSet());
+        inMemoryGameRepository.save(currentGame);
+    }
+
+    private void checkValidCardState(Integer gameId, int cardId){
+        Game currentGame = inMemoryGameRepository.findById(gameId);
+        Card currentCard = currentGame.getCardCollection().getCardById(cardId);
+        if (currentCard.getCardState() != CardState.FACEDOWN) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This card is unavailable.");
+        }
     }
 }
