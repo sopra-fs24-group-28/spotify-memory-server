@@ -6,7 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class WSCardContent {
-    private Long cardId;
+    private Integer cardId;
     private String songId;
     private String imageUrl;
 }

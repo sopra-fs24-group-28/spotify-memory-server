@@ -35,6 +35,8 @@ public class WebSocketController {
             User user = authService.getUserBySessionToken((String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("token"));
             UserContextHolder.setCurrentUser(user);
             gameService.runTurn(gameId, incomingCardId.getCardId());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
             UserContextHolder.clear();
         }
