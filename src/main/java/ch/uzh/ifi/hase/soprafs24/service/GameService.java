@@ -85,6 +85,7 @@ public class GameService {
     }
 
     private void initiateNewTurn(Game currentGame, boolean gameStreak){
+        // TODO: gameStreak added for same player keep playing after matching cards & later powerups
         List<User> players = currentGame.getPlayers();
         Long activePlayer = currentGame.getActivePlayer();
         int activePlayerIndex;
@@ -209,10 +210,10 @@ public class GameService {
         card.setCardState(CardState.FACEUP);
 
         publishCardContents(currentGame, card);
-        Thread.sleep(2000);
+        Thread.sleep(GameConstant.getViewSleep());
+        // set sleep for all card flips.
 
         handleMatch(currentGame, currentTurn);
-        checkGameEnd(currentGame);
     }
 
     private void publishCardContents(Game currentGame, Card card){
@@ -225,6 +226,7 @@ public class GameService {
         eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
     }
 
+    //TODO: should set this functions in DTOs or elsewhere?
     private Map<Integer, CardState> mapCardsState(CardCollection cardCollection) {
         List<Card> cards = cardCollection.getCards();
         Map<Integer, CardState> cardsState = null;
@@ -238,10 +240,12 @@ public class GameService {
     private void handleMatch(Game currentGame, Turn currentTurn){
         if (checkMatch(currentGame, currentTurn)){
             if (isCompleteSet(currentGame, currentTurn)){
-                winPoints(currentGame);
+                winPoints(currentGame, currentTurn);
+                checkGameEnd(currentGame); // TODO: check terminate state
                 initiateNewTurn(currentGame, true);
             }
         } else {
+            setCardsFaceDown(currentGame, currentTurn);
             initiateNewTurn(currentGame, false);
         }
         inMemoryGameRepository.save(currentGame);
@@ -256,10 +260,29 @@ public class GameService {
         return currentTurn.getPicks().size() == currentGame.getGameParameters().getNumOfCardsPerSet();
     }
 
-    private void winPoints(Game currentGame) {
+    private void winPoints(Game currentGame, Turn currentTurn) {
         Long userId = UserContextHolder.getCurrentUser().getUserId();
         Long score = currentGame.getScoreBoard().get(userId);
         currentGame.getScoreBoard().put(userId, score + currentGame.getGameParameters().getNumOfCardsPerSet());
+        setCardsExcluded(currentGame, currentTurn);
+        inMemoryGameRepository.save(currentGame);
+    }
+
+    private void setCardsFaceDown(Game currentGame, Turn currentTurn){
+        CardCollection cardCollection = currentGame.getCardCollection();
+
+        for (int cardId : currentTurn.getPicks()){
+            cardCollection.getCardById(cardId).setCardState(CardState.FACEDOWN);
+        }
+        inMemoryGameRepository.save(currentGame);
+    }
+
+    private void setCardsExcluded(Game currentGame, Turn currentTurn){
+        CardCollection cardCollection = currentGame.getCardCollection();
+
+        for (int cardId : currentTurn.getPicks()){
+            cardCollection.getCardById(cardId).setCardState(CardState.EXCLUDED);
+        }
         inMemoryGameRepository.save(currentGame);
     }
 
@@ -268,6 +291,8 @@ public class GameService {
         WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
                 .gameChangesDto(WSGameChanges.builder()
                         .activePlayer(currentGame.getActivePlayer()).build())
+                .cardsStates(
+                        new WSCardsStates(mapCardsState(currentGame.getCardCollection())))
                 .scoreBoard(
                         new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()
                 .build();
