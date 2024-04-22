@@ -29,8 +29,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserService {
 
-  private final Logger log = LoggerFactory.getLogger(UserService.class);
-
   private UserRepository userRepository;
   private SpotifyJWTRepository spotifyJWTRepository;
 
@@ -45,8 +43,6 @@ public class UserService {
     // flush() is called
     newUser = userRepository.save(newUser);
     userRepository.flush();
-
-    log.debug("Created Information for User: {}", newUser);
     return newUser;
   }
 
@@ -55,7 +51,7 @@ public class UserService {
 
       // remove old spotifyJWT if already exits (e.g. second login attempt without log out)
       if (user.getSpotifyJWT() != null) {
-          User loggedOutUser = logoutUser(user);
+          logoutUser(user);
       }
 
       // save the spotifyJWT first
