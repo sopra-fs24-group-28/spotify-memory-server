@@ -4,11 +4,15 @@ import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGameDto;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyOverviewDto;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PostGameStartDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSGameChanges;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
@@ -62,21 +66,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public void addPlayerToGame(@PathVariable Integer gameId) {
         List<User> users = gameService.addPlayerToGame(gameId);
-        List<PlayerDTO> players = userService.getPlayerDTOListFromListOfUsers(users);
-
-        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(
-                this,
-                gameId,
-                players));
-
-
-        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
-                .gameChangesDto(
-                        WSGameChanges.builder()
-                        .playerList(players).build())
-                .build();
-
-        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
+        sendPlayersChangedWsDto(gameId, users);
     }
 
     @DeleteMapping("/{gameId}/player")
@@ -85,15 +75,9 @@ public class GameController {
         List<User> users = gameService.removePlayerFromGame(gameId);
 
         if (users == null) {
-            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(
-                    this,
-                    gameId,
-                    GameState.FINISHED));
+            sendGameStateChangedWsDto(gameId, GameState.FINISHED);
         } else {
-            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(
-                    this,
-                    gameId,
-                    userService.getPlayerDTOListFromListOfUsers(users)));
+            sendPlayersChangedWsDto(gameId, users);
         }
 
     }
@@ -106,11 +90,51 @@ public class GameController {
     }
 
 
-    @PostMapping("/{gameId}") // TODO: change to websocket
+    @PostMapping("/{gameId}/start")
     @ResponseStatus(HttpStatus.OK)
-    public GameDTO startGame(@PathVariable Integer gameId) {
+    public void startGame(@PathVariable Integer gameId) {
         User host = UserContextHolder.getCurrentUser();
-        Game game = gameService.startGame(gameId, host); // TODO: remove id and get User from SecContext in Service
-        return new GameDTO(userService.getPlayerDTOListFromListOfUsers(game.getPlayers()), game.getActivePlayer(), game.getHostId(), game.getScoreBoard(), game.getGameParameters());
+        Game game = gameService.startGame(gameId, host);
+        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, game.getGameState()));
+
+        WSGameChanges wsGameChanges = WSGameChanges.builder()
+                .gameState(game.getGameState())
+                .activePlayer(game.getActivePlayer())
+                .build();
+
+        WSCardsStates wsCardsStates = new WSCardsStates(game.getCardCollection().getAllCardStates());
+
+        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                .gameChangesDto(wsGameChanges)
+                .cardsStates(wsCardsStates)
+                .build();
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
+    }
+
+    /*
+    * HELPER METHODS FOR WEBSOCKET UPDATES
+    * */
+
+    private void sendPlayersChangedWsDto(Integer gameId, List<User> users) {
+        List<PlayerDTO> players = userService.getPlayerDTOListFromListOfUsers(users);
+
+        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, players));
+
+
+        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                .gameChangesDto(WSGameChanges.builder().playerList(players).build()).build();
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
+    }
+
+    private void sendGameStateChangedWsDto(Integer gameId, GameState gameState) {
+        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, gameState));
+
+        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                .gameChangesDto(WSGameChanges.builder().gameState(gameState).build()).build();
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
+
     }
 }
