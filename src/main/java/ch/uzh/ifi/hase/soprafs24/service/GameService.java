@@ -163,7 +163,7 @@ public class GameService {
             List<Turn> history = currentGame.getHistory();
             Turn currentTurn = history.get(history.size()-1);
 
-            checkValidCardState(gameId, cardId); // need event > make player to pick other card.
+            checkValidCardState(gameId, cardId); // IF not, don't do anything.
             currentTurn.getPicks().add(cardId);
             currentGame.getCardCollection().getCardById(cardId).setCardState(CardState.FACEUP);
             // check IF, current picks are matching
@@ -172,6 +172,7 @@ public class GameService {
                 if (currentTurn.getPicks().size() == currentGame.getGameParameters().getNumOfCardsPerSet()){
                     excludeCards(gameId, currentTurn);
                     winPoints(gameId, currentPlayer.getUserId());
+                    // check game to terminate or not. (set gameState.finished / active.set null, 
                     initiateNewTurn(currentGame);
                     inMemoryGameRepository.save(currentGame);
                 }
