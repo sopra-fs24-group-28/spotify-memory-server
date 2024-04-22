@@ -14,35 +14,35 @@ import java.util.Optional;
 public class UserHandshakeInterceptor implements HandshakeInterceptor {
 
     @Override
-    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        Optional<String> token = extractToken(request);
-
-        if (token.isEmpty()) {
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
-            return false;
-        }
-
+    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
         try {
+            String token = extractToken(request);
+
+            if (token == null) {
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                return false;
+            }
+
             attributes.put("token", token);
             return true;
         } catch (Exception e) {
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            response.setStatusCode(HttpStatus.BAD_REQUEST);
             return false;
         }
     }
 
-    private Optional<String> extractToken(ServerHttpRequest request) {
+    private String extractToken(ServerHttpRequest request) {
         String query = request.getURI().getQuery();
         if (query != null) {
             String[] queryParams = query.split("&");
             for (String param : queryParams) {
                 String[] keyValue = param.split("=");
                 if ("token".equals(keyValue[0]) && keyValue.length > 1) {
-                    return Optional.of(keyValue[1]);
+                    return keyValue[1];
                 }
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override
