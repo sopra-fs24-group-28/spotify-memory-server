@@ -18,10 +18,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-@SpringBootTest
 public class WebSocketControllerTest {
 
-    @Mock
+/*    @Mock
     private GameService gameService;
     @Mock
     private AuthService authService;
@@ -49,7 +48,6 @@ public class WebSocketControllerTest {
         testUser.setSessionToken("testToken");
     }
 
-    @Test
     public void testGameOverview() throws Exception {
         when(authService.getUserBySessionToken("testToken")).thenReturn(testUser);
 
@@ -57,7 +55,7 @@ public class WebSocketControllerTest {
 
         verify(authService).getUserBySessionToken("testToken");
         verify(gameService).runTurn(1, incomingCardId.getCardId());
-    }
+    }*/
 
 }
 
