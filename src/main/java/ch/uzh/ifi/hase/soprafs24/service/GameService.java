@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.game.CardState;
 import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.Stats;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameConstant;
@@ -10,6 +11,7 @@ import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
 import ch.uzh.ifi.hase.soprafs24.model.game.Card;
 import ch.uzh.ifi.hase.soprafs24.model.game.CardCollection;
+import ch.uzh.ifi.hase.soprafs24.repository.StatsRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
@@ -35,6 +37,7 @@ public class GameService {
     private final UserService userService;
     private InMemoryGameRepository inMemoryGameRepository;
     private ApplicationEventPublisher eventPublisher;
+    private StatsRepository statsRepository;
 
 
 
@@ -59,6 +62,7 @@ public class GameService {
             randomizePlayersIndex(currentGame);
             createCardCollection(currentGame);
             createScoreBoard(currentGame);
+            currentGame.setMatchCount(0);
             initiateNewTurn(currentGame, false);
             return inMemoryGameRepository.save(currentGame);
         } else {
@@ -214,6 +218,16 @@ public class GameService {
         // set sleep for all card flips.
 
         handleMatch(currentGame, currentTurn);
+
+        if (checkFinished(currentGame)){
+            finishGame(currentGame);
+            publishGamefinished(currentGame);
+            Thread.sleep(GameConstant.getFinishSleep());
+
+            resetGame(currentGame);
+        } else {
+            publishOnPlayState(currentGame);
+        }
     }
 
     private void publishCardContents(Game currentGame, Card card){
@@ -238,18 +252,18 @@ public class GameService {
     }
 
     private void handleMatch(Game currentGame, Turn currentTurn){
+
         if (checkMatch(currentGame, currentTurn)){
             if (isCompleteSet(currentGame, currentTurn)){
                 winPoints(currentGame, currentTurn);
-                checkGameEnd(currentGame); // TODO: check terminate state
                 initiateNewTurn(currentGame, true);
             }
         } else {
             setCardsFaceDown(currentGame, currentTurn);
             initiateNewTurn(currentGame, false);
         }
+
         inMemoryGameRepository.save(currentGame);
-        publishTurnState(currentGame);
     }
 
     private boolean checkMatch(Game currentGame, Turn currentTurn){
@@ -265,6 +279,7 @@ public class GameService {
         Long score = currentGame.getScoreBoard().get(userId);
         currentGame.getScoreBoard().put(userId, score + currentGame.getGameParameters().getNumOfCardsPerSet());
         setCardsExcluded(currentGame, currentTurn);
+        addMatchCount(currentGame);
         inMemoryGameRepository.save(currentGame);
     }
 
@@ -286,7 +301,15 @@ public class GameService {
         inMemoryGameRepository.save(currentGame);
     }
 
-    private void publishTurnState(Game currentGame){
+    private void addMatchCount(Game currentGame){
+        Integer matchCount = currentGame.getMatchCount();
+        matchCount++;
+
+        currentGame.setMatchCount(matchCount);
+        inMemoryGameRepository.save(currentGame);
+    }
+
+    private void publishOnPlayState(Game currentGame){
 
         WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
                 .gameChangesDto(WSGameChanges.builder()
@@ -300,8 +323,54 @@ public class GameService {
         eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
     }
 
-    private void checkGameEnd(Game currentGame){
-        // TODO: check cards are all turned & terminate Game. send GameState.Finished to frontend.
+    private boolean checkFinished(Game currentGame){
+        return (currentGame.getMatchCount() == currentGame.getGameParameters().getNumOfSets());
+    }
+
+    private void finishGame(Game currentGame){
+        currentGame.setGameState(GameState.FINISHED);
+        recordGameStatistics(currentGame);
+        resetGame(currentGame);
+        inMemoryGameRepository.save(currentGame);
+    }
+
+    private void recordGameStatistics(Game currentGame){
+        Random random = new Random();
+        Integer gameId = random.nextInt(2147483647);
+        List<User> players = currentGame.getPlayers();
+
+        for (User player: players){
+            Stats stats = new Stats();
+            stats.setUserId(player.getUserId());
+            stats.setGameId(gameId);
+            stats.setSetsWon(currentGame.getScoreBoard().get(player.getUserId()));
+            // TODO: how to get win, loss & aborted
+            statsRepository.saveAndFlush(stats);
+        }
+
+    }
+
+    private void resetGame(Game currentGame){
+        currentGame.setGameState(GameState.OPEN);
+        currentGame.setHistory(null);
+        currentGame.setActivePlayer(null);
+        currentGame.setScoreBoard(null);
+        currentGame.setMatchCount(null);
+        currentGame.setCardCollection(null);
+
+        inMemoryGameRepository.save(currentGame);
+    }
+
+    private void publishGamefinished(Game currentGame){
+
+        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                .gameChangesDto(WSGameChanges.builder()
+                        .gameState(currentGame.getGameState()).build())
+                .scoreBoard(
+                        new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()
+                .build();
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
     }
 
 }

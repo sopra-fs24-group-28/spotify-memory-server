@@ -36,6 +36,8 @@ public class Game {
 
     private CardCollection cardCollection;
 
+    private Integer matchCount;
+
     public Game(GameParameters gameParameters, User host) {
         this.gameState = GameState.OPEN;
         this.gameParameters = gameParameters;

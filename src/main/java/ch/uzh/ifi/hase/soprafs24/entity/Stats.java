@@ -16,13 +16,13 @@ public class Stats {
     private Long id;
 
     @NonNull
-    private Integer userId;
+    private Long userId;
 
     @NonNull
     private Integer gameId;
 
     @NonNull
-    private Integer setsWon;
+    private Long setsWon;
 
     @NonNull
     private Boolean win;
