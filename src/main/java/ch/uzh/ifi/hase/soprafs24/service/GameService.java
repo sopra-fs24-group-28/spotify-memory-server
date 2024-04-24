@@ -217,14 +217,14 @@ public class GameService {
         Thread.sleep(GameConstant.getViewSleep());
         // set sleep for all card flips.
 
-        handleMatch(currentGame, currentTurn);
+        currentGame = handleMatch(currentGame, currentTurn);
 
         if (checkFinished(currentGame)){
             finishGame(currentGame);
             publishGamefinished(currentGame);
             Thread.sleep(GameConstant.getFinishSleep());
 
-            resetGame(currentGame);
+            resetGame(currentGame); // TODO: create a separate request on frontend request
         } else {
             publishOnPlayState(currentGame);
         }
@@ -251,7 +251,7 @@ public class GameService {
         return cardsState;
     }
 
-    private void handleMatch(Game currentGame, Turn currentTurn){
+    private Game handleMatch(Game currentGame, Turn currentTurn){
 
         if (checkMatch(currentGame, currentTurn)){
             if (isCompleteSet(currentGame, currentTurn)){
@@ -263,7 +263,7 @@ public class GameService {
             initiateNewTurn(currentGame, false);
         }
 
-        inMemoryGameRepository.save(currentGame);
+        return inMemoryGameRepository.save(currentGame);
     }
 
     private boolean checkMatch(Game currentGame, Turn currentTurn){

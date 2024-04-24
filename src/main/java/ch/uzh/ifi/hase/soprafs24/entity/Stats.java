@@ -16,7 +16,7 @@ public class Stats {
     private Long id;
 
     @NonNull
-    private Long userId;
+    private Long userId; // TODO: connect to Users as 1:N or N:1
 
     @NonNull
     private Integer gameId;
