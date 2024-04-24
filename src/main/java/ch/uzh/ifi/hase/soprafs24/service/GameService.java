@@ -97,7 +97,12 @@ public class GameService {
         if (activePlayer == null) {
             activePlayerIndex = 0;
         } else {
-            activePlayerIndex = players.indexOf(userService.findUserByUserId(activePlayer));
+            // Returns -1 for some reason
+            // activePlayerIndex = players.indexOf(userService.findUserByUserId(activePlayer));
+            activePlayerIndex = -1;
+            for (int index = 0; index < players.size(); index++) {
+                if (activePlayer.equals(players.get(index).getUserId())) {activePlayerIndex = index;}
+            }
             if (!gameStreak) {
                 activePlayerIndex++;
                 if (activePlayerIndex == players.size()) {
@@ -107,6 +112,7 @@ public class GameService {
         }
 
         currentGame.setActivePlayer(players.get(activePlayerIndex).getUserId());
+        activePlayer = currentGame.getActivePlayer();
         Turn turn = new Turn(activePlayer);
         currentGame.getHistory().add(turn);
         inMemoryGameRepository.save(currentGame);
@@ -224,7 +230,7 @@ public class GameService {
             publishGamefinished(currentGame);
             Thread.sleep(GameConstant.getFinishSleep());
 
-            resetGame(currentGame); // TODO: create a separate request on frontend request
+            //resetGame(currentGame); // TODO: create a separate request on frontend request
         } else {
             publishOnPlayState(currentGame);
         }
@@ -243,7 +249,7 @@ public class GameService {
     //TODO: should set this functions in DTOs or elsewhere?
     private Map<Integer, CardState> mapCardsState(CardCollection cardCollection) {
         List<Card> cards = cardCollection.getCards();
-        Map<Integer, CardState> cardsState = null;
+        Map<Integer, CardState> cardsState = new HashMap<>();
 
         for (Card card : cards) {
             cardsState.put(card.getCardId(), card.getCardState());
@@ -320,7 +326,7 @@ public class GameService {
                         new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()
                 .build();
 
-        eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
+        //eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
     }
 
     private boolean checkFinished(Game currentGame){
@@ -330,7 +336,7 @@ public class GameService {
     private void finishGame(Game currentGame){
         currentGame.setGameState(GameState.FINISHED);
         recordGameStatistics(currentGame);
-        resetGame(currentGame);
+        //resetGame(currentGame);
         inMemoryGameRepository.save(currentGame);
     }
 
@@ -370,7 +376,7 @@ public class GameService {
                         new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()
                 .build();
 
-        eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
+        // eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
     }
 
 }
