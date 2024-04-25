@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.logging.*;
 
 @Service
 @Transactional
@@ -38,6 +39,8 @@ public class GameService {
     private InMemoryGameRepository inMemoryGameRepository;
     private ApplicationEventPublisher eventPublisher;
     private StatsRepository statsRepository;
+
+    private static final Logger logger = Logger.getLogger(GameService.class.getName());
 
 
 
