@@ -80,6 +80,26 @@ public class SpotifyControllerTest {
         }
     }
 
+    @Test
+    public void givenValidDeviceId_ReturnOK() throws Exception {
+        try (MockedStatic<UserContextHolder> mocked_UCH = mockStatic(UserContextHolder.class)) {
+            User testUser = new User();
+            testUser.setUsername("testUsername");
+            testUser.setUserId(1L);
+            testUser.setSessionToken("token");
+
+            Mockito.when(authService.getUserBySessionToken(Mockito.any())).thenReturn(testUser);
+            given(UserContextHolder.getCurrentUser()).willReturn(testUser);
+            doNothing().when(spotifyService).setDeviceId(Mockito.any(), Mockito.any());
+
+            mockMvc.perform(post("/spotify/user/deviceid")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer token")
+                            .content("deviceid")
+                    )
+                    .andExpect(status().isOk());
+        }
+    }
 
     public static String asJsonString(final Object obj) {
         try {

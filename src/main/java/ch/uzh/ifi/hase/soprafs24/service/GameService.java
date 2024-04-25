@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.game.CardState;
+import ch.uzh.ifi.hase.soprafs24.constant.game.GameCategory;
 import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Stats;
@@ -213,6 +214,16 @@ public class GameService {
         currentTurn.getPicks().add(cardId);
         Card card = currentGame.getCardCollection().getCardById(cardId);
         card.setCardState(CardState.FACEUP);
+
+        // if gamecategory == standardsong, set song on all players' devices
+        if (currentGame.getGameParameters().getGameCategory() == GameCategory.STANDARDSONG) {
+            for (User player : currentGame.getPlayers()) {
+                SpotifyService.setSong(
+                        player.getSpotifyJWT().getAccessToken(),
+                        player.getSpotifyDeviceId(),
+                        card.getSongId());
+            }
+        }
 
         publishCardContents(currentGame, card);
         Thread.sleep(GameConstant.getViewSleep());
