@@ -16,13 +16,13 @@ public class Stats {
     private Long id;
 
     @NonNull
-    private Integer userId;
+    private Long userId; // TODO: connect to Users as 1:N or N:1
 
     @NonNull
     private Integer gameId;
 
     @NonNull
-    private Integer setsWon;
+    private Long setsWon;
 
     @NonNull
     private Boolean win;
