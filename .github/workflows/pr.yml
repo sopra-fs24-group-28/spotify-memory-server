@@ -23,6 +23,18 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          DATASOURCE_URL: ${{ secrets.DATASOURCE_URL }}
+          DATASOURCE_USERNAME: ${{ secrets.DATASOURCE_USERNAME }}
+          DATASOURCE_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
         
       - name: Test with Gradle
         run: ./gradlew test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          DATASOURCE_URL: ${{ secrets.DATASOURCE_URL }}
+          DATASOURCE_USERNAME: ${{ secrets.DATASOURCE_USERNAME }}
+          DATASOURCE_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
