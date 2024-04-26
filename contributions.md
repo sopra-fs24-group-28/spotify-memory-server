@@ -68,6 +68,14 @@
 * Wrote tests for CardCollection functions
 * Helped to implement Persistance & get user Playlists
 
+### Week 5
+* Unit tests for UserService
+* Unit tests for AuthService
+* Unit tests for AuthController
+* Integration test for running full game
+* [#113](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/113) Several minor improvements (Card-Content, Playlist name and Playlist url)
+* [#138](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/138) Create POST /spotify/user/deviceid
+
 ## Niklas
 ### Week 1
 * [#30] Log out functionality
