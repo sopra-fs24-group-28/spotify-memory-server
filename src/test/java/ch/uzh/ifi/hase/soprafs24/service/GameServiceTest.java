@@ -223,9 +223,9 @@ public class GameServiceTest {
             Mockito.when(inMemoryGameRepository.findAll()).thenReturn(games);
 
             // assert user status
-            List<Game> resurtGames = gameService.getGames();
+            List<Game> resultGames = gameService.getGames();
 
-            assertEquals(resurtGames, games);
+            assertEquals(resultGames, games);
         }
     }
 
@@ -240,9 +240,9 @@ public class GameServiceTest {
             Mockito.when(inMemoryGameRepository.findAll()).thenReturn(games);
 
             // assert user status
-            List<Game> resurtGames = gameService.getGames();
+            List<Game> resultGames = gameService.getGames();
 
-            assertEquals(resurtGames, games);
+            assertEquals(resultGames, games);
         }
     }
 
