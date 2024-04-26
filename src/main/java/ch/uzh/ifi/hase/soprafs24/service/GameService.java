@@ -91,10 +91,10 @@ public class GameService {
     private void initiateNewTurn(Game currentGame, boolean gameStreak){
         // TODO: gameStreak added for same player keep playing after matching cards & later powerups
         List<User> players = currentGame.getPlayers();
-        Long activePlayer = currentGame.getActivePlayer();
+
         int activePlayerIndex;
 
-        if (activePlayer == null) {
+        if (currentGame.getActivePlayer() == null) {
             activePlayerIndex = 0;
         } else {
             // Returns -1 for some reason
@@ -110,10 +110,9 @@ public class GameService {
                 }
             }
         }
-
-        currentGame.setActivePlayer(players.get(activePlayerIndex).getUserId());
-        activePlayer = currentGame.getActivePlayer();
-        Turn turn = new Turn(activePlayer);
+        Long activePlayerId = players.get(activePlayerIndex).getUserId();
+        currentGame.setActivePlayer(activePlayerId);
+        Turn turn = new Turn(activePlayerId);
         currentGame.getHistory().add(turn);
         inMemoryGameRepository.save(currentGame);
     }
