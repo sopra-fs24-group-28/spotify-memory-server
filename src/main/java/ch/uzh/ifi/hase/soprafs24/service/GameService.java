@@ -217,13 +217,7 @@ public class GameService {
 
         // if gamecategory == standardsong, set song on all players' devices
         if (currentGame.getGameParameters().getGameCategory() == GameCategory.STANDARDSONG) {
-            for (User player : currentGame.getPlayers()) {
-                User fetchedPlayer = userService.findUserByUserId(player.getUserId());
-                SpotifyService.setSong(
-                        fetchedPlayer.getSpotifyJWT().getAccessToken(),
-                        fetchedPlayer.getSpotifyDeviceId(),
-                        card.getSongId());
-            }
+            setSongForAllPlayers(currentGame, card);
         }
 
         publishCardContents(currentGame, card);
@@ -240,6 +234,16 @@ public class GameService {
             resetGame(currentGame); // TODO: create a separate request on frontend request
         } else {
             publishOnPlayState(currentGame);
+        }
+    }
+
+    private void setSongForAllPlayers(Game currentGame, Card card) {
+        for (User player : currentGame.getPlayers()) {
+            User fetchedPlayer = userService.findUserByUserId(player.getUserId());
+            SpotifyService.setSong(
+                    fetchedPlayer.getSpotifyJWT().getAccessToken(),
+                    fetchedPlayer.getSpotifyDeviceId(),
+                    card.getSongId());
         }
     }
 
