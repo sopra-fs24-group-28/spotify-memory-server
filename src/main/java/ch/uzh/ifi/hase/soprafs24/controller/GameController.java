@@ -65,21 +65,13 @@ public class GameController {
     @PutMapping("/{gameId}/player")
     @ResponseStatus(HttpStatus.OK)
     public void addPlayerToGame(@PathVariable Integer gameId) {
-        List<User> users = gameService.addPlayerToGame(gameId);
-        sendPlayersChangedWsDto(gameId, users);
+        gameService.addPlayerToGame(gameId);
     }
 
     @DeleteMapping("/{gameId}/player")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removePlayerFromGame(@PathVariable Integer gameId) {
-        List<User> users = gameService.removePlayerFromGame(gameId);
-
-        if (users == null) {
-            sendGameStateChangedWsDto(gameId, GameState.FINISHED);
-        } else {
-            sendPlayersChangedWsDto(gameId, users);
-        }
-
+        gameService.removePlayerFromGame(gameId);
     }
 
     @GetMapping("/{gameId}")
@@ -93,47 +85,6 @@ public class GameController {
     @PostMapping("/{gameId}/start")
     @ResponseStatus(HttpStatus.OK)
     public void startGame(@PathVariable Integer gameId) {
-        Game game = gameService.startGame(gameId);
-        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, game.getGameState()));
-
-        WSGameChanges wsGameChanges = WSGameChanges.builder()
-                .gameState(game.getGameState())
-                .activePlayer(game.getActivePlayer())
-                .build();
-
-        WSCardsStates wsCardsStates = new WSCardsStates(game.getCardCollection().getAllCardStates());
-
-        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
-                .gameChangesDto(wsGameChanges)
-                .cardsStates(wsCardsStates)
-                .build();
-
-        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
-    }
-
-    /*
-    * HELPER METHODS FOR WEBSOCKET UPDATES
-    * */
-
-    private void sendPlayersChangedWsDto(Integer gameId, List<User> users) {
-        List<PlayerDTO> players = userService.getPlayerDTOListFromListOfUsers(users);
-
-        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, players));
-
-
-        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
-                .gameChangesDto(WSGameChanges.builder().playerList(players).build()).build();
-
-        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
-    }
-
-    private void sendGameStateChangedWsDto(Integer gameId, GameState gameState) {
-        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, gameState));
-
-        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
-                .gameChangesDto(WSGameChanges.builder().gameState(gameState).build()).build();
-
-        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
-
+        gameService.startGame(gameId);
     }
 }

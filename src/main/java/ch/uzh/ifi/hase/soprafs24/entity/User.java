@@ -48,4 +48,7 @@ public class User implements Serializable {
   @JsonManagedReference
   private SpotifyJWT spotifyJWT;
 
+  @Column
+  private Integer currentGameId;
+
 }

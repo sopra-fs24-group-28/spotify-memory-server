@@ -24,6 +24,7 @@ import java.util.HashMap;
 public class AuthService {
 
     private UserService userService;
+    private GameService gameService;
 
     public User authenticateFromCode(String code) {
         AuthorizationCodeCredentials authorizationCodeCredentials = getAuthorizationCodeCredentials(code);
@@ -69,6 +70,9 @@ public class AuthService {
         userToCreateOrLogin.setUsername(username);
 
         if (userService.userExists(userToCreateOrLogin)) {
+            if (userToCreateOrLogin.getCurrentGameId() != null) {
+                gameService.removePlayerFromGame(userToCreateOrLogin.getCurrentGameId());
+            }
             return userService.loginUser(userToCreateOrLogin.getSpotifyUserId(), spotifyJWT);
         } else {
             User createdUser = userService.createUser(userToCreateOrLogin);
@@ -78,7 +82,11 @@ public class AuthService {
 
     public void logout() {
         try {
-            userService.logoutUser(UserContextHolder.getCurrentUser());
+            User user = UserContextHolder.getCurrentUser();
+            if (user.getCurrentGameId() != null) {
+                gameService.removePlayerFromGame(user.getCurrentGameId());
+            }
+            userService.logoutUser(user);
         } catch (Exception e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The unexpected error: " + e.getMessage());
         }
