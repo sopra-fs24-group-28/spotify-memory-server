@@ -36,6 +36,11 @@
 * [#41](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/41#issue-2203432033) Open a WebSocket connection from the back-end
 * [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) lobby overview websocket deployed (with Diyar & Niklas)
 
+### Week 5
+* [...] Controller Unit Tests
+* [...] WS Testing
+* [...] WS Game BE&FE (Diyar & Niklas)
+
 ## Henry
 
 ### Week 1
