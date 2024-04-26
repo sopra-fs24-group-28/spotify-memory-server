@@ -12,7 +12,7 @@ import java.util.*;
 @Setter
 public class CardCollection {
     private List<Card> cards = new ArrayList<>();
-    private HashMap<Integer, List<Integer>> matchingCards = new HashMap<Integer, List<Integer>>();
+    private HashMap<Integer, List<Integer>> matchingCards = new HashMap<>();
 
     // cards are created in the constructor
     public CardCollection(GameParameters gameParameters, String accessToken) {
