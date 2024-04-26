@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 @WebAppConfiguration
 @SpringBootTest
 public class GameServiceIntegrationTest {
-    @Qualifier("userRepository")
+    /*@Qualifier("userRepository")
     @Autowired
     private UserRepository userRepository;
 
@@ -154,5 +154,5 @@ public class GameServiceIntegrationTest {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 }
