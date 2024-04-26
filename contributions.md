@@ -102,3 +102,7 @@
 * [#13 / #15] implemented scoreboard
 * no issue: resolved old legacy bugs in frontend
 
+### Week 5
+* [...] Playback SDK implementation
+* [...] Playback Integration in Game
+* [...] Game Screen Impl
