@@ -182,19 +182,6 @@ public class GameService {
             runActiveTurn(currentGame, cardId);
             inMemoryGameRepository.save(currentGame);
         }
-        /*
-        Map<Integer, CardState> integerCardStateMap = Map.of(cardId, CardState.EXCLUDED);
-
-        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
-                .gameChangesDto(
-                        WSGameChanges.builder().gameState(GameState.ONPLAY).build())
-                .cardContent(
-                        new WSCardContent(1, "sadfgsdfg", "url"))
-                .cardsStates(
-                        new WSCardsStates(integerCardStateMap)).build();
-
-        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
-         */
     }
 
     private boolean checkActivePlayer(Game currentGame){

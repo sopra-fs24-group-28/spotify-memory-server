@@ -14,7 +14,7 @@ public class Card {
     private String imageUrl;
     private CardState cardState;
 
-    Card(String songId, String imageUrl) {
+    public Card(String songId, String imageUrl) {
         Random random = new Random();
 
         // upper bound in nextInt corresponds to max positive integer
