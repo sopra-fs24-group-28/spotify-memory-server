@@ -151,6 +151,7 @@ public class UserServiceTest {
         assertEquals(testUser.getSpotifyUserId(), loggedOutUser.getSpotifyUserId());
         assertNull(loggedOutUser.getSpotifyJWT());
         assertNull(loggedOutUser.getSessionToken());
+        assertNull(loggedOutUser.getSpotifyDeviceId());
         assertEquals(UserStatus.OFFLINE, loggedOutUser.getState());
     }
 
@@ -213,6 +214,22 @@ public class UserServiceTest {
         assertEquals(testUser.getSpotifyUserId(), updatedUser.getSpotifyUserId());
         assertEquals(testUser.getUsername(), updatedUser.getUsername());
         assertEquals(updatedUser.getState(), UserStatus.INGAME);
+    }
+
+    @Test
+    public void setSpotifyDeviceId_validInputs_success() {
+        // mock repository functions
+        Mockito.when(userRepository.findBySpotifyUserId(Mockito.any())).thenReturn(testUser);
+
+        // change user state
+        User updatedUser = userService.setSpotifyDeviceId(testUser.getSpotifyUserId(), "deviceId");
+
+        // check userRepository is called once only
+        Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
+
+        // assert user status
+        assertEquals(testUser.getSpotifyUserId(), updatedUser.getSpotifyUserId());
+        assertEquals(updatedUser.getSpotifyDeviceId(), "deviceId");
     }
 
     @Test

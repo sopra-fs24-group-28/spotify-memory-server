@@ -77,6 +77,15 @@ public class UserService {
       user.setState(UserStatus.OFFLINE);
       user.setSessionToken(null);
       user.setSpotifyJWT(null);
+      user.setSpotifyDeviceId(null);
+      user = userRepository.save(user);
+      userRepository.flush();
+      return user;
+  }
+
+  public User setSpotifyDeviceId(String spotifyUserId, String deviceId) {
+      User user = userRepository.findBySpotifyUserId(spotifyUserId);
+      user.setSpotifyDeviceId(deviceId);
       user = userRepository.save(user);
       userRepository.flush();
       return user;
