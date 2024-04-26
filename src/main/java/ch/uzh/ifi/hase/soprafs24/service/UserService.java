@@ -7,8 +7,6 @@ import ch.uzh.ifi.hase.soprafs24.repository.SpotifyJWTRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -128,6 +126,11 @@ public class UserService {
   public User setPlayerState(User user, UserStatus userStatus) {
       user.setState(userStatus);
       return userRepository.saveAndFlush(user);
+  }
+
+  public void setGameIdForGivenUser(User user, Integer gameId) {
+        user.setCurrentGameId(gameId);
+        userRepository.saveAndFlush(user);
   }
 
   public List<PlayerDTO> getPlayerDTOListFromListOfUsers(List<User> users) {

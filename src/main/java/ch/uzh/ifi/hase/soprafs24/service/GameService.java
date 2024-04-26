@@ -14,6 +14,7 @@ import ch.uzh.ifi.hase.soprafs24.model.game.Card;
 import ch.uzh.ifi.hase.soprafs24.model.game.CardCollection;
 import ch.uzh.ifi.hase.soprafs24.repository.StatsRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardContent;
@@ -21,6 +22,7 @@ import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSGameChanges;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSScoreBoardChanges;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
+import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -35,7 +37,7 @@ import java.util.*;
 @AllArgsConstructor
 public class GameService {
 
-    private final UserService userService;
+    private UserService userService;
     private InMemoryGameRepository inMemoryGameRepository;
     private ApplicationEventPublisher eventPublisher;
     private StatsRepository statsRepository;
@@ -43,17 +45,20 @@ public class GameService {
 
 
     public Game createGame(GameParameters gameParameters) {
-         User host = UserContextHolder.getCurrentUser();
-         if (host.getState().equals(UserStatus.INGAME)) {
-             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a game");
-         }
-         Game newGame = new Game(gameParameters, host);
-         addPlayerToGame(newGame, host);
-         setPlaylistNameAndURL(newGame);
-         return inMemoryGameRepository.save(newGame);
+
+        User host = UserContextHolder.getCurrentUser();
+        if (host.getState().equals(UserStatus.INGAME)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a game");
+        }
+        Game newGame = new Game(gameParameters, host);
+        Game game = inMemoryGameRepository.save(newGame);
+        addPlayerToGame(game, host);
+        setPlaylistNameAndURL(game);
+        return inMemoryGameRepository.save(newGame);
+
      }
 
-    public Game startGame(Integer gameId) {
+    public void startGame(Integer gameId) {
         Game currentGame = inMemoryGameRepository.findById(gameId);
         User host = UserContextHolder.getCurrentUser();
         Long hostId = host.getUserId();
@@ -65,7 +70,25 @@ public class GameService {
             createScoreBoard(currentGame);
             currentGame.setMatchCount(0);
             initiateNewTurn(currentGame, false);
-            return inMemoryGameRepository.save(currentGame);
+            inMemoryGameRepository.save(currentGame);
+
+            eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, currentGame.getGameState()));
+
+            WSGameChanges wsGameChanges = WSGameChanges.builder()
+                    .gameState(currentGame.getGameState())
+                    .activePlayer(currentGame.getActivePlayer())
+                    .build();
+
+            WSCardsStates wsCardsStates = new WSCardsStates(currentGame.getCardCollection().getAllCardStates());
+
+            WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                    .gameChangesDto(wsGameChanges)
+                    .cardsStates(wsCardsStates)
+                    .build();
+
+            eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
+
+
         } else {
          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to start the game.");
         }
@@ -132,39 +155,52 @@ public class GameService {
 
      public Game getGameById(Integer gameId) {return inMemoryGameRepository.findById(gameId);}
 
-     public List<User> addPlayerToGame(Integer gameId) {
+     public void addPlayerToGame(Integer gameId) {
          User newUser = UserContextHolder.getCurrentUser();
          Game game = inMemoryGameRepository.findById(gameId);
          if (game.getGameState() == GameState.OPEN && game.getPlayers().size() < game.getGameParameters().getPlayerLimit()){
-             return addPlayerToGame(game, newUser);
+             List<User> users = addPlayerToGame(game, newUser);
+             sendPlayersChangedWsDto(gameId, users);
          } else {
              throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to join the game.");
          }
      }
 
-     public List<User> removePlayerFromGame(Integer gameId) {
+     public void removePlayerFromGame(Integer gameId) {
          User userToRemove = UserContextHolder.getCurrentUser();
          Game game = inMemoryGameRepository.findById(gameId);
          userService.setPlayerState(userToRemove, UserStatus.ONLINE);
+         userService.setGameIdForGivenUser(userToRemove, null);
          if (game.getHostId().equals(userToRemove.getUserId())) {
              for (User user: game.getPlayers()) {
                  userService.setPlayerState(user, UserStatus.ONLINE);
+                 userService.setGameIdForGivenUser(user, null);
              }
              inMemoryGameRepository.deleteById(gameId);
-             return null;
+             sendGameStateChangedWsDto(gameId, GameState.FINISHED);
          } else {
              game.getPlayers().removeIf(u -> u.getUserId().equals(userToRemove.getUserId()));
-             return inMemoryGameRepository.save(game).getPlayers();
+             List<User> users = inMemoryGameRepository.save(game).getPlayers();
+             sendPlayersChangedWsDto(gameId, users);
          }
      }
 
     private List<User> addPlayerToGame(Game game, User user) {
-        if (game.getGameState().equals(GameState.OPEN)) {
+        if (user.getCurrentGameId() != null || user.getState().equals(UserStatus.INGAME)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a game." + user.getCurrentGameId());
+        } else if (game.getPlayers().size() >= game.getGameParameters().getPlayerLimit()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player limit exceeded.");
+        } else if (game.getGameState().equals(GameState.ONPLAY) || game.getGameState().equals(GameState.FINISHED)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Game is currently not open");
+        } else if (game.getGameState().equals(GameState.OPEN)) {
+
+            userService.setGameIdForGivenUser(user, game.getGameId());
             userService.setPlayerState(user, UserStatus.INGAME);
+
             game.getPlayers().add(user);
             return inMemoryGameRepository.save(game).getPlayers();
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Game is not open");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There has been an unexpected exception. Logout if the issue persists");
         }
     }
 
@@ -393,6 +429,32 @@ public class GameService {
                 .build();
 
         // eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
+    }
+
+    /*
+     * HELPER METHODS FOR WEBSOCKET UPDATES
+     * */
+
+    private void sendPlayersChangedWsDto(Integer gameId, List<User> users) {
+        List<PlayerDTO> players = userService.getPlayerDTOListFromListOfUsers(users);
+
+        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, players));
+
+
+        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                .gameChangesDto(WSGameChanges.builder().playerList(players).build()).build();
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
+    }
+
+    private void sendGameStateChangedWsDto(Integer gameId, GameState gameState) {
+        eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, gameState));
+
+        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                .gameChangesDto(WSGameChanges.builder().gameState(gameState).build()).build();
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
+
     }
 
 }
