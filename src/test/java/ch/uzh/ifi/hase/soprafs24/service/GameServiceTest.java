@@ -428,7 +428,7 @@ public class GameServiceTest {
                             gameService.runTurn(testGame.getGameId(), testCard.getCardId());
 
                             Mockito.verify(inMemoryGameRepository, Mockito.times(4)).save(Mockito.any());
-                            Mockito.verify(eventPublisher, Mockito.times(2)).publishEvent(Mockito.any());
+                            Mockito.verify(eventPublisher, Mockito.times(1)).publishEvent(Mockito.any());
 
                         }
                     }
