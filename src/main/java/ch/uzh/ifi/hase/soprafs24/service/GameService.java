@@ -374,11 +374,11 @@ public class GameService {
                         .activePlayer(currentGame.getActivePlayer()).build())
                 .cardsStates(
                         new WSCardsStates(mapCardsState(currentGame.getCardCollection())))
-                .scoreBoard(
-                        new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()
+/*                .scoreBoard(
+                        new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()*/
                 .build();
 
-        //eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
+        eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
     }
 
     private boolean checkFinished(Game currentGame){
@@ -424,11 +424,11 @@ public class GameService {
         WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
                 .gameChangesDto(WSGameChanges.builder()
                         .gameState(currentGame.getGameState()).build())
-                .scoreBoard(
-                        new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()
+/*                .scoreBoard(
+                        new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()*/
                 .build();
 
-        // eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
+        eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
     }
 
     /*
