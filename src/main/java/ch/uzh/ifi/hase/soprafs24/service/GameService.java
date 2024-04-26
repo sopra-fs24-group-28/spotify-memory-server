@@ -218,9 +218,10 @@ public class GameService {
         // if gamecategory == standardsong, set song on all players' devices
         if (currentGame.getGameParameters().getGameCategory() == GameCategory.STANDARDSONG) {
             for (User player : currentGame.getPlayers()) {
+                User fetchedPlayer = userService.findUserByUserId(player.getUserId());
                 SpotifyService.setSong(
-                        player.getSpotifyJWT().getAccessToken(),
-                        player.getSpotifyDeviceId(),
+                        fetchedPlayer.getSpotifyJWT().getAccessToken(),
+                        fetchedPlayer.getSpotifyDeviceId(),
                         card.getSongId());
             }
         }

@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("spotify")
 @AllArgsConstructor
@@ -30,9 +32,9 @@ public class SpotifyController {
 
     @PostMapping("/user/deviceid")
     @ResponseStatus(HttpStatus.OK)
-    public void setSpotifyDeviceId(@RequestBody String deviceId) {
+    public void setSpotifyDeviceId(@RequestBody Map<String, String> payload) {
         User user = UserContextHolder.getCurrentUser();
-        spotifyService.setDeviceId(user.getSpotifyUserId(), deviceId);
+        spotifyService.setDeviceId(user.getSpotifyUserId(), payload.get("deviceid"));
     }
 }
 
