@@ -23,6 +23,13 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+        with:
+          env_vars: |-
+            clientSecret=${{ secrets.CLIENTSECRET }}
+            redirectURL=${{ secrets.REDIRECTURL }}
+            DATASOURCE_URL=${{secrets.DATASOURCE_URL}}
+            DATASOURCE_USERNAME=${{secrets.DATASOURCE_USERNAME}}
+            DATASOURCE_PASSWORD=${{secrets.DATASOURCE_PASSWORD}}
 
       - name: Test with Gradle
         run: ./gradlew test
