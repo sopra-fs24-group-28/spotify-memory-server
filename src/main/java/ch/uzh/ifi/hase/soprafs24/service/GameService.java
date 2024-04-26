@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 @Transactional
@@ -41,7 +42,7 @@ public class GameService {
     private ApplicationEventPublisher eventPublisher;
     private StatsRepository statsRepository;
 
-
+    private final Object gameLock = new Object();
 
     public Game createGame(GameParameters gameParameters) {
 
@@ -97,7 +98,6 @@ public class GameService {
         List<User> players = currentGame.getPlayers();
         Collections.shuffle(players); // Set players List to random order.
         currentGame.setPlayers(players);
-        inMemoryGameRepository.save(currentGame);
     }
 
     private void createScoreBoard(Game currentGame){
@@ -116,36 +116,28 @@ public class GameService {
         List<User> players = currentGame.getPlayers();
         Long activePlayer = currentGame.getActivePlayer();
 
-        int activePlayerIndex;
+        int activePlayerIndex = 0;
 
-        if (activePlayer == null) {
-            activePlayerIndex = 0;
-        } else {
-            // Returns -1 for some reason
-            // activePlayerIndex = players.indexOf(userService.findUserByUserId(activePlayer));
-            activePlayerIndex = -1;
-            for (int index = 0; index < players.size(); index++) {
-                if (activePlayer.equals(players.get(index).getUserId())) {activePlayerIndex = index;}
-            }
-            if (!gameStreak) {
-                activePlayerIndex++;
-                if (activePlayerIndex == players.size()) {
-                    activePlayerIndex = 0;
-                }
-            }
+        if (activePlayer != null) {
+            activePlayerIndex = IntStream.range(0, players.size())
+                    .filter(i -> activePlayer.equals(players.get(i).getUserId()))
+                    .findFirst()
+                    .orElse(0);
+        }
+
+        if (!gameStreak) {
+            activePlayerIndex = (activePlayerIndex + 1) % players.size();
         }
         Long activePlayerId = players.get(activePlayerIndex).getUserId();
         currentGame.setActivePlayer(activePlayerId);
         Turn turn = new Turn(activePlayerId);
         currentGame.getHistory().add(turn);
-        inMemoryGameRepository.save(currentGame);
     }
 
     private void createCardCollection(Game currentGame){
         User host = UserContextHolder.getCurrentUser();
         CardCollection CardCollection = new CardCollection(currentGame.getGameParameters(), host.getSpotifyJWT().getAccessToken());
         currentGame.setCardCollection(CardCollection);
-        inMemoryGameRepository.save(currentGame);
     }
 
      public List<Game> getGames() {
@@ -214,7 +206,7 @@ public class GameService {
         }
     }
 
-    private Game setPlaylistNameAndURL(Game game) {
+    private void setPlaylistNameAndURL(Game game) {
          HashMap<String,String> playlistMetadata = SpotifyService.getPlaylistMetadata(
                  UserContextHolder.getCurrentUser().getSpotifyJWT().getAccessToken(),
                  game.getGameParameters().getPlaylist().getPlaylistId()
@@ -223,29 +215,18 @@ public class GameService {
         game.getGameParameters().getPlaylist().setPlaylistName(playlistMetadata.get("playlist_name"));
         game.getGameParameters().getPlaylist().setPlaylistImageUrl(playlistMetadata.get("image_url"));
 
-        return inMemoryGameRepository.save(game);
     }
 
     public void runTurn(Integer gameId, Integer cardId) throws InterruptedException {
-        Game currentGame = inMemoryGameRepository.findById(gameId);
+        synchronized (gameLock) {
+            Game currentGame = inMemoryGameRepository.findById(gameId);
 
-        if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)){
-            runActiveTurn(currentGame, cardId);
-            inMemoryGameRepository.save(currentGame);
+            if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)){
+                System.out.println("Running active turn");
+                runActiveTurn(currentGame, cardId);
+                inMemoryGameRepository.save(currentGame);
+            }
         }
-        /*
-        Map<Integer, CardState> integerCardStateMap = Map.of(cardId, CardState.EXCLUDED);
-
-        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
-                .gameChangesDto(
-                        WSGameChanges.builder().gameState(GameState.ONPLAY).build())
-                .cardContent(
-                        new WSCardContent(1, "sadfgsdfg", "url"))
-                .cardsStates(
-                        new WSCardsStates(integerCardStateMap)).build();
-
-        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
-         */
     }
 
     private boolean checkActivePlayer(Game currentGame){
@@ -321,20 +302,20 @@ public class GameService {
         return cardsState;
     }
 
-    private Game handleMatch(Game currentGame, Turn currentTurn){
-
-        if (checkMatch(currentGame, currentTurn)){
-            if (isCompleteSet(currentGame, currentTurn)){
+    private Game handleMatch(Game currentGame, Turn currentTurn) {
+        if (checkMatch(currentGame, currentTurn)) {
+            if (isCompleteSet(currentGame, currentTurn)) {
                 winPoints(currentGame, currentTurn);
+                addMatchCount(currentGame);
                 initiateNewTurn(currentGame, true);
             }
         } else {
             setCardsFaceDown(currentGame, currentTurn);
             initiateNewTurn(currentGame, false);
         }
-
         return inMemoryGameRepository.save(currentGame);
     }
+
 
     private boolean checkMatch(Game currentGame, Turn currentTurn){
         return currentGame.getCardCollection().checkMatch(currentTurn.getPicks());
@@ -346,11 +327,8 @@ public class GameService {
 
     private void winPoints(Game currentGame, Turn currentTurn) {
         Long userId = UserContextHolder.getCurrentUser().getUserId();
-        Long score = currentGame.getScoreBoard().get(userId);
-        currentGame.getScoreBoard().put(userId, score + currentGame.getGameParameters().getNumOfCardsPerSet());
+        currentGame.getScoreBoard().compute(userId, (k, score) -> score + currentGame.getGameParameters().getNumOfCardsPerSet());
         setCardsExcluded(currentGame, currentTurn);
-        addMatchCount(currentGame);
-        inMemoryGameRepository.save(currentGame);
     }
 
     private void setCardsFaceDown(Game currentGame, Turn currentTurn){
@@ -359,7 +337,6 @@ public class GameService {
         for (int cardId : currentTurn.getPicks()){
             cardCollection.getCardById(cardId).setCardState(CardState.FACEDOWN);
         }
-        inMemoryGameRepository.save(currentGame);
     }
 
     private void setCardsExcluded(Game currentGame, Turn currentTurn){
@@ -368,7 +345,6 @@ public class GameService {
         for (int cardId : currentTurn.getPicks()){
             cardCollection.getCardById(cardId).setCardState(CardState.EXCLUDED);
         }
-        inMemoryGameRepository.save(currentGame);
     }
 
     private void addMatchCount(Game currentGame){
