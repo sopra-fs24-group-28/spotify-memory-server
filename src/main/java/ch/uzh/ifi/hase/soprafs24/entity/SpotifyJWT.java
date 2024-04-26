@@ -15,10 +15,10 @@ public class SpotifyJWT {
     @Column(nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String accessToken;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String refreshToken;
 
     @Column(nullable = false)
@@ -27,7 +27,7 @@ public class SpotifyJWT {
     @Column(nullable = false)
     private String tokenType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String scope;
 
     @OneToOne(fetch = FetchType.LAZY)
