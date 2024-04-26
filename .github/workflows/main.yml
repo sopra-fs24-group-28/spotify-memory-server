@@ -23,6 +23,12 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
+      - name: Authenticate at Google Cloud
+        id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_CREDENTIALS }}
+
       - name: Test and analyze
         run: bash ./gradlew test jacocoTestReport sonar
         env:
@@ -31,7 +37,6 @@ jobs:
           DATASOURCE_URL: ${{ secrets.DATASOURCE_URL }}
           DATASOURCE_USERNAME: ${{ secrets.DATASOURCE_USERNAME }}
           DATASOURCE_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
   deploy:
     name: Deploying to Google Cloud
