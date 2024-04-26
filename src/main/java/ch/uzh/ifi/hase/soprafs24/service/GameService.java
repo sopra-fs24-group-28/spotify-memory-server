@@ -20,7 +20,6 @@ import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardContent;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSGameChanges;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSScoreBoardChanges;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
@@ -150,7 +149,14 @@ public class GameService {
     }
 
      public List<Game> getGames() {
-         return inMemoryGameRepository.findAll();
+         List<Game> games = inMemoryGameRepository.findAll();
+         List<Game> cleanedGames = new ArrayList<>();
+         for (Game game: games) {
+             if (!game.getGameState().equals(GameState.FINISHED)) {
+                 cleanedGames.add(game);
+             }
+         }
+         return cleanedGames;
      }
 
      public Game getGameById(Integer gameId) {return inMemoryGameRepository.findById(gameId);}
@@ -168,6 +174,10 @@ public class GameService {
 
      public void removePlayerFromGame(Integer gameId) {
          User userToRemove = UserContextHolder.getCurrentUser();
+         removePlayerHelper(gameId, userToRemove);
+     }
+
+     private void removePlayerHelper(Integer gameId, User userToRemove) {
          Game game = inMemoryGameRepository.findById(gameId);
          userService.setPlayerState(userToRemove, UserStatus.ONLINE);
          userService.setGameIdForGivenUser(userToRemove, null);
@@ -271,6 +281,8 @@ public class GameService {
             finishGame(currentGame);
             publishGamefinished(currentGame);
             Thread.sleep(GameConstant.getFinishSleep());
+
+            removePlayerHelper(currentGame.getGameId(), userService.findUserByUserId(currentGame.getHostId()));
 
             //resetGame(currentGame); // TODO: create a separate request on frontend request
         } else {
