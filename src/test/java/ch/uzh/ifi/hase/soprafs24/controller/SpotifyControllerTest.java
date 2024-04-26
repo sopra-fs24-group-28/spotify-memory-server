@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -80,6 +81,29 @@ public class SpotifyControllerTest {
         }
     }
 
+    @Test
+    public void givenValidDeviceId_ReturnOK() throws Exception {
+        try (MockedStatic<UserContextHolder> mocked_UCH = mockStatic(UserContextHolder.class)) {
+            User testUser = new User();
+            testUser.setUsername("testUsername");
+            testUser.setUserId(1L);
+            testUser.setSessionToken("token");
+
+            HashMap<String, String> content = new HashMap<>();
+            content.put("deviceid","testDeviceId");
+
+            Mockito.when(authService.getUserBySessionToken(Mockito.any())).thenReturn(testUser);
+            given(UserContextHolder.getCurrentUser()).willReturn(testUser);
+            doNothing().when(spotifyService).setDeviceId(Mockito.any(), Mockito.any());
+
+            mockMvc.perform(post("/spotify/user/deviceid")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer token")
+                            .content(asJsonString(content))
+                    )
+                    .andExpect(status().isOk());
+        }
+    }
 
     public static String asJsonString(final Object obj) {
         try {

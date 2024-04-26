@@ -37,6 +37,9 @@ public class User implements Serializable {
   @Column(unique = true)
   private String sessionToken;
 
+  @Column(nullable = true)
+  private String spotifyDeviceId;
+
   @Enumerated(EnumType.STRING)
   private UserStatus state;
 

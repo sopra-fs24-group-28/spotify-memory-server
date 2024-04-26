@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.game.CardState;
+import ch.uzh.ifi.hase.soprafs24.constant.game.GameCategory;
 import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Stats;
@@ -28,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 @Service
 @Transactional
@@ -39,7 +39,7 @@ public class GameService {
     private InMemoryGameRepository inMemoryGameRepository;
     private ApplicationEventPublisher eventPublisher;
     private StatsRepository statsRepository;
-    private static final Logger logger = Logger.getLogger(GameService.class.getName());
+
 
 
     public Game createGame(GameParameters gameParameters) {
@@ -92,13 +92,19 @@ public class GameService {
     private void initiateNewTurn(Game currentGame, boolean gameStreak){
         // TODO: gameStreak added for same player keep playing after matching cards & later powerups
         List<User> players = currentGame.getPlayers();
+        Long activePlayer = currentGame.getActivePlayer();
 
         int activePlayerIndex;
 
-        if (currentGame.getActivePlayer() == null) {
+        if (activePlayer == null) {
             activePlayerIndex = 0;
         } else {
-            activePlayerIndex = players.indexOf(userService.findUserByUserId(currentGame.getActivePlayer()));
+            // Returns -1 for some reason
+            // activePlayerIndex = players.indexOf(userService.findUserByUserId(activePlayer));
+            activePlayerIndex = -1;
+            for (int index = 0; index < players.size(); index++) {
+                if (activePlayer.equals(players.get(index).getUserId())) {activePlayerIndex = index;}
+            }
             if (!gameStreak) {
                 activePlayerIndex++;
                 if (activePlayerIndex == players.size()) {
@@ -106,7 +112,6 @@ public class GameService {
                 }
             }
         }
-
         Long activePlayerId = players.get(activePlayerIndex).getUserId();
         currentGame.setActivePlayer(activePlayerId);
         Turn turn = new Turn(activePlayerId);
@@ -182,6 +187,19 @@ public class GameService {
             runActiveTurn(currentGame, cardId);
             inMemoryGameRepository.save(currentGame);
         }
+        /*
+        Map<Integer, CardState> integerCardStateMap = Map.of(cardId, CardState.EXCLUDED);
+
+        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                .gameChangesDto(
+                        WSGameChanges.builder().gameState(GameState.ONPLAY).build())
+                .cardContent(
+                        new WSCardContent(1, "sadfgsdfg", "url"))
+                .cardsStates(
+                        new WSCardsStates(integerCardStateMap)).build();
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
+         */
     }
 
     private boolean checkActivePlayer(Game currentGame){
@@ -202,6 +220,11 @@ public class GameService {
         Card card = currentGame.getCardCollection().getCardById(cardId);
         card.setCardState(CardState.FACEUP);
 
+        // if gamecategory == standardsong, set song on all players' devices
+        if (currentGame.getGameParameters().getGameCategory() == GameCategory.STANDARDSONG) {
+            setSongForAllPlayers(currentGame, card);
+        }
+
         publishCardContents(currentGame, card);
         Thread.sleep(GameConstant.getViewSleep());
         // set sleep for all card flips.
@@ -213,9 +236,19 @@ public class GameService {
             publishGamefinished(currentGame);
             Thread.sleep(GameConstant.getFinishSleep());
 
-            resetGame(currentGame); // TODO: create a separate request on frontend request
+            //resetGame(currentGame); // TODO: create a separate request on frontend request
         } else {
             publishOnPlayState(currentGame);
+        }
+    }
+
+    private void setSongForAllPlayers(Game currentGame, Card card) {
+        for (User player : currentGame.getPlayers()) {
+            User fetchedPlayer = userService.findUserByUserId(player.getUserId());
+            SpotifyService.setSong(
+                    fetchedPlayer.getSpotifyJWT().getAccessToken(),
+                    fetchedPlayer.getSpotifyDeviceId(),
+                    card.getSongId());
         }
     }
 
@@ -232,7 +265,7 @@ public class GameService {
     //TODO: should set this functions in DTOs or elsewhere?
     private Map<Integer, CardState> mapCardsState(CardCollection cardCollection) {
         List<Card> cards = cardCollection.getCards();
-        Map<Integer, CardState> cardsState = null;
+        Map<Integer, CardState> cardsState = new HashMap<>();
 
         for (Card card : cards) {
             cardsState.put(card.getCardId(), card.getCardState());
@@ -309,7 +342,7 @@ public class GameService {
                         new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()
                 .build();
 
-        eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
+        //eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
     }
 
     private boolean checkFinished(Game currentGame){
@@ -319,7 +352,7 @@ public class GameService {
     private void finishGame(Game currentGame){
         currentGame.setGameState(GameState.FINISHED);
         recordGameStatistics(currentGame);
-        resetGame(currentGame);
+        //resetGame(currentGame);
         inMemoryGameRepository.save(currentGame);
     }
 
@@ -359,7 +392,7 @@ public class GameService {
                         new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()
                 .build();
 
-        eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
+        // eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
     }
 
 }

@@ -4,6 +4,7 @@ import com.google.gson.JsonParser;
 
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlaylistDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlaylistCollectionDTO;
+import lombok.AllArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,10 @@ import java.util.Map;
  */
 @Service
 @Transactional
+@AllArgsConstructor
 public class SpotifyService {
+
+    private UserService userService;
 
     public static AuthorizationCodeCredentials authorizationCode_Sync(String code) {
         final String clientId = "5aac3ff5093942be92372c19a12fdecd";
@@ -146,19 +150,19 @@ public class SpotifyService {
         return songs;
     }
 
-    public static void setSong(String accessToken, String trackId) {
+    public static void setSong(String accessToken, String deviceId, String trackId) {
 
         final SpotifyApi spotifyApi = new SpotifyApi.Builder().setAccessToken(accessToken).build();
 
         final StartResumeUsersPlaybackRequest startResumeUsersPlaybackRequest = spotifyApi
                 .startResumeUsersPlayback()
-                //.device_id("5fbb3ba6aa454b5534c4ba43a8c7e8e45a63ad0e")
+                .device_id(deviceId)
                 .uris(JsonParser.parseString("[\"spotify:track:" + trackId + "\"]").getAsJsonArray())
                 .position_ms(0)
                 .build();
 
         final PauseUsersPlaybackRequest pauseUsersPlaybackRequest = spotifyApi.pauseUsersPlayback()
-                //.device_id("5fbb3ba6aa454b5534c4ba43a8c7e8e45a63ad0e")
+                .device_id(deviceId)
                 .build();
 
         try {
@@ -167,6 +171,10 @@ public class SpotifyService {
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong (setSong)!\n" + e.getMessage());
         }
+    }
+
+    public void setDeviceId(String spotifyUserId, String deviceId) {
+        userService.setSpotifyDeviceId(spotifyUserId, deviceId);
     }
 
     private static ArrayList<ArrayList<String>> parsePlaylistTrackPaging(Paging<PlaylistTrack> playlistTrackPaging, String accessToken, Integer numOfSongs) {

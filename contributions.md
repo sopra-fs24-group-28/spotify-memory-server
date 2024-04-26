@@ -15,6 +15,13 @@
 * [client-#28](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/28) lobby overview rest request consumed and displayed
 * [client-#29](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/29) lobby overview ws request consumed and overview updated, minor bug found upon deployment
 
+### Week 5
+* [client-#20](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/20) conditional game start affordance for host
+* [client-#9](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/9) correct routing in relation to lobbywaitingroom
+* [client-#17](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/17) send game update over websocket to server
+* [client-#19](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/19) correct routing in relation to game start
+
+
 ## Elias
 ### Week 1
 * [#89](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/89) Changes As Requested (Game related Objects and Game creation)
@@ -28,6 +35,11 @@
 * [#73](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/73#issue-2203802872) If the user leaves the game, remove user from Game
 * [#41](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/41#issue-2203432033) Open a WebSocket connection from the back-end
 * [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) lobby overview websocket deployed (with Diyar & Niklas)
+
+### Week 5
+* [...] Controller Unit Tests
+* [...] WS Testing
+* [...] WS Game BE&FE (Diyar & Niklas)
 
 ## Henry
 
@@ -61,6 +73,14 @@
 * Wrote tests for CardCollection functions
 * Helped to implement Persistance & get user Playlists
 
+### Week 5
+* Unit tests for UserService
+* Unit tests for AuthService
+* Unit tests for AuthController
+* Integration test for running full game
+* [#113](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/113) Several minor improvements (Card-Content, Playlist name and Playlist url)
+* [#138](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/138) Create POST /spotify/user/deviceid
+
 ## Niklas
 ### Week 1
 * [#30] Log out functionality
@@ -82,3 +102,7 @@
 * [#13 / #15] implemented scoreboard
 * no issue: resolved old legacy bugs in frontend
 
+### Week 5
+* [...] Playback SDK implementation
+* [...] Playback Integration in Game
+* [...] Game Screen Impl
