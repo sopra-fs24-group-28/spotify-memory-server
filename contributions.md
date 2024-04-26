@@ -15,6 +15,13 @@
 * [client-#28](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/28) lobby overview rest request consumed and displayed
 * [client-#29](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/29) lobby overview ws request consumed and overview updated, minor bug found upon deployment
 
+### Week 5
+* [client-#20](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/20) conditional game start affordance for host
+* [client-#9](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/9) correct routing in relation to lobbywaitingroom
+* [client-#17](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/17) send game update over websocket to server
+* [client-#19](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/19) correct routing in relation to game start
+
+
 ## Elias
 ### Week 1
 * [#89](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/89) Changes As Requested (Game related Objects and Game creation)
