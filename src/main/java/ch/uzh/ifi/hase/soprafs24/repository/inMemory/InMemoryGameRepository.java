@@ -5,10 +5,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,6 +37,19 @@ public class InMemoryGameRepository implements GameRepository {
     @Override
     public void deleteById(Integer id) {
         games.remove(id);
+    }
+
+    public boolean existsByGameStatsId(Integer gameStatsId) {
+        return games.values().stream()
+                .anyMatch(game -> Objects.equals(game.getGameStatsId(), gameStatsId));
+    }
+
+    public Integer getLatestGameStatsId() {
+        return games.values().stream()
+                .map(Game::getGameStatsId)
+                .filter(Objects::nonNull)
+                .max(Integer::compareTo)
+                .orElse(1);
     }
 
     @Override

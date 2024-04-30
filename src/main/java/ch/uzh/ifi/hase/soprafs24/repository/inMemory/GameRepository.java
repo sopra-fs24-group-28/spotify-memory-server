@@ -12,4 +12,5 @@ public interface GameRepository {
     void deleteById(Integer id);
 
     List<Game> findAll();
+
 }

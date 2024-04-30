@@ -38,6 +38,8 @@ public class Game {
 
     private Integer matchCount;
 
+    private Integer gameStatsId;
+
     public Game(GameParameters gameParameters, User host) {
         this.gameState = GameState.OPEN;
         this.gameParameters = gameParameters;
