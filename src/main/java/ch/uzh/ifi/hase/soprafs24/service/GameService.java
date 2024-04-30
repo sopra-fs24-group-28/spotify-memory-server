@@ -42,8 +42,6 @@ public class GameService {
     private ApplicationEventPublisher eventPublisher;
     private StatsRepository statsRepository;
 
-    private final Object gameLock = new Object();
-
     public Game createGame(GameParameters gameParameters) {
 
         User host = UserContextHolder.getCurrentUser();
@@ -218,8 +216,9 @@ public class GameService {
     }
 
     public void runTurn(Integer gameId, Integer cardId) throws InterruptedException {
-        synchronized (gameLock) {
-            Game currentGame = inMemoryGameRepository.findById(gameId);
+        Game currentGame = inMemoryGameRepository.findById(gameId);
+
+        synchronized (currentGame) {
 
             if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)){
                 System.out.println("Running active turn");
