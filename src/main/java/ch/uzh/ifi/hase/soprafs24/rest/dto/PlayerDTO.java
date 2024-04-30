@@ -9,9 +9,11 @@ import lombok.Setter;
 public class PlayerDTO {
     private Long userId;
     private String username;
+    private String imageUrl;
 
     public PlayerDTO(User user) {
         userId = user.getUserId();
         username = user.getUsername();
+        imageUrl = user.getImageUrl();
     }
 }

@@ -77,6 +77,27 @@ public class UserServiceTest {
     }
 
     @Test
+    public void updateUser_validInputs_success() {
+        // create the user
+        User createdUser = userService.createUser(testUser);
+        Mockito.when(userRepository.findBySpotifyUserId(Mockito.any())).thenReturn(testUser);
+
+        User updatedUser = createdUser;
+        updatedUser.setUsername("newUsername");
+        updatedUser.setImageUrl("newImageUrl");
+        Mockito.when(userRepository.save(Mockito.any())).thenReturn(updatedUser);
+        updatedUser = userService.updateUser(updatedUser);
+
+        // check userRepository is called once only
+        Mockito.verify(userRepository, Mockito.times(2)).save(Mockito.any());
+
+        // assert user status
+        assertEquals(updatedUser.getSpotifyUserId(), createdUser.getSpotifyUserId());
+        assertEquals(updatedUser.getUsername(), "newUsername");
+        assertEquals(updatedUser.getImageUrl(), "newImageUrl");
+    }
+
+    @Test
     public void loginUser_validInputs_noLogout_success() {
         // mock repository functions
         SpotifyJWT spotifyJWT = new SpotifyJWT();
@@ -95,6 +116,7 @@ public class UserServiceTest {
 
         // then
         Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
+        Mockito.verify(spotifyJWTRepository, Mockito.times(1)).save(Mockito.any());
 
         // assert user status
         assertEquals(testUser.getSpotifyUserId(), loggedInUser.getSpotifyUserId());
@@ -117,19 +139,21 @@ public class UserServiceTest {
         Mockito.when(userRepository.findBySpotifyUserId(Mockito.any())).thenReturn(testUser);
         Mockito.when(spotifyJWTRepository.save(Mockito.any())).thenReturn(spotifyJWT);
 
-        // login the user with an empty SpotifyJWT
-        User loggedInUser = userService.loginUser(testUser.getUsername(), spotifyJWT);
+        // login the user a first time and make sure it's status is online
+        User loggedInUser = userService.loginUser("testSpotifyUserId", spotifyJWT);
         assertEquals(UserStatus.ONLINE, loggedInUser.getState());
-        User twiceLoggedInUser = userService.loginUser(testUser.getUsername(), spotifyJWT);
 
-        // then
+        // login the same user a second time
+        User twiceLoggedInUser = userService.loginUser("testSpotifyUserId", spotifyJWT);
+
+        // make sure userRepository is saved three times (first login, logout, second login)
         Mockito.verify(userRepository, Mockito.times(3)).save(Mockito.any());
 
-        // assert user status
-        assertEquals(testUser.getSpotifyUserId(), twiceLoggedInUser.getSpotifyUserId());
+        // assert user status after second login
+        assertEquals(UserStatus.ONLINE, twiceLoggedInUser.getState());
+        assertEquals("testSpotifyUserId", twiceLoggedInUser.getSpotifyUserId());
         assertNotNull(twiceLoggedInUser.getSpotifyJWT());
         assertNotNull(twiceLoggedInUser.getSessionToken());
-        assertEquals(UserStatus.ONLINE, twiceLoggedInUser.getState());
     }
 
     @Test
