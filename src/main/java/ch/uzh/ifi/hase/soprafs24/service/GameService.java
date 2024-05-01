@@ -97,6 +97,10 @@ public class GameService {
         // search for Stats & inMemoryGameRepository => find largest gameStatsID.
         Integer gameStatsId = Integer.max(inMemoryGameRepository.getLatestGameStatsId(), statsService.getLatestGameId());
         gameStatsId++;
+
+        // check gameStatsId is unique value
+        assert !statsRepository.existsByGameId(gameStatsId);
+        assert !inMemoryGameRepository.existsByGameStatsId(gameStatsId);
         return gameStatsId;
     }
 
