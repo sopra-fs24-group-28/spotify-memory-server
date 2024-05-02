@@ -43,7 +43,7 @@ public class AuthService {
         spotifyJWT.setExpiresln(authorizationCodeCredentials.getExpiresIn());
 
         // create and/or login the user
-        return createOrLogin(spotifyUserData.get("id"), spotifyUserData.get("display_name"), spotifyJWT);
+        return createOrLogin(spotifyUserData.get("id"), spotifyUserData.get("display_name"), spotifyUserData.get("image_url"), spotifyJWT);
     }
 
     public String getAccessToken() {
@@ -64,15 +64,17 @@ public class AuthService {
         return SpotifyService.getUserData(accessToken);
     }
 
-    private User createOrLogin(String spotifyUserId, String username, SpotifyJWT spotifyJWT) {
+    private User createOrLogin(String spotifyUserId, String username, String image_url, SpotifyJWT spotifyJWT) {
         User userToCreateOrLogin = new User();
         userToCreateOrLogin.setSpotifyUserId(spotifyUserId);
         userToCreateOrLogin.setUsername(username);
+        userToCreateOrLogin.setImageUrl(image_url);
 
         if (userService.userExists(userToCreateOrLogin)) {
             if (userToCreateOrLogin.getCurrentGameId() != null) {
                 gameService.removePlayerFromGame(userToCreateOrLogin.getCurrentGameId());
             }
+            userService.updateUser(userToCreateOrLogin);
             return userService.loginUser(userToCreateOrLogin.getSpotifyUserId(), spotifyJWT);
         } else {
             User createdUser = userService.createUser(userToCreateOrLogin);
@@ -95,7 +97,5 @@ public class AuthService {
     public User getUserBySessionToken(String authHeader) {
         return userService.getUserBySessionToken(authHeader);
     }
-
-
 
 }

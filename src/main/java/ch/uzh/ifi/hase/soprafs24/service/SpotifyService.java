@@ -57,7 +57,7 @@ public class SpotifyService {
             return authorizationCodeRequest.execute();
         }
         catch (IOException | SpotifyWebApiException | ParseException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The authorization code is invalid: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The authorization code is invalid: " + e.getMessage());
         }
     }
     
@@ -76,9 +76,15 @@ public class SpotifyService {
             spotifyUserData.put("id", userProfile.getId());
             spotifyUserData.put("display_name", userProfile.getDisplayName());
             spotifyUserData.put("product", userProfile.getProduct().getType());
+            // add url to profile image (if available, otherwise default placeholder)
+            try {
+                spotifyUserData.put("image_url", userProfile.getImages()[0].getUrl());
+            } catch (Exception e) {
+                spotifyUserData.put("image_url", "https://onedrive.live.com/embed?resid=3FDF6D9F7AFE5B85%21109886&authkey=%21AGmGcFZLnNAQFf4&width=640&height=640");
+            }
 
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong (getUserData)!\n" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 1)!\n" + e.getMessage());
         }
 
         return spotifyUserData;
@@ -97,10 +103,16 @@ public class SpotifyService {
             final Playlist playlist = playlistRequest.execute();
 
             playlistMetadata.put("playlist_name", playlist.getName());
-            playlistMetadata.put("image_url", playlist.getImages()[0].getUrl());
+            // add url to profile image (if available, otherwise default placeholder)
+            try {
+                playlistMetadata.put("image_url", playlist.getImages()[0].getUrl());
+            }
+            catch (Exception e) {
+                playlistMetadata.put("image_url", "https://onedrive.live.com/embed?resid=3FDF6D9F7AFE5B85%21109887&authkey=%21ANjdWjIEnjkmc5A&width=360&height=360");
+            }
 
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong (getPlaylistMetadata)!\n" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 2)!\n" + e.getMessage());
         }
 
         return playlistMetadata;
@@ -127,7 +139,7 @@ public class SpotifyService {
             return playlistCollectionDTO;
 
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong (getUserPlaylistNames)!\n" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 3)!\n" + e.getMessage());
         }
     }
 
@@ -145,7 +157,7 @@ public class SpotifyService {
             songs = parsePlaylistTrackPaging(playlistTrackPaging, accessToken, numOfSongs);
 
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong (getPlaylistData)!\n" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 4)!\n" + e.getMessage());
         }
         return songs;
     }
@@ -169,7 +181,7 @@ public class SpotifyService {
             startResumeUsersPlaybackRequest.execute(); // also starts execution
             pauseUsersPlaybackRequest.execute(); // pauses execution
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong (setSong)!\n" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 5)!\n" + e.getMessage());
         }
     }
 
@@ -178,19 +190,23 @@ public class SpotifyService {
     }
 
     private static ArrayList<ArrayList<String>> parsePlaylistTrackPaging(Paging<PlaylistTrack> playlistTrackPaging, String accessToken, Integer numOfSongs) {
-        // This function parses only the first page of the paginated PlaylistTrack! (seems to bee 100 songs)
-        ArrayList<ArrayList<String>> songs = new ArrayList<>();
+        try {
+            // This function parses only the first page of the paginated PlaylistTrack! (seems to bee 100 songs)
+            ArrayList<ArrayList<String>> songs = new ArrayList<>();
 
-        int numSongs = Math.min(numOfSongs, playlistTrackPaging.getItems().length);
+            int numSongs = Math.min(numOfSongs, playlistTrackPaging.getItems().length);
 
-        for (int i = 0; i < numSongs; i++) {
-            ArrayList<String> song = new ArrayList<>();
-            String trackId = playlistTrackPaging.getItems()[i].getTrack().getId();
-            song.add(trackId);
-            song.add(getTrackAlbumCover(accessToken, trackId));
-            songs.add(song);
+            for (int i = 0; i < numSongs; i++) {
+                ArrayList<String> song = new ArrayList<>();
+                String trackId = playlistTrackPaging.getItems()[i].getTrack().getId();
+                song.add(trackId);
+                song.add(getTrackAlbumCover(accessToken, trackId));
+                songs.add(song);
+            }
+            return songs;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 6)!\n" + e.getMessage());
         }
-        return songs;
     }
 
     private static String getTrackAlbumCover(String accessToken, String trackId) {
@@ -204,9 +220,8 @@ public class SpotifyService {
             // Execute the request synchronous
             final Track track = trackRequest.execute();
             trackAlbumCover = track.getAlbum().getImages()[0].getUrl();
-
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Something went wrong (getTrackAlbumCover)!\n" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 7)!\n" + e.getMessage());
         }
         return trackAlbumCover;
     }
