@@ -20,10 +20,6 @@ public class StatsService {
         return newGameId;
     }
 
-    public Boolean checkGameIdExist(Integer gameId){
-        return statsRepository.existsByGameId(gameId);
-    }
-
     public Integer getLatestGameId(){
         return statsRepository.findMaxGameID();
     }

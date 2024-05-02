@@ -43,11 +43,6 @@ public class InMemoryGameRepository implements GameRepository {
         games.remove(id);
     }
 
-    public boolean existsByGameStatsId(Integer gameStatsId) {
-        return games.values().stream()
-                .anyMatch(game -> Objects.equals(game.getGameStatsId(), gameStatsId));
-    }
-
     public Integer getLatestGameStatsId() {
         return games.values().stream()
                 .map(Game::getGameStatsId)
