@@ -51,9 +51,13 @@ public class GameService {
         Game newGame = new Game(gameParameters, host);
         Game game = inMemoryGameRepository.save(newGame);
         addPlayerToGame(game, host);
-        setPlaylistNameAndURL(game);
-        return inMemoryGameRepository.save(newGame);
+        int playlistLength = setPlaylistNameAndURL(game);
 
+        // if playlist is too short, reduce number of sets
+        if (game.getGameParameters().getNumOfSets() > playlistLength) {
+            game.getGameParameters().setNumOfSets(playlistLength);
+        }
+        return inMemoryGameRepository.save(game);
      }
 
     public void startGame(Integer gameId) {
@@ -204,7 +208,7 @@ public class GameService {
         }
     }
 
-    private void setPlaylistNameAndURL(Game game) {
+    private Integer setPlaylistNameAndURL(Game game) {
          HashMap<String,String> playlistMetadata = SpotifyService.getPlaylistMetadata(
                  UserContextHolder.getCurrentUser().getSpotifyJWT().getAccessToken(),
                  game.getGameParameters().getPlaylist().getPlaylistId()
@@ -213,6 +217,7 @@ public class GameService {
         game.getGameParameters().getPlaylist().setPlaylistName(playlistMetadata.get("playlist_name"));
         game.getGameParameters().getPlaylist().setPlaylistImageUrl(playlistMetadata.get("image_url"));
 
+        return Integer.parseInt(playlistMetadata.get("playlist_length"));
     }
 
     public void runTurn(Integer gameId, Integer cardId) throws InterruptedException {

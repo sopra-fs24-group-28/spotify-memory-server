@@ -103,6 +103,7 @@ public class SpotifyService {
             final Playlist playlist = playlistRequest.execute();
 
             playlistMetadata.put("playlist_name", playlist.getName());
+            playlistMetadata.put("playlist_length", String.valueOf(playlist.getTracks().getItems().length));
             // add url to profile image (if available, otherwise default placeholder)
             try {
                 playlistMetadata.put("image_url", playlist.getImages()[0].getUrl());
