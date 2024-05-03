@@ -84,6 +84,7 @@ public class GameServiceIntegrationTest {
 
         // add mocked data for playlistMetadata
         playlistMetadata.put("playlist_name", "playlist_name");
+        playlistMetadata.put("playlist_length", "2");
         playlistMetadata.put("image_url", "image_url");
 
         // add mocked data for playlistData
