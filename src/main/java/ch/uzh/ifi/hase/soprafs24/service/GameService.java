@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
 @Service
@@ -43,6 +44,9 @@ public class GameService {
     private InMemoryGameRepository inMemoryGameRepository;
     private ApplicationEventPublisher eventPublisher;
     private StatsRepository statsRepository;
+
+    private final AtomicBoolean isUpdating = new AtomicBoolean();
+
 
     public Game createGame(GameParameters gameParameters) {
 
@@ -221,10 +225,14 @@ public class GameService {
         Game currentGame = inMemoryGameRepository.findById(gameId);
 
         synchronized (currentGame) {
-
-            if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)){
-                runActiveTurn(currentGame, cardId);
-                inMemoryGameRepository.save(currentGame);
+            try {
+                isUpdating.getAndSet(true);
+                if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)) {
+                    runActiveTurn(currentGame, cardId);
+                    inMemoryGameRepository.save(currentGame);
+                }
+            } finally {
+                isUpdating.getAndSet(false);
             }
         }
     }
@@ -272,6 +280,7 @@ public class GameService {
     }
 
     public void handleInactivePlayer(Integer gameId) {
+        if (isUpdating.get()) return;
         User inactivePlayer = UserContextHolder.getCurrentUser();
         Game currentGame = inMemoryGameRepository.findById(gameId);
         if (currentGame != null && inactivePlayer.getUserId().equals(currentGame.getActivePlayer())) {
@@ -286,6 +295,7 @@ public class GameService {
                     .build();
 
             eventPublisher.publishEvent(new GameChangesEvent( this, gameId, wsGameChangesDto));
+
         }
     }
 
