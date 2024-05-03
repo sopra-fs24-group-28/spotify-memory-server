@@ -81,10 +81,15 @@ public class GameController {
         return new LobbyGameDto(game.getGameParameters(), userService.getPlayerDTOListFromListOfUsers(game.getPlayers()), game.getGameState(), game.getHostId());
     }
 
-
     @PostMapping("/{gameId}/start")
     @ResponseStatus(HttpStatus.OK)
     public void startGame(@PathVariable Integer gameId) {
         gameService.startGame(gameId);
+    }
+
+    @PutMapping("/{gameId}/inactive")
+    @ResponseStatus(HttpStatus.OK)
+    public void inactivePlayerHandler(@PathVariable Integer gameId) {
+        gameService.handleInactivePlayer(gameId);
     }
 }

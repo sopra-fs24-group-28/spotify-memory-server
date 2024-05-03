@@ -16,6 +16,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.StatsRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
+import ch.uzh.ifi.hase.soprafs24.websocket.EventListeningWebsocketBean;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardContent;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
@@ -37,6 +38,7 @@ import java.util.stream.IntStream;
 @AllArgsConstructor
 public class GameService {
 
+    private final EventListeningWebsocketBean eventListeningWebsocketBean;
     private UserService userService;
     private InMemoryGameRepository inMemoryGameRepository;
     private ApplicationEventPublisher eventPublisher;
@@ -221,7 +223,6 @@ public class GameService {
         synchronized (currentGame) {
 
             if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)){
-                System.out.println("Running active turn");
                 runActiveTurn(currentGame, cardId);
                 inMemoryGameRepository.save(currentGame);
             }
@@ -267,6 +268,24 @@ public class GameService {
             //resetGame(currentGame); // TODO: create a separate request on frontend request
         } else {
             publishOnPlayState(currentGame);
+        }
+    }
+
+    public void handleInactivePlayer(Integer gameId) {
+        User inactivePlayer = UserContextHolder.getCurrentUser();
+        Game currentGame = inMemoryGameRepository.findById(gameId);
+        if (currentGame != null && inactivePlayer.getUserId().equals(currentGame.getActivePlayer())) {
+            setCardsFaceDown(currentGame, currentGame.getHistory().get(currentGame.getHistory().size()-1));
+            initiateNewTurn(currentGame, false);
+
+            inMemoryGameRepository.save(currentGame);
+
+            WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
+                    .cardsStates(new WSCardsStates(currentGame.getCardCollection().getAllCardStates()))
+                    .gameChangesDto(WSGameChanges.builder().activePlayer(currentGame.getActivePlayer()).build())
+                    .build();
+
+            eventPublisher.publishEvent(new GameChangesEvent( this, gameId, wsGameChangesDto));
         }
     }
 
@@ -355,15 +374,26 @@ public class GameService {
     }
 
     private void publishOnPlayState(Game currentGame){
+        WSGameChangesDto wsGameChangesDto;
 
-        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
-                .gameChangesDto(WSGameChanges.builder()
-                        .activePlayer(currentGame.getActivePlayer()).build())
-                .cardsStates(
-                        new WSCardsStates(mapCardsState(currentGame.getCardCollection())))
+
+        if (currentGame.getHistory().get(currentGame.getHistory().size()-1).getPicks().isEmpty()) {
+            wsGameChangesDto = WSGameChangesDto.builder()
+                    .gameChangesDto(WSGameChanges.builder()
+                            .activePlayer(currentGame.getActivePlayer()).build())
+                    .cardsStates(
+                            new WSCardsStates(mapCardsState(currentGame.getCardCollection())))
 /*                .scoreBoard(
                         new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()*/
-                .build();
+                    .build();
+        } else {
+            wsGameChangesDto = WSGameChangesDto.builder()
+                    .cardsStates(
+                            new WSCardsStates(mapCardsState(currentGame.getCardCollection())))
+/*                .scoreBoard(
+                        new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()*/
+                    .build();
+        }
 
         eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
     }
