@@ -40,7 +40,7 @@ public class User implements Serializable {
   @Column(nullable = true)
   private String spotifyDeviceId;
 
-  @Column(nullable = true)
+  @Column(nullable = true, length = 1000)
   private String imageUrl;
 
   @Enumerated(EnumType.STRING)
