@@ -46,6 +46,10 @@
 * [...] WS Testing
 * [...] WS Game BE&FE (Diyar & Niklas)
 
+### Week 6
+* [...] Solved async issues in game updates (race condition through WS)
+* [...] Timing functionality per turn
+
 ## Henry
 
 ### Week 1
@@ -115,3 +119,8 @@
 * [...] Playback SDK implementation
 * [...] Playback Integration in Game
 * [...] Game Screen Impl
+
+### Week 6
+* [...] Redisign Game Interface and Misc
+* [...] Reciverfunction corrected and optimized
+* [...] UX elements (toaster, responsiveness)
