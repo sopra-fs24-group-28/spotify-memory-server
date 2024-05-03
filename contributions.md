@@ -21,6 +21,11 @@
 * [client-#17](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/17) send game update over websocket to server
 * [client-#19](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/19) correct routing in relation to game start
 
+### Week 6
+* [client-#4](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/4) Reroute the players to the game screen upon receiving start request
+* [client-#7](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/7) Provide an affordance for the host to restart the game in the game-over screen
+* [client-#62](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/62) Prevent observing players from making direct (card related) actions in the front-end
+
 
 ## Elias
 ### Week 1
