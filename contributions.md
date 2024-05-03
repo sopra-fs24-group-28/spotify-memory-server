@@ -86,6 +86,10 @@
 * [#113](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/113) Several minor improvements (Card-Content, Playlist name and Playlist url)
 * [#138](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/138) Create POST /spotify/user/deviceid
 
+### Week 6
+* [#148](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/148) Collect and save profile pictures
+* Improve SpotifyService Error Handling & Update Username/Pictures at login
+
 ## Niklas
 ### Week 1
 * [#30] Log out functionality
