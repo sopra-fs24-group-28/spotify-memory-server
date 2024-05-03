@@ -64,6 +64,15 @@
 * [#55](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/55) Prepare game state (e.g. Scoreboard, Turn object) (In Progress with helper functions)
 * [#56] Upon valid request to start game, close lobby to new players and start Game (pull request)
 
+### Week 5
+* [...] Apply game logics within GameService
+* [...] Unit tests for GameService
+
+### Week 6
+* [#71] update the players game statisticsand persit it in the database
+* [...] Unit tests for GameService
+  
+
 ## Nicolas
 ### Week 1
 * [#91](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/91) Get initial Access Token from Spotify
