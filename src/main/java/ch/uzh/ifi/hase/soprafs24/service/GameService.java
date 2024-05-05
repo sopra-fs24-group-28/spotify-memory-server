@@ -154,12 +154,8 @@ public class GameService {
      public void addPlayerToGame(Integer gameId) {
          User newUser = UserContextHolder.getCurrentUser();
          Game game = inMemoryGameRepository.findById(gameId);
-         if (game.getGameState() == GameState.OPEN && game.getPlayers().size() < game.getGameParameters().getPlayerLimit()){
-             List<User> users = addPlayerToGame(game, newUser);
-             sendPlayersChangedWsDto(gameId, users);
-         } else {
-             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to join the game.");
-         }
+         List<User> users = addPlayerToGame(game, newUser);
+         sendPlayersChangedWsDto(gameId, users);
      }
 
      public void removePlayerFromGame(Integer gameId) {
