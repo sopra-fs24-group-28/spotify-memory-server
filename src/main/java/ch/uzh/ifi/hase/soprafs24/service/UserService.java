@@ -44,6 +44,17 @@ public class UserService {
     return newUser;
   }
 
+  public User updateUser(User updatedUser) {
+      User user = userRepository.findBySpotifyUserId(updatedUser.getSpotifyUserId());
+      // update username and imageurl
+      user.setUsername(updatedUser.getUsername());
+      user.setImageUrl(updatedUser.getImageUrl());
+
+      user = userRepository.save(user);
+      userRepository.flush();
+      return user;
+    }
+
   public User loginUser(String spotifyUserId, SpotifyJWT spotifyJWT) {
       User user = userRepository.findBySpotifyUserId(spotifyUserId);
 
