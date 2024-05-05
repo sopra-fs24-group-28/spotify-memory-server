@@ -296,7 +296,7 @@ public class GameService {
 
             //resetGame(currentGame); // TODO: create a separate request on frontend request
         } else {
-            publishOnPlayState(currentGame);
+        publishOnPlayState(currentGame);
         }
     }
 

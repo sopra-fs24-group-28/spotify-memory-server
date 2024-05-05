@@ -163,7 +163,7 @@ public class SpotifyService {
         return songs;
     }
 
-    public static boolean setSong(String accessToken, String deviceId, String trackId) {
+    public static void setSong(String accessToken, String deviceId, String trackId) {
 
         final SpotifyApi spotifyApi = new SpotifyApi.Builder().setAccessToken(accessToken).build();
 
@@ -181,7 +181,6 @@ public class SpotifyService {
         try {
             startResumeUsersPlaybackRequest.execute(); // also starts execution
             pauseUsersPlaybackRequest.execute(); // pauses execution
-            return true;
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 5)!\n" + e.getMessage());
         }
