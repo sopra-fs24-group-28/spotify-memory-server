@@ -14,7 +14,4 @@ public class Turn {
         this.userId = userId;
     }
 
-    public void addPick(int pick) {
-        picks.add(pick);
-    }
 }

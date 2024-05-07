@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.util.*;
 
 @Getter
-@Setter
 public class CardCollection {
     private List<Card> cards = new ArrayList<>();
     private HashMap<Integer, List<Integer>> matchingCards = new HashMap<>();
@@ -25,15 +24,13 @@ public class CardCollection {
             List<Integer> newCardIds = new ArrayList<>();
             // inner loop over the number of cards per set to create cards
             for (int j=0; j<gameParameters.getNumOfCardsPerSet(); j++) {
-                Card newCard;
+                Card newCard = new Card(null, null);
 
                 // create new card (content depends on GameCategory)
                 if (gameParameters.getGameCategory() == GameCategory.STANDARDSONG) {
                     newCard = new Card(songs.get(i).get(0), null);
                 } else if (gameParameters.getGameCategory() == GameCategory.STANDARDALBUMCOVER) {
                     newCard = new Card(null, songs.get(i).get(1));
-                } else {
-                    newCard = new Card(null, null);
                 }
 
                 newCards.add(newCard);
@@ -82,11 +79,13 @@ public class CardCollection {
     }
 
     public Card getCardById(Integer cardId) {
+        Card result = null;
         for (Card card : this.cards) {
             if (card.getCardId() == cardId) {
-                return card;
+                result = card;
+                break;
             }
         }
-        return null;
+        return result;
     }
 }

@@ -40,10 +40,14 @@ public class CardCollectionTest {
                 }});
             }};
 
+            Playlist testPlaylist = new Playlist("playlist");
+            testPlaylist.setPlaylistName("name");
+            testPlaylist.setPlaylistImageUrl("url");
+
             // Mock the behavior of SpotifyService.getPlaylistData
             when(SpotifyService.getPlaylistData("accessToken", "playlist", 3)).thenReturn(returnArray);
 
-            GameParameters gameParameters = new GameParameters(5,numOfSets,numOfCardsPerSet, STANDARDSONG, new Playlist("playlist"),1,1,10,15);
+            GameParameters gameParameters = new GameParameters(5,numOfSets,numOfCardsPerSet, STANDARDSONG, testPlaylist,1,1,10,15);
             // Create a CardCollection instance
             CardCollection cardCollection = new CardCollection(gameParameters, "accessToken");
 
