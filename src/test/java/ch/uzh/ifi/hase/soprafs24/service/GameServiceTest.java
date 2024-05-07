@@ -12,6 +12,8 @@ import ch.uzh.ifi.hase.soprafs24.repository.StatsRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
+import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
+import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -673,10 +675,15 @@ public class GameServiceTest {
 
                     gameService.runTurn(testGame.getGameId(), testCard.getCardId());
 
-                    assertEquals(4L, testGame.getScoreBoard().get(1L));
-                    assertEquals(GameState.FINISHED, testGame.getGameState());
-                    verify(inMemoryGameRepository, times(4)).save(Mockito.any());
-                    verify(eventPublisher, times(4)).publishEvent(Mockito.any());
+//                    assertEquals(4L, testGame.getScoreBoard().get(1L));
+                    assertEquals(GameState.OPEN, testGame.getGameState());
+                    assertNull(testGame.getCardCollection());
+                    assertNull(testGame.getMatchCount());
+                    assertNull(testGame.getScoreBoard());
+                    assertNull(testGame.getActivePlayer());
+                    verify(inMemoryGameRepository, times(5)).save(Mockito.any());
+                    verify(eventPublisher, times(3)).publishEvent(any(GameChangesEvent.class));
+                    verify(eventPublisher, times(1)).publishEvent(any(LobbyOverviewChangedEvent.class));
                     verify(statsService, times(2)).saveStats(Mockito.any());
                 }
                 catch (InterruptedException e) {

@@ -7,12 +7,12 @@ import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.model.game.Playlist;
 import ch.uzh.ifi.hase.soprafs24.repository.SpotifyJWTRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.StatsRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import org.junit.jupiter.api.*;
 import org.mockito.*;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,6 +24,7 @@ import java.util.Objects;
 
 import static ch.uzh.ifi.hase.soprafs24.constant.game.GameCategory.STANDARDALBUMCOVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 
@@ -33,6 +34,10 @@ public class GameServiceIntegrationTest {
     @Qualifier("userRepository")
     @Autowired
     private UserRepository userRepository;
+
+    @Qualifier("statsRepository")
+    @Autowired
+    private StatsRepository statsRepository;
 
     @Qualifier("spotifyJWTRepository")
     @Autowired
@@ -44,8 +49,12 @@ public class GameServiceIntegrationTest {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private StatsService statsService;
+
     private User user1;
     private User user2;
+    private Integer gameStatsId;
     private HashMap<String, String> playlistMetadata = new HashMap<>();
 
     ArrayList<ArrayList<String>> playlistData = null;
@@ -98,6 +107,7 @@ public class GameServiceIntegrationTest {
     public void teardown() {
         userRepository.delete(user1);
         userRepository.delete(user2);
+        statsRepository.deleteAll(statsRepository.findByGameId(gameStatsId));
     }
 
     @Test
@@ -111,6 +121,8 @@ public class GameServiceIntegrationTest {
             UserContextHolder.setCurrentUser(userRepository.findBySpotifyUserId("id1"));
             Game game = gameService.createGame(gameParameters);
 
+            assertEquals(game.getGameState(), GameState.OPEN);
+
             // user2 joins game
             UserContextHolder.setCurrentUser(userRepository.findBySpotifyUserId("id2"));
             gameService.addPlayerToGame(game.getGameId());
@@ -123,6 +135,11 @@ public class GameServiceIntegrationTest {
             String firstPlayer = userService.findUserByUserId(game.getActivePlayer()).getSpotifyUserId();
             String secondPlayer;
             if(Objects.equals(firstPlayer, "id1")){secondPlayer = "id2";} else {secondPlayer = "id1";}
+
+            gameStatsId = game.getGameStatsId();
+            assertEquals(game.getGameState(), GameState.ONPLAY);
+            assertEquals(game.getScoreBoard().get(userRepository.findBySpotifyUserId(secondPlayer).getUserId()), 0);
+            assertEquals(game.getScoreBoard().get(userRepository.findBySpotifyUserId(firstPlayer).getUserId()), 0);
 
             // first player makes two selections that don't match
             UserContextHolder.setCurrentUser(userRepository.findBySpotifyUserId(firstPlayer));
@@ -146,12 +163,17 @@ public class GameServiceIntegrationTest {
 
             gameService.runTurn(game.getGameId(), firstCard2);
             gameService.runTurn(game.getGameId(), secondCard2);
+
+            assertEquals(game.getGameState(), GameState.ONPLAY);
+            assertEquals(game.getScoreBoard().get(userRepository.findBySpotifyUserId(secondPlayer).getUserId()), 2);
+            assertEquals(game.getScoreBoard().get(userRepository.findBySpotifyUserId(firstPlayer).getUserId()), 0);
+
             gameService.runTurn(game.getGameId(), thirdCard2);
             gameService.runTurn(game.getGameId(), fourthCard2);
 
-            assertEquals(game.getGameState(), GameState.FINISHED);
-            assertEquals(game.getScoreBoard().get(userRepository.findBySpotifyUserId(secondPlayer).getUserId()), 4);
-            assertEquals(game.getScoreBoard().get(userRepository.findBySpotifyUserId(firstPlayer).getUserId()), 0);
+            assertEquals(game.getGameState(), GameState.OPEN);
+            assertNull(game.getScoreBoard());
+
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
