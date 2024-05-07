@@ -607,6 +607,7 @@ public class GameServiceTest {
                     // set game (testUser's turn)
                     Turn testTurn = new Turn(testUser.getUserId());
                     testGame.setActivePlayer(testUser.getUserId());
+                    testGame.setActivePlayerStreak(0);
                     testGame.getPlayers().add(testOpponent);
 
                     // set handleMatch
@@ -655,6 +656,7 @@ public class GameServiceTest {
                     Turn testTurn = new Turn(testUser.getUserId());
                     testGame.setActivePlayer(testUser.getUserId());
                     testGame.getPlayers().add(testOpponent);
+                    testGame.setActivePlayerStreak(0);
                     testOpponent.setCurrentGameId(3);
 
                     // set handleMatch

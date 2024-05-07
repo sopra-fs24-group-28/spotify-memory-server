@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public record WSGameChanges( @JsonProperty Change<Long> activePlayer,
-                             @JsonProperty Change<Long> activePlayerStreak,
+                             @JsonProperty Change<Boolean> activePlayerStreakActive,
                              @JsonProperty Change<Boolean> quickTurnActive,
                              @JsonProperty Change<HashMap<Long, Long>> quickTurn,
                              @JsonProperty Change<List<PlayerDTO>> playerList,
@@ -24,7 +24,7 @@ public record WSGameChanges( @JsonProperty Change<Long> activePlayer,
 
     public static class WSGameChangesBuilder {
         private Change<Long> activePlayer = Change.of(false, Optional.empty());
-        private Change<Long> activePlayerStreak = Change.of(false, Optional.empty());
+        private Change<Boolean> activePlayerStreakActive = Change.of(false, Optional.empty());
         private Change<Boolean> quickTurnActive = Change.of(false, Optional.empty());
         private Change<HashMap<Long, Long>> quickTurn = Change.of(false, Optional.empty());
         private Change<List<PlayerDTO>> playerList = Change.of(false, Optional.empty());
@@ -36,8 +36,8 @@ public record WSGameChanges( @JsonProperty Change<Long> activePlayer,
             return this;
         }
 
-        public WSGameChangesBuilder activePlayerStreak(Long streak) {
-            this.activePlayerStreak = Change.of(true, Optional.ofNullable(streak));
+        public WSGameChangesBuilder activePlayerStreakActive(Boolean streakActive) {
+            this.activePlayerStreakActive = Change.of(true, Optional.ofNullable(streakActive));
             return this;
         }
 
