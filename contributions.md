@@ -103,6 +103,10 @@
 * [#148](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/148) Collect and save profile pictures
 * Improve SpotifyService Error Handling & Update Username/Pictures at login
 
+### Week 7
+* [#84](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/84) Streak Powerup implementation
+* Cleanup work
+
 ## Niklas
 ### Week 1
 * [#30] Log out functionality
