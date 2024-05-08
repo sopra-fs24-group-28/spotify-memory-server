@@ -41,6 +41,7 @@ public class GameService {
 
     private final EventListeningWebsocketBean eventListeningWebsocketBean;
     private UserService userService;
+    private StatsService statsService;
     private InMemoryGameRepository inMemoryGameRepository;
     private ApplicationEventPublisher eventPublisher;
     private StatsRepository statsRepository;
@@ -57,9 +58,13 @@ public class GameService {
         Game newGame = new Game(gameParameters, host);
         Game game = inMemoryGameRepository.save(newGame);
         addPlayerToGame(game, host);
-        setPlaylistNameAndURL(game);
-        return inMemoryGameRepository.save(newGame);
+        int playlistLength = setPlaylistNameAndURL(game);
 
+        // if playlist is too short, reduce number of sets
+        if (game.getGameParameters().getNumOfSets() > playlistLength) {
+            game.getGameParameters().setNumOfSets(playlistLength);
+        }
+        return inMemoryGameRepository.save(game);
      }
 
     public void startGame(Integer gameId) {
@@ -68,6 +73,7 @@ public class GameService {
         Long hostId = host.getUserId();
         if (currentGame.getPlayers().size() >= GameConstant.getMinPlayers() && Objects.equals(currentGame.getHostId(), hostId)){
             currentGame.setGameState(GameState.ONPLAY);
+            currentGame.setGameStatsId(setNewGameStatsId());
 
             randomizePlayersIndex(currentGame);
             createCardCollection(currentGame);
@@ -96,6 +102,14 @@ public class GameService {
         } else {
          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to start the game.");
         }
+    }
+
+    private Integer setNewGameStatsId(){
+        // search for Stats & inMemoryGameRepository => find largest gameStatsID.
+        Integer gameStatsId = Integer.max(inMemoryGameRepository.getLatestGameStatsId(), statsService.getLatestGameId());
+        gameStatsId++;
+
+        return gameStatsId;
     }
 
     private void randomizePlayersIndex(Game currentGame){
@@ -160,12 +174,8 @@ public class GameService {
      public void addPlayerToGame(Integer gameId) {
          User newUser = UserContextHolder.getCurrentUser();
          Game game = inMemoryGameRepository.findById(gameId);
-         if (game.getGameState() == GameState.OPEN && game.getPlayers().size() < game.getGameParameters().getPlayerLimit()){
-             List<User> users = addPlayerToGame(game, newUser);
-             sendPlayersChangedWsDto(gameId, users);
-         } else {
-             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to join the game.");
-         }
+         List<User> users = addPlayerToGame(game, newUser);
+         sendPlayersChangedWsDto(gameId, users);
      }
 
      public void removePlayerFromGame(Integer gameId) {
@@ -181,15 +191,34 @@ public class GameService {
              for (User user: game.getPlayers()) {
                  userService.setPlayerState(user, UserStatus.ONLINE);
                  userService.setGameIdForGivenUser(user, null);
+                 // user removed while ONPLAY -> recorded as aborted
+                 if (Objects.equals(game.getGameState(),GameState.ONPLAY)){
+                     recordAbortedPlayer(game, user);
+                 }
              }
              inMemoryGameRepository.deleteById(gameId);
              sendGameStateChangedWsDto(gameId, GameState.FINISHED);
          } else {
              game.getPlayers().removeIf(u -> u.getUserId().equals(userToRemove.getUserId()));
              List<User> users = inMemoryGameRepository.save(game).getPlayers();
+             if (Objects.equals(game.getGameState(),GameState.ONPLAY)){
+                 recordAbortedPlayer(game, userToRemove);
+             }
              sendPlayersChangedWsDto(gameId, users);
          }
      }
+
+    private void recordAbortedPlayer(Game game, User userToRemove) {
+        Stats stats = new Stats();
+        Long userId = userToRemove.getUserId();
+        stats.setUserId(userId);
+        stats.setGameId(game.getGameStatsId());
+        stats.setSetsWon(game.getScoreBoard().get(userToRemove.getUserId()));
+        stats.setWin(false);
+        stats.setLoss(false);
+        stats.setAborted(true);
+        statsService.saveStats(stats);
+    }
 
     private List<User> addPlayerToGame(Game game, User user) {
         if (user.getCurrentGameId() != null || user.getState().equals(UserStatus.INGAME)) {
@@ -210,7 +239,7 @@ public class GameService {
         }
     }
 
-    private void setPlaylistNameAndURL(Game game) {
+    private Integer setPlaylistNameAndURL(Game game) {
          HashMap<String,String> playlistMetadata = SpotifyService.getPlaylistMetadata(
                  UserContextHolder.getCurrentUser().getSpotifyJWT().getAccessToken(),
                  game.getGameParameters().getPlaylist().getPlaylistId()
@@ -219,6 +248,7 @@ public class GameService {
         game.getGameParameters().getPlaylist().setPlaylistName(playlistMetadata.get("playlist_name"));
         game.getGameParameters().getPlaylist().setPlaylistImageUrl(playlistMetadata.get("image_url"));
 
+        return Integer.parseInt(playlistMetadata.get("playlist_length"));
     }
 
     public void runTurn(Integer gameId, Integer cardId) throws InterruptedException {
@@ -275,7 +305,7 @@ public class GameService {
 
             //resetGame(currentGame); // TODO: create a separate request on frontend request
         } else {
-            publishOnPlayState(currentGame);
+        publishOnPlayState(currentGame);
         }
     }
 
@@ -420,19 +450,30 @@ public class GameService {
     }
 
     private void recordGameStatistics(Game currentGame){
-        Random random = new Random();
-        Integer gameId = random.nextInt(2147483647);
+        Integer gameStatsId = currentGame.getGameStatsId();
         List<User> players = currentGame.getPlayers();
+        HashMap<Long, Long> scores = currentGame.getScoreBoard();
+        Long winningScore = scores.values().stream()
+                        .max(Long::compareTo).orElseThrow();
 
         for (User player: players){
             Stats stats = new Stats();
-            stats.setUserId(player.getUserId());
-            stats.setGameId(gameId);
-            stats.setSetsWon(currentGame.getScoreBoard().get(player.getUserId()));
-            // TODO: how to get win, loss & aborted
-            statsRepository.saveAndFlush(stats);
+            Long userId = player.getUserId();
+            stats.setUserId(userId);
+            stats.setGameId(gameStatsId);
+            stats.setSetsWon(scores.get(player.getUserId()));
+            // With max scores wins, else losses
+            if (Objects.equals(scores.get(userId), winningScore)){
+                stats.setWin(true);
+                stats.setLoss(false);
+                stats.setAborted(false);
+            } else {
+                stats.setWin(false);
+                stats.setLoss(true);
+                stats.setAborted(false);
+            }
+            statsService.saveStats(stats);
         }
-
     }
 
     private void resetGame(Game currentGame){
@@ -442,6 +483,7 @@ public class GameService {
         currentGame.setScoreBoard(null);
         currentGame.setMatchCount(null);
         currentGame.setCardCollection(null);
+        currentGame.setGameStatsId(null);
 
         inMemoryGameRepository.save(currentGame);
     }

@@ -21,6 +21,11 @@
 * [client-#17](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/17) send game update over websocket to server
 * [client-#19](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/19) correct routing in relation to game start
 
+### Week 6
+* [client-#4](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/4) Reroute the players to the game screen upon receiving start request
+* [client-#7](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/7) Provide an affordance for the host to restart the game in the game-over screen
+* [client-#62](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/62) Prevent observing players from making direct (card related) actions in the front-end
+
 
 ## Elias
 ### Week 1
@@ -41,6 +46,10 @@
 * [...] WS Testing
 * [...] WS Game BE&FE (Diyar & Niklas)
 
+### Week 6
+* [...] Solved async issues in game updates (race condition through WS)
+* [...] Timing functionality per turn
+
 ## Henry
 
 ### Week 1
@@ -54,6 +63,15 @@
 * [#88](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/88) Persistance with Google cloud SQL
 * [#55](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/55) Prepare game state (e.g. Scoreboard, Turn object) (In Progress with helper functions)
 * [#56] Upon valid request to start game, close lobby to new players and start Game (pull request)
+
+### Week 5
+* [...] Apply game logics within GameService
+* [...] Unit tests for GameService
+
+### Week 6
+* [#71] update the players game statisticsand persit it in the database
+* [...] Unit tests for GameService
+  
 
 ## Nicolas
 ### Week 1
@@ -81,6 +99,14 @@
 * [#113](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/113) Several minor improvements (Card-Content, Playlist name and Playlist url)
 * [#138](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/138) Create POST /spotify/user/deviceid
 
+### Week 6
+* [#148](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/148) Collect and save profile pictures
+* Improve SpotifyService Error Handling & Update Username/Pictures at login
+
+### Week 7
+* [#84](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/84) Streak Powerup implementation
+* Cleanup work
+
 ## Niklas
 ### Week 1
 * [#30] Log out functionality
@@ -106,3 +132,8 @@
 * [...] Playback SDK implementation
 * [...] Playback Integration in Game
 * [...] Game Screen Impl
+
+### Week 6
+* [...] Redisign Game Interface and Misc
+* [...] Reciverfunction corrected and optimized
+* [...] UX elements (toaster, responsiveness)
