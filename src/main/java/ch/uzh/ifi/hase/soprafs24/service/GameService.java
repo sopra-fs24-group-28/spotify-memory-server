@@ -20,6 +20,7 @@ import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardContent;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSGameChanges;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSScoreBoardChanges;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
@@ -390,8 +391,8 @@ public class GameService {
                         .activePlayer(currentGame.getActivePlayer()).build())
                 .cardsStates(
                         new WSCardsStates(mapCardsState(currentGame.getCardCollection())))
-/*                .scoreBoard(
-                        new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()*/
+                .scoreBoard(
+                        new WSScoreBoardChanges(currentGame.getScoreBoard()))
                 .build();
 
         eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
@@ -452,8 +453,8 @@ public class GameService {
         WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
                 .gameChangesDto(WSGameChanges.builder()
                         .gameState(currentGame.getGameState()).build())
-/*                .scoreBoard(
-                        new WSScoreBoardChanges()) // TODO: set WSScoreBoardChanges()*/
+                .scoreBoard(
+                        new WSScoreBoardChanges(currentGame.getScoreBoard()))
                 .build();
 
         eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
