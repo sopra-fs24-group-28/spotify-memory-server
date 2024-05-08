@@ -292,7 +292,6 @@ public class GameService {
             publishGamefinished(currentGame);
             Thread.sleep(GameConstant.getFinishSleep());
 
-            //removePlayerHelper(currentGame.getGameId(), userService.findUserByUserId(currentGame.getHostId()));
             resetGame(currentGame);
             sendGameStateChangedWsDto(currentGame.getGameId(), currentGame.getGameState());
         } else {
