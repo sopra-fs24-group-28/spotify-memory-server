@@ -44,6 +44,14 @@ public class GameService {
 
     private final ConcurrentHashMap<Integer, Boolean> isUpdating = new ConcurrentHashMap<>();
 
+    private void setGameInCalcStatus(Integer id, Boolean newVal) {
+        isUpdating.put(id, newVal);
+    }
+
+    private boolean isGameInCalc(Integer id) {
+        return id != null && isUpdating.get(id) != null && isUpdating.get(id);
+    }
+
 
     public Game createGame(GameParameters gameParameters) {
 
@@ -251,14 +259,14 @@ public class GameService {
         Game currentGame = inMemoryGameRepository.findById(gameId);
 
         synchronized (currentGame) {
+            setGameInCalcStatus(currentGame.getGameId(), true);
             try {
-                isUpdating.put(currentGame.getGameId(), true);
                 if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)) {
                     runActiveTurn(currentGame, cardId);
                     inMemoryGameRepository.save(currentGame);
                 }
             } finally {
-                isUpdating.put(currentGame.getGameId(), false);
+                setGameInCalcStatus(currentGame.getGameId(), false);
             }
         }
     }
@@ -306,7 +314,7 @@ public class GameService {
     }
 
     public void handleInactivePlayer(Integer gameId) {
-        if (isUpdating.get(gameId) != null && isUpdating.get(gameId)) return;
+        if (isGameInCalc(gameId)) return;
         User inactivePlayer = UserContextHolder.getCurrentUser();
         Game currentGame = inMemoryGameRepository.findById(gameId);
         if (currentGame != null && inactivePlayer.getUserId().equals(currentGame.getActivePlayer())) {

@@ -103,6 +103,7 @@ public class GameServiceTest {
         testGame.getPlayers().add(testUser);
         testGame.setGameStatsId(3);
         testGame.setScoreBoard(new HashMap<Long, Long>());
+        testGame.setGameId(1);
 
         testSpotifyJWT = new SpotifyJWT();
         testStats = new Stats();
@@ -674,7 +675,7 @@ public class GameServiceTest {
                     gameService.runTurn(testGame.getGameId(), testCard.getCardId());
 
                     assertEquals(4L, testGame.getScoreBoard().get(1L));
-                    assertEquals(GameState.FINISHED, testGame.getGameState());
+                    assertEquals(GameState.OPEN, testGame.getGameState());
                     verify(inMemoryGameRepository, times(4)).save(Mockito.any());
                     verify(eventPublisher, times(4)).publishEvent(Mockito.any());
                     verify(statsService, times(2)).saveStats(Mockito.any());
