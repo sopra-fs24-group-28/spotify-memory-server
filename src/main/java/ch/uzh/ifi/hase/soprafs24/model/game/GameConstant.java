@@ -16,6 +16,6 @@ public final class GameConstant {
     }
 
     public static Integer getFinishSleep() {
-        return viewSleep;
+        return finishSleep;
     }
 }
