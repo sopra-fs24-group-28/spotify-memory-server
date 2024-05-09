@@ -357,7 +357,6 @@ public class GameService {
         eventPublisher.publishEvent(new GameChangesEvent(this, currentGame.getGameId(), wsGameChangesDto));
     }
 
-    //TODO: should set this functions in DTOs or elsewhere?
     private Map<Integer, CardState> mapCardsState(CardCollection cardCollection) {
         List<Card> cards = cardCollection.getCards();
         Map<Integer, CardState> cardsState = new HashMap<>();
@@ -393,7 +392,9 @@ public class GameService {
 
     private void winPoints(Game currentGame, Turn currentTurn) {
         Long userId = UserContextHolder.getCurrentUser().getUserId();
-        currentGame.getScoreBoard().compute(userId, (k, score) -> score + currentGame.getGameParameters().getNumOfCardsPerSet());
+        int multiplier = streakMultiplierIsActive(currentGame) ? currentGame.getGameParameters().getStreakMultiplier() : 1;
+        final int newPoints = currentGame.getGameParameters().getNumOfCardsPerSet() * multiplier;
+        currentGame.getScoreBoard().compute(userId, (k, score) -> score + newPoints);
         setCardsExcluded(currentGame, currentTurn);
     }
 
@@ -434,11 +435,13 @@ public class GameService {
         if (currentGame.getHistory().get(currentGame.getHistory().size()-1).getPicks().isEmpty()) {
             wsGameChangesDto = WSGameChangesDto.builder()
                     .gameChangesDto(WSGameChanges.builder()
-                            .activePlayer(currentGame.getActivePlayer()).build())
+                            .activePlayer(currentGame.getActivePlayer())
+                            .activePlayerStreakActive(streakMultiplierIsActive(currentGame))
+                            .build())
                     .cardsStates(
                             new WSCardsStates(mapCardsState(currentGame.getCardCollection())))
                     .scoreBoard(
-                            new WSScoreBoardChanges(currentGame.getScoreBoard())) // TODO: set WSScoreBoardChanges()*/
+                            new WSScoreBoardChanges(currentGame.getScoreBoard()))
                     .build();
         } else {
             wsGameChangesDto = WSGameChangesDto.builder()
