@@ -9,19 +9,19 @@ public class UserGetDTO {
     private String username;
     private String imageUrl;
     private Integer totalGames;
-    private Integer GamesWon;
-    private Integer GamesLoss;
-    private Integer GamesAborted;
-    private Long SetsWon;
+    private Integer gamesWon;
+    private Integer gamesLoss;
+    private Integer gamesAborted;
+    private Long setsWon;
 
     public UserGetDTO(PlayerDTO playerDTO, UserStatsDTO userStatsDTO) {
         userId = playerDTO.getUserId();
         username = playerDTO.getUsername();
         imageUrl = playerDTO.getImageUrl();
         totalGames = userStatsDTO.getTotalGames();
-        GamesWon = userStatsDTO.getGamesWon();
-        GamesLoss = userStatsDTO.getGamesLoss();
-        GamesAborted = userStatsDTO.getGamesAborted();
-        SetsWon = userStatsDTO.getTotalSetsWon();
+        gamesWon = userStatsDTO.getGamesWon();
+        gamesLoss = userStatsDTO.getGamesLoss();
+        gamesAborted = userStatsDTO.getGamesAborted();
+        setsWon = userStatsDTO.getTotalSetsWon();
     }
 }
