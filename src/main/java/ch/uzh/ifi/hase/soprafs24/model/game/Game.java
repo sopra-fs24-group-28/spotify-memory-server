@@ -16,7 +16,7 @@ public class Game {
 
     private Long activePlayer;
 
-    private Long activePlayerStreak;
+    private Integer activePlayerStreak;
 
     private GameState gameState;
 

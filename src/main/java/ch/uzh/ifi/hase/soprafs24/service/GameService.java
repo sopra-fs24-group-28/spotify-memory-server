@@ -82,6 +82,7 @@ public class GameService {
             WSGameChanges wsGameChanges = WSGameChanges.builder()
                     .gameState(currentGame.getGameState())
                     .activePlayer(currentGame.getActivePlayer())
+                    .activePlayerStreakActive(streakMultiplierIsActive(currentGame))
                     .build();
 
             WSCardsStates wsCardsStates = new WSCardsStates(currentGame.getCardCollection().getAllCardStates());
@@ -125,7 +126,6 @@ public class GameService {
     }
 
     private void initiateNewTurn(Game currentGame, boolean gameStreak){
-        // TODO: gameStreak added for same player keep playing after matching cards & later powerups
         List<User> players = currentGame.getPlayers();
         Long activePlayer = currentGame.getActivePlayer();
 
@@ -140,6 +140,10 @@ public class GameService {
 
         if (!gameStreak) {
             activePlayerIndex = (activePlayerIndex + 1) % players.size();
+            currentGame.setActivePlayerStreak(0);
+        } else {
+            int streak = currentGame.getActivePlayerStreak();
+            currentGame.setActivePlayerStreak(streak+1);
         }
         Long activePlayerId = players.get(activePlayerIndex).getUserId();
         currentGame.setActivePlayer(activePlayerId);
@@ -356,8 +360,16 @@ public class GameService {
 
     private void winPoints(Game currentGame, Turn currentTurn) {
         Long userId = UserContextHolder.getCurrentUser().getUserId();
-        currentGame.getScoreBoard().compute(userId, (k, score) -> score + currentGame.getGameParameters().getNumOfCardsPerSet());
+        int multiplier = streakMultiplierIsActive(currentGame) ? currentGame.getGameParameters().getStreakMultiplier() : 1;
+        final int newPoints = currentGame.getGameParameters().getNumOfCardsPerSet() * multiplier;
+        currentGame.getScoreBoard().compute(userId, (k, score) -> score + newPoints);
         setCardsExcluded(currentGame, currentTurn);
+    }
+
+    private Boolean streakMultiplierIsActive(Game currentGame) {
+        int activeStreak = currentGame.getActivePlayerStreak();
+        int streakStart = currentGame.getGameParameters().getStreakStart();
+        return activeStreak >= streakStart;
     }
 
     private void setCardsFaceDown(Game currentGame, Turn currentTurn){
@@ -388,7 +400,9 @@ public class GameService {
 
         WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
                 .gameChangesDto(WSGameChanges.builder()
-                        .activePlayer(currentGame.getActivePlayer()).build())
+                        .activePlayer(currentGame.getActivePlayer())
+                        .activePlayerStreakActive(streakMultiplierIsActive(currentGame))
+                        .build())
                 .cardsStates(
                         new WSCardsStates(mapCardsState(currentGame.getCardCollection())))
                 .scoreBoard(
