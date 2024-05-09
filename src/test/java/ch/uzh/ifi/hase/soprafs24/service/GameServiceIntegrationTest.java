@@ -23,8 +23,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import static ch.uzh.ifi.hase.soprafs24.constant.game.GameCategory.STANDARDALBUMCOVER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -172,7 +171,7 @@ public class GameServiceIntegrationTest {
             gameService.runTurn(game.getGameId(), fourthCard2);
 
             assertEquals(game.getGameState(), GameState.OPEN);
-            assertNull(game.getScoreBoard());
+            assertTrue(game.getScoreBoard().isEmpty());
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
