@@ -104,6 +104,8 @@ public class GameServiceTest {
         testGame = new Game(gameParameters, testUser);
         testGame.getPlayers().add(testUser);
         testGame.setGameStatsId(3);
+        testGame.setScoreBoard(new HashMap<Long, Long>());
+        testGame.setGameId(1);
 
         testSpotifyJWT = new SpotifyJWT();
         testStats = new Stats();

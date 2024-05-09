@@ -12,11 +12,9 @@ import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
 import ch.uzh.ifi.hase.soprafs24.model.game.Card;
 import ch.uzh.ifi.hase.soprafs24.model.game.CardCollection;
-import ch.uzh.ifi.hase.soprafs24.repository.StatsRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
-import ch.uzh.ifi.hase.soprafs24.websocket.EventListeningWebsocketBean;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardContent;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
@@ -32,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 
 @Service
@@ -39,12 +38,21 @@ import java.util.stream.IntStream;
 @AllArgsConstructor
 public class GameService {
 
-    private final EventListeningWebsocketBean eventListeningWebsocketBean;
     private UserService userService;
     private StatsService statsService;
     private InMemoryGameRepository inMemoryGameRepository;
     private ApplicationEventPublisher eventPublisher;
-    private StatsRepository statsRepository;
+
+    private final ConcurrentHashMap<Integer, Boolean> isUpdating = new ConcurrentHashMap<>();
+
+    private void setGameInCalcStatus(Integer id, Boolean newVal) {
+        isUpdating.put(id, newVal);
+    }
+
+    private boolean isGameInCalc(Integer id) {
+        return id != null && isUpdating.get(id) != null && isUpdating.get(id);
+    }
+
 
     public Game createGame(GameParameters gameParameters) {
 
@@ -252,10 +260,14 @@ public class GameService {
         Game currentGame = inMemoryGameRepository.findById(gameId);
 
         synchronized (currentGame) {
-
-            if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)){
-                runActiveTurn(currentGame, cardId);
-                inMemoryGameRepository.save(currentGame);
+            setGameInCalcStatus(currentGame.getGameId(), true);
+            try {
+                if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)) {
+                    runActiveTurn(currentGame, cardId);
+                    inMemoryGameRepository.save(currentGame);
+                }
+            } finally {
+                setGameInCalcStatus(currentGame.getGameId(), false);
             }
         }
     }
@@ -302,6 +314,7 @@ public class GameService {
     }
 
     public void handleInactivePlayer(Integer gameId) {
+        if (isGameInCalc(gameId)) return;
         User inactivePlayer = UserContextHolder.getCurrentUser();
         Game currentGame = inMemoryGameRepository.findById(gameId);
         if (currentGame != null && inactivePlayer.getUserId().equals(currentGame.getActivePlayer())) {
@@ -316,6 +329,7 @@ public class GameService {
                     .build();
 
             eventPublisher.publishEvent(new GameChangesEvent( this, gameId, wsGameChangesDto));
+
         }
     }
 
