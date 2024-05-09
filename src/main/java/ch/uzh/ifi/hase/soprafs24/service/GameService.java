@@ -436,13 +436,16 @@ public class GameService {
     }
 
     private void resetGame(Game currentGame){
+        //set game to initial value
         currentGame.setGameState(GameState.OPEN);
-        currentGame.setHistory(null);
+        currentGame.setHistory(new ArrayList<>());
         currentGame.setActivePlayer(null);
-        currentGame.setScoreBoard(null);
+        currentGame.setScoreBoard(new HashMap<>());
         currentGame.setMatchCount(null);
         currentGame.setCardCollection(null);
         currentGame.setGameStatsId(null);
+        currentGame.setQuickTurn(new HashMap<>());
+        currentGame.setQuickTurnActive(false);
 
         inMemoryGameRepository.save(currentGame);
     }
