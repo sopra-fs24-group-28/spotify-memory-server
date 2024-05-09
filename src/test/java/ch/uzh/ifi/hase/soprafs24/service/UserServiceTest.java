@@ -6,16 +6,20 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.SpotifyJWTRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -272,5 +276,23 @@ public class UserServiceTest {
         assertEquals(1, playerDTOs.size());
         assertEquals(testUser.getUsername(), playerDTOs.get(0).getUsername());
         assertEquals(testUser.getUserId(), playerDTOs.get(0).getUserId());
+    }
+
+    @Test
+    public void getPlayerDTOForCurrentUser_validInputs_success() {
+        try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
+            // prepare currentUser
+            Mockito.when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
+
+            // create playerDTO
+            PlayerDTO playerDTO = userService.getPlayerDTOForCurrentUser();
+
+            // check userRepository is called once only
+            Mockito.verify(userRepository, Mockito.times(0)).save(Mockito.any());
+
+            // assert user status
+            assertEquals(testUser.getUsername(), playerDTO.getUsername());
+            assertEquals(testUser.getUserId(), playerDTO.getUserId());
+        }
     }
 }
