@@ -519,6 +519,8 @@ public class GameServiceTest {
                     testGame.getHistory().add(new Turn(testUser.getUserId()));
                     testGame.getPlayers().add(testOpponent);
                     testGame.setActivePlayer(testUser.getUserId());
+                    testGame.getScoreBoard().put(1L, 2L);
+                    testGame.getScoreBoard().put(2L, 2L);
 
                     when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
                     when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
@@ -560,6 +562,8 @@ public class GameServiceTest {
                             testGame.getHistory().add(new Turn(testUser.getUserId()));
                             testGame.setActivePlayer(testUser.getUserId());
                             testGame.getPlayers().add(testOpponent);
+                            testGame.getScoreBoard().put(1L, 2L);
+                            testGame.getScoreBoard().put(2L, 2L);
 
                             when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
                             when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
