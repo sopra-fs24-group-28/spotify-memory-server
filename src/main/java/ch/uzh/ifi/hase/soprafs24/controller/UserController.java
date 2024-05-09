@@ -27,7 +27,7 @@ public class UserController {
     private final UserService userService;
     private final StatsService statsService;
 
-    @GetMapping("/profile")
+    @GetMapping("/profiles")
     @ResponseStatus(HttpStatus.OK)
     public UserGetDTO getUserProfile(){
         PlayerDTO currentUserDTD = userService.getPlayerDTOForCurrentUser();
