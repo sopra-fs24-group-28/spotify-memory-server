@@ -9,11 +9,15 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+<<<<<<< HEAD
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
+=======
+import org.mockito.*;
+>>>>>>> 1add268 (total test edit)
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -282,7 +286,11 @@ public class UserServiceTest {
     public void getPlayerDTOForCurrentUser_validInputs_success() {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             // prepare currentUser
+<<<<<<< HEAD
             Mockito.when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
+=======
+            when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
+>>>>>>> 1add268 (total test edit)
 
             // create playerDTO
             PlayerDTO playerDTO = userService.getPlayerDTOForCurrentUser();
