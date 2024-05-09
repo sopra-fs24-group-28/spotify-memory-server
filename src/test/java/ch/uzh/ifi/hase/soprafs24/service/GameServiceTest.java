@@ -104,7 +104,6 @@ public class GameServiceTest {
         testGame = new Game(gameParameters, testUser);
         testGame.getPlayers().add(testUser);
         testGame.setGameStatsId(3);
-        testGame.setScoreBoard(new HashMap<Long, Long>());
 
         testSpotifyJWT = new SpotifyJWT();
         testStats = new Stats();
@@ -519,6 +518,8 @@ public class GameServiceTest {
                     testGame.getHistory().add(new Turn(testUser.getUserId()));
                     testGame.getPlayers().add(testOpponent);
                     testGame.setActivePlayer(testUser.getUserId());
+                    testGame.getScoreBoard().put(1L, 2L);
+                    testGame.getScoreBoard().put(2L, 2L);
 
                     when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
                     when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
@@ -560,6 +561,8 @@ public class GameServiceTest {
                             testGame.getHistory().add(new Turn(testUser.getUserId()));
                             testGame.setActivePlayer(testUser.getUserId());
                             testGame.getPlayers().add(testOpponent);
+                            testGame.getScoreBoard().put(1L, 2L);
+                            testGame.getScoreBoard().put(2L, 2L);
 
                             when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
                             when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
@@ -679,7 +682,7 @@ public class GameServiceTest {
                     assertEquals(GameState.OPEN, testGame.getGameState());
                     assertNull(testGame.getCardCollection());
                     assertNull(testGame.getMatchCount());
-                    assertNull(testGame.getScoreBoard());
+                    assertTrue(testGame.getScoreBoard().isEmpty());
                     assertNull(testGame.getActivePlayer());
                     verify(inMemoryGameRepository, times(5)).save(Mockito.any());
                     verify(eventPublisher, times(3)).publishEvent(any(GameChangesEvent.class));
