@@ -19,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import javax.persistence.PersistenceException;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -75,6 +77,25 @@ public class UserControllerTest {
         mockMvc.perform(getRequest)
                 .andExpect(status().isOk())
                 .andExpect(content().json(asJsonString(expectedResponse)));
+    }
+
+    @Test
+    public void getUserProfile_returnException() throws Exception {
+        // set expected results
+        PlayerDTO testUserDTO = new PlayerDTO(testUser);
+        UserStatsDTO worngTestStatsDTO = new UserStatsDTO(
+                testUser.getUserId(), 7, 3, 2, 1, 10L
+        );
+
+        Mockito.when(authService.getUserBySessionToken(Mockito.any())).thenReturn(testUser);
+        Mockito.when(userService.getPlayerDTOForCurrentUser()).thenReturn(testUserDTO);
+        Mockito.when(statsService.getCurrentUserStats()).thenThrow(PersistenceException.class);
+
+        MockHttpServletRequestBuilder getRequest = get("/users/profiles")
+                .contentType(MediaType.APPLICATION_JSON).header("Authorization", "Bearer token");
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isBadRequest());
     }
 
     public static String asJsonString(final Object obj) {

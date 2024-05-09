@@ -19,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -283,7 +282,6 @@ public class UserServiceTest {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             // prepare currentUser
             Mockito.when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
-
             // create playerDTO
             PlayerDTO playerDTO = userService.getPlayerDTOForCurrentUser();
 
