@@ -6,6 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.SpotifyJWTRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -150,4 +151,8 @@ public class UserService {
               .toList();
   }
 
+    public PlayerDTO getPlayerDTOForCurrentUser() {
+      User user = UserContextHolder.getCurrentUser();
+      return new PlayerDTO(user);
+    }
 }

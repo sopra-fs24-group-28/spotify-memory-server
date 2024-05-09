@@ -686,6 +686,7 @@ public class GameServiceTest {
                     assertNull(testGame.getMatchCount());
                     assertTrue(testGame.getScoreBoard().isEmpty());
                     assertNull(testGame.getActivePlayer());
+                    assertTrue(testGame.getHistory().isEmpty());
                     verify(inMemoryGameRepository, times(5)).save(Mockito.any());
                     verify(eventPublisher, times(3)).publishEvent(any(GameChangesEvent.class));
                     verify(eventPublisher, times(1)).publishEvent(any(LobbyOverviewChangedEvent.class));

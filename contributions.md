@@ -50,6 +50,9 @@
 * [...] Solved async issues in game updates (race condition through WS)
 * [...] Timing functionality per turn
 
+### Week 7
+* [...] Complete Turn Timer Backend and Frontend (Diyar)
+
 ## Henry
 
 ### Week 1
@@ -71,6 +74,10 @@
 ### Week 6
 * [#71] update the players game statisticsand persit it in the database
 * [...] Unit tests for GameService
+
+### Week 7
+* [...] Unit tests for GameService Finished
+* [...](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/165) Reset Game back to open after finished
   
 
 ## Nicolas
