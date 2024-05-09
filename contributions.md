@@ -50,6 +50,9 @@
 * [...] Solved async issues in game updates (race condition through WS)
 * [...] Timing functionality per turn
 
+### Week 7
+* [...] Complete Turn Timer Backend and Frontend (Diyar)
+
 ## Henry
 
 ### Week 1
