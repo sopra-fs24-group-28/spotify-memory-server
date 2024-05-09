@@ -14,7 +14,7 @@ public interface StatsRepository extends JpaRepository<Stats, Long> {
     @Query("SELECT COALESCE(MAX(g.gameId), 1) FROM Stats g")
     Integer findMaxGameID();
 
-    List<Stats> findByGameId(Integer gameId);
+    List<Stats> findByGameId(Integer gameStatsId);
 
     List<Stats> findByUserId(Long userId);
 

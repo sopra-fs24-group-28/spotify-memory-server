@@ -80,7 +80,7 @@ public class StatsServiceTest {
     }
 
     @Test
-    public void getCurrentUserStats_invalidReturn_success() {
+    public void getCurrentUserStats_invalidReturn_exceptionThrown() {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
             when(statsRepository.countByUserId(Mockito.any())).thenReturn(5);
