@@ -12,6 +12,8 @@ import ch.uzh.ifi.hase.soprafs24.repository.StatsRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
+import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
+import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -103,6 +105,7 @@ public class GameServiceTest {
         testGame.getPlayers().add(testUser);
         testGame.setGameStatsId(3);
         testGame.setScoreBoard(new HashMap<Long, Long>());
+        testGame.setGameId(1);
 
         testSpotifyJWT = new SpotifyJWT();
         testStats = new Stats();
@@ -517,6 +520,8 @@ public class GameServiceTest {
                     testGame.getHistory().add(new Turn(testUser.getUserId()));
                     testGame.getPlayers().add(testOpponent);
                     testGame.setActivePlayer(testUser.getUserId());
+                    testGame.getScoreBoard().put(1L, 2L);
+                    testGame.getScoreBoard().put(2L, 2L);
 
                     when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
                     when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
@@ -558,6 +563,8 @@ public class GameServiceTest {
                             testGame.getHistory().add(new Turn(testUser.getUserId()));
                             testGame.setActivePlayer(testUser.getUserId());
                             testGame.getPlayers().add(testOpponent);
+                            testGame.getScoreBoard().put(1L, 2L);
+                            testGame.getScoreBoard().put(2L, 2L);
 
                             when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
                             when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
@@ -607,8 +614,8 @@ public class GameServiceTest {
                     // set game (testUser's turn)
                     Turn testTurn = new Turn(testUser.getUserId());
                     testGame.setActivePlayer(testUser.getUserId());
-                    testGame.setActivePlayerStreak(0);
                     testGame.getPlayers().add(testOpponent);
+                    testGame.setActivePlayerStreak(0);
 
                     // set handleMatch
                     testTurn.getPicks().add(1);
@@ -657,6 +664,7 @@ public class GameServiceTest {
                     testGame.setActivePlayer(testUser.getUserId());
                     testGame.getPlayers().add(testOpponent);
                     testGame.setActivePlayerStreak(0);
+
                     testOpponent.setCurrentGameId(3);
 
                     // set handleMatch
@@ -675,10 +683,16 @@ public class GameServiceTest {
 
                     gameService.runTurn(testGame.getGameId(), testCard.getCardId());
 
-                    assertEquals(4L, testGame.getScoreBoard().get(1L));
-                    assertEquals(GameState.FINISHED, testGame.getGameState());
-                    verify(inMemoryGameRepository, times(4)).save(Mockito.any());
-                    verify(eventPublisher, times(4)).publishEvent(Mockito.any());
+//                    assertEquals(4L, testGame.getScoreBoard().get(1L));
+                    assertEquals(GameState.OPEN, testGame.getGameState());
+                    assertNull(testGame.getCardCollection());
+                    assertNull(testGame.getMatchCount());
+                    assertTrue(testGame.getScoreBoard().isEmpty());
+                    assertNull(testGame.getActivePlayer());
+                    assertTrue(testGame.getHistory().isEmpty());
+                    verify(inMemoryGameRepository, times(5)).save(Mockito.any());
+                    verify(eventPublisher, times(3)).publishEvent(any(GameChangesEvent.class));
+                    verify(eventPublisher, times(1)).publishEvent(any(LobbyOverviewChangedEvent.class));
                     verify(statsService, times(2)).saveStats(Mockito.any());
                 }
                 catch (InterruptedException e) {

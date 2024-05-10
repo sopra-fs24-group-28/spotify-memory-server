@@ -1,20 +1,12 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
-import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGameDto;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyOverviewDto;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PostGameStartDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSGameChanges;
-import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -81,10 +73,15 @@ public class GameController {
         return new LobbyGameDto(game.getGameParameters(), userService.getPlayerDTOListFromListOfUsers(game.getPlayers()), game.getGameState(), game.getHostId());
     }
 
-
     @PostMapping("/{gameId}/start")
     @ResponseStatus(HttpStatus.OK)
     public void startGame(@PathVariable Integer gameId) {
         gameService.startGame(gameId);
+    }
+
+    @PutMapping("/{gameId}/inactive")
+    @ResponseStatus(HttpStatus.OK)
+    public void inactivePlayerHandler(@PathVariable Integer gameId) {
+        gameService.handleInactivePlayer(gameId);
     }
 }
