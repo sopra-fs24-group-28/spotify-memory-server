@@ -223,21 +223,18 @@ public class SpotifyService {
 
     private static String getHighestResolutionImage(Image[] images) {
         try {
-            String default_image = "https://onedrive.live.com/embed?resid=3FDF6D9F7AFE5B85%21109886&authkey=%21AGmGcFZLnNAQFf4&width=640&height=640";
+            // initialize return image with default image
+            String return_image = "https://onedrive.live.com/embed?resid=3FDF6D9F7AFE5B85%21109886&authkey=%21AGmGcFZLnNAQFf4&width=640&height=640";
             if (images.length > 0) {
                 int max_width = -1;
-                String image_url = default_image;
                 for (Image image : images) {
                     if (image.getWidth() > max_width) {
                         max_width = image.getWidth();
-                        image_url = image.getUrl();
+                        return_image = image.getUrl();
                     }
                 }
-                return image_url;
             }
-            else {
-                return default_image;
-            }
+            return return_image;
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 8)!\n" + e.getMessage());
         }
