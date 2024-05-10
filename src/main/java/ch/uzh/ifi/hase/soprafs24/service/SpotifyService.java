@@ -29,7 +29,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Spotify Service
@@ -76,12 +75,7 @@ public class SpotifyService {
             spotifyUserData.put("id", userProfile.getId());
             spotifyUserData.put("display_name", userProfile.getDisplayName());
             spotifyUserData.put("product", userProfile.getProduct().getType());
-            // add url to profile image (if available, otherwise default placeholder)
-            try {
-                spotifyUserData.put("image_url", userProfile.getImages()[0].getUrl());
-            } catch (Exception e) {
-                spotifyUserData.put("image_url", "https://onedrive.live.com/embed?resid=3FDF6D9F7AFE5B85%21109886&authkey=%21AGmGcFZLnNAQFf4&width=640&height=640");
-            }
+            spotifyUserData.put("image_url", getHighestResolutionImage(userProfile.getImages()));
 
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 1)!\n" + e.getMessage());
@@ -225,5 +219,27 @@ public class SpotifyService {
             throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 7)!\n" + e.getMessage());
         }
         return trackAlbumCover;
+    }
+
+    private static String getHighestResolutionImage(Image[] images) {
+        try {
+            String default_image = "https://onedrive.live.com/embed?resid=3FDF6D9F7AFE5B85%21109886&authkey=%21AGmGcFZLnNAQFf4&width=640&height=640";
+            if (images.length > 0) {
+                int max_width = -1;
+                String image_url = default_image;
+                for (Image image : images) {
+                    if (image.getWidth() > max_width) {
+                        max_width = image.getWidth();
+                        image_url = image.getUrl();
+                    }
+                }
+                return image_url;
+            }
+            else {
+                return default_image;
+            }
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 8)!\n" + e.getMessage());
+        }
     }
 }
