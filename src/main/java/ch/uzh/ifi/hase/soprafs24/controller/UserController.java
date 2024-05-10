@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.server.ResponseStatusException;
+import javax.persistence.PersistenceException;
 
 /**
  * User Controller
@@ -29,12 +32,15 @@ public class UserController {
 
     @GetMapping("/profiles")
     @ResponseStatus(HttpStatus.OK)
-    public UserGetDTO getUserProfile(){
-        PlayerDTO currentUserDTD = userService.getPlayerDTOForCurrentUser();
-        UserStatsDTO userStatsDTO = statsService.getCurrentUserStats();
-        return new UserGetDTO(currentUserDTD, userStatsDTO);
+    @ResponseBody
+    public UserGetDTO getUserProfile() {
+        try{
+            PlayerDTO currentUserDTD = userService.getPlayerDTOForCurrentUser();
+            UserStatsDTO userStatsDTO = statsService.getCurrentUserStats();
+            return new UserGetDTO(currentUserDTD, userStatsDTO);
+        } catch (PersistenceException error) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    String.format("User profile unavailable."));
+        }
     }
-
-
-
 }
