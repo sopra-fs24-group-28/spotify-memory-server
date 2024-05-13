@@ -534,7 +534,7 @@ public class GameServiceTest {
 
                     assertEquals(testOpponent.getUserId(), testGame.getActivePlayer());
                     verify(inMemoryGameRepository, times(2)).save(Mockito.any());
-                    verify(eventPublisher, times(2)).publishEvent(Mockito.any());
+                    verify(eventPublisher, times(3)).publishEvent(Mockito.any());
                     verify(userService, times(0)).findUserByUserId(Mockito.any());
 
                 }
@@ -586,7 +586,7 @@ public class GameServiceTest {
 
                             assertEquals(testOpponent.getUserId(), testGame.getActivePlayer());
                             verify(inMemoryGameRepository, times(2)).save(Mockito.any());
-                            verify(eventPublisher, times(2)).publishEvent(Mockito.any());
+                            verify(eventPublisher, times(3)).publishEvent(Mockito.any());
                             verify(userService, times(2)).findUserByUserId(Mockito.any());
 
                         }
@@ -636,7 +636,7 @@ public class GameServiceTest {
                     assertEquals(4L, testGame.getScoreBoard().get(1L));
                     assertEquals(testUser.getUserId(), testGame.getActivePlayer());
                     verify(inMemoryGameRepository, times(3)).save(Mockito.any());
-                    verify(eventPublisher, times(2)).publishEvent(Mockito.any());
+                    verify(eventPublisher, times(3)).publishEvent(Mockito.any());
 
                 }
                 catch (InterruptedException e) {

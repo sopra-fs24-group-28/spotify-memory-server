@@ -64,7 +64,7 @@ public class ManualSecurityFilterTest {
         manualSecurityFilter.doFilter(mockRequest, mockResponse, mockFilterChain);
 
         verify(mockFilterChain, never()).doFilter(mockRequest, mockResponse);
-        verify(mockResponse).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Bad Credentials");
+        verify(mockResponse).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Invalid Token");
     }
 
     @Test
@@ -80,5 +80,15 @@ public class ManualSecurityFilterTest {
 
         verify(mockFilterChain, times(1)).doFilter(mockRequest, mockResponse);
         verify(mockResponse, never()).sendError(anyInt(), anyString());
+    }
+
+    @Test
+    public void whenNoAuthHeader_thenRespondWithBadRequestError() throws Exception {
+        when(mockRequest.getRequestURI()).thenReturn("/other");
+
+        manualSecurityFilter.doFilter(mockRequest, mockResponse, mockFilterChain);
+
+        verify(mockFilterChain, never()).doFilter(mockRequest, mockResponse);
+        verify(mockResponse).sendError(HttpServletResponse.SC_BAD_REQUEST, "Unauthorized: Missing Authorization Header");
     }
 }
