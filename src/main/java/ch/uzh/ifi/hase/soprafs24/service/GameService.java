@@ -6,6 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.game.GameState;
 import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Stats;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.event.InactiveRequestEvent;
 import ch.uzh.ifi.hase.soprafs24.model.game.Game;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameConstant;
 import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
@@ -24,6 +25,7 @@ import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,7 @@ public class GameService {
     private StatsService statsService;
     private InMemoryGameRepository inMemoryGameRepository;
     private ApplicationEventPublisher eventPublisher;
+    private DeferredExecutionService deferredExecutionService;
 
     private final ConcurrentHashMap<Integer, Boolean> isUpdating = new ConcurrentHashMap<>();
 
@@ -272,6 +275,7 @@ public class GameService {
                 }
             } finally {
                 setGameInCalcStatus(currentGame.getGameId(), false);
+                eventPublisher.publishEvent(new InactiveRequestEvent(this, gameId));
             }
         }
     }
@@ -318,10 +322,31 @@ public class GameService {
     }
 
     public void handleInactivePlayer(Integer gameId) {
-        if (isGameInCalc(gameId)) return;
+        if (isGameInCalc(gameId)) {
+            deferredExecutionService.deferTask(gameId, () -> executeInactivePlayerLogic(gameId));
+        } else {
+            executeInactivePlayerLogic(gameId);
+        }
+    }
+
+    @EventListener
+    public void onGameCalculationStatusChange(InactiveRequestEvent event) {
+        if (deferredExecutionService.hasDeferredTask(event.getGameId())) {
+            deferredExecutionService.executeDeferredTask(event.getGameId());
+        }
+    }
+
+    private void executeInactivePlayerLogic(Integer gameId) {
         User inactivePlayer = UserContextHolder.getCurrentUser();
         Game currentGame = inMemoryGameRepository.findById(gameId);
-        if (currentGame != null && inactivePlayer.getUserId().equals(currentGame.getActivePlayer())) {
+
+        int historySize = currentGame.getHistory().size();
+
+        // We need to ensure that a correct selection at the very end of a turn does not in a wrongful change of Turn
+        if (historySize > 1 &&
+                (currentGame.getHistory().get(historySize - 1).getPicks().isEmpty()
+                        && currentGame.getHistory().get(historySize - 2).getUserId() == currentGame.getActivePlayer())) {return;}
+        if (inactivePlayer.getUserId().equals(currentGame.getActivePlayer())) {
             setCardsFaceDown(currentGame, currentGame.getHistory().get(currentGame.getHistory().size()-1));
             initiateNewTurn(currentGame, false);
 
