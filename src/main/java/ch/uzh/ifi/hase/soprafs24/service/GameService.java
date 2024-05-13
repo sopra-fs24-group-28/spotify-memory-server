@@ -57,8 +57,8 @@ public class GameService {
     public Game createGame(GameParameters gameParameters) {
 
         User host = UserContextHolder.getCurrentUser();
-        if (host.getState().equals(UserStatus.INGAME)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a game");
+        if (host.getCurrentGameId() != null || host.getState().equals(UserStatus.INGAME)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a game." + host.getCurrentGameId());
         }
         Game newGame = new Game(gameParameters, host);
         Game game = inMemoryGameRepository.save(newGame);
