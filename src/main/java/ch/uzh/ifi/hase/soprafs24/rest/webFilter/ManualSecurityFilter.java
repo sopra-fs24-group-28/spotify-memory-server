@@ -28,25 +28,34 @@ public class ManualSecurityFilter  implements Filter {
 
         if (
                 requestUri.startsWith("/auth") && "POST".equalsIgnoreCase(request.getMethod())
-                        || requestUri.startsWith("/ws")//TODO: ws endpoint auth?
+                        || requestUri.startsWith("/ws")
         ) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
 
-        String token = request.getHeader("Authorization").split(" ")[1];
-        User user = authService.getUserBySessionToken(token);
+        try {
+            String token = request.getHeader("Authorization").split(" ")[1];
 
-        if (user != null) {
-            UserContextHolder.setCurrentUser(user);
-            try {
-                filterChain.doFilter(servletRequest, servletResponse);
-            } finally {
-                UserContextHolder.clear();
+            User user = authService.getUserBySessionToken(token);
+
+            if (user != null) {
+                UserContextHolder.setCurrentUser(user);
+                try {
+                    filterChain.doFilter(servletRequest, servletResponse);
+                } finally {
+                    UserContextHolder.clear();
+                }
+            } else {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Invalid Token");
             }
-        } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Bad Credentials");
+
         }
+
+        catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unauthorized: Missing Authorization Header");
+        }
+
     }
 
 }
