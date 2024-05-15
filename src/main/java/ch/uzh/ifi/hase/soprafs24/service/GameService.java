@@ -190,6 +190,7 @@ public class GameService {
      public void removePlayerFromGame(Integer gameId) {
          User userToRemove = UserContextHolder.getCurrentUser();
          removePlayerHelper(gameId, userToRemove);
+         pausePlaybackHelper(userToRemove);
      }
 
      private void removePlayerHelper(Integer gameId, User userToRemove) {
@@ -267,6 +268,7 @@ public class GameService {
             setGameInCalcStatus(currentGame.getGameId(), true);
             try {
                 if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)) {
+                    pausePlaybackAllPlayers(currentGame);
                     runActiveTurn(currentGame, cardId);
                     inMemoryGameRepository.save(currentGame);
                 }
@@ -322,6 +324,7 @@ public class GameService {
         User inactivePlayer = UserContextHolder.getCurrentUser();
         Game currentGame = inMemoryGameRepository.findById(gameId);
         if (currentGame != null && inactivePlayer.getUserId().equals(currentGame.getActivePlayer())) {
+            pausePlaybackAllPlayers(currentGame);
             setCardsFaceDown(currentGame, currentGame.getHistory().get(currentGame.getHistory().size()-1));
             initiateNewTurn(currentGame, false);
 
@@ -344,6 +347,25 @@ public class GameService {
                     fetchedPlayer.getSpotifyJWT().getAccessToken(),
                     fetchedPlayer.getSpotifyDeviceId(),
                     card.getSongId());
+        }
+    }
+
+    private void pausePlaybackAllPlayers(Game currentGame) {
+        if (currentGame.getGameParameters().getGameCategory() == GameCategory.STANDARDSONG) {
+            for (User player : currentGame.getPlayers()) {
+                User fetchedPlayer = userService.findUserByUserId(player.getUserId());
+                pausePlaybackHelper(fetchedPlayer);
+            }
+        }
+    }
+
+    private void pausePlaybackHelper(User userToPause) {
+        try {
+            SpotifyService.pausePlayback(
+                    userToPause.getSpotifyJWT().getAccessToken(),
+                    userToPause.getSpotifyDeviceId());
+        } catch (ResponseStatusException e) {
+            System.out.println("Couldn't pause playback for user " + userToPause.getUserId());
         }
     }
 
@@ -370,11 +392,13 @@ public class GameService {
     private Game handleMatch(Game currentGame, Turn currentTurn) {
         if (checkMatch(currentGame, currentTurn)) {
             if (isCompleteSet(currentGame, currentTurn)) {
+                pausePlaybackAllPlayers(currentGame);
                 winPoints(currentGame, currentTurn);
                 addMatchCount(currentGame);
                 initiateNewTurn(currentGame, true);
             }
         } else {
+            pausePlaybackAllPlayers(currentGame);
             setCardsFaceDown(currentGame, currentTurn);
             initiateNewTurn(currentGame, false);
         }

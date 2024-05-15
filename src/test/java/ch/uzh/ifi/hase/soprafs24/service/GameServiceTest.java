@@ -397,21 +397,25 @@ public class GameServiceTest {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try (MockedStatic<UserRepository> mockedUserRepository = mockStatic(UserRepository.class)) {
-                    // set users
-                    testUser.setState(UserStatus.INGAME);
-                    testOpponent.setState(UserStatus.INGAME);
-                    when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
+                    try(MockedStatic<SpotifyService> mockedSpotifyService = mockStatic(SpotifyService.class)) {
+                        // set users
+                        testUser.setState(UserStatus.INGAME);
+                        testOpponent.setState(UserStatus.INGAME);
+                        when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
 
-                    // set games (with user as host)
-                    testGame.setHostId(testUser.getUserId());
-                    testGame.getPlayers().add(testOpponent);
-                    when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
+                        // set games (with user as host)
+                        testGame.setHostId(testUser.getUserId());
+                        testGame.getPlayers().add(testOpponent);
+                        when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
+                        doNothing().when(SpotifyService.class);
+                        SpotifyService.pausePlayback(any(), any());
 
-                    gameService.removePlayerFromGame(testGame.getGameId());
+                        gameService.removePlayerFromGame(testGame.getGameId());
 
-                    verify(userService, times(testGame.getPlayers().size()+1)).setPlayerState(Mockito.any(), Mockito.any());
-                    verify(inMemoryGameRepository).deleteById(Mockito.any());
-                    verify(eventPublisher, times(2)).publishEvent(Mockito.any());
+                        verify(userService, times(testGame.getPlayers().size() + 1)).setPlayerState(Mockito.any(), Mockito.any());
+                        verify(inMemoryGameRepository).deleteById(Mockito.any());
+                        verify(eventPublisher, times(2)).publishEvent(Mockito.any());
+                    }
                 }
             }
         }
@@ -422,25 +426,29 @@ public class GameServiceTest {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try (MockedStatic<UserRepository> mockedUserRepository = mockStatic(UserRepository.class)) {
-                    // set users
-                    testUser.setState(UserStatus.INGAME);
-                    testOpponent.setState(UserStatus.INGAME);
-                    when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
+                    try(MockedStatic<SpotifyService> mockedSpotifyService = mockStatic(SpotifyService.class)) {
+                        // set users
+                        testUser.setState(UserStatus.INGAME);
+                        testOpponent.setState(UserStatus.INGAME);
+                        when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
 
-                    // set games (with user as host, and ONPLAY)
-                    testGame.getPlayers().add(testOpponent);
-                    testGame.setHostId(testUser.getUserId());
-                    testGame.setGameState(GameState.ONPLAY);
-                    testGame.getScoreBoard().put(1L, 2L);
-                    testGame.getScoreBoard().put(2L, 2L);
-                    when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
+                        // set games (with user as host, and ONPLAY)
+                        testGame.getPlayers().add(testOpponent);
+                        testGame.setHostId(testUser.getUserId());
+                        testGame.setGameState(GameState.ONPLAY);
+                        testGame.getScoreBoard().put(1L, 2L);
+                        testGame.getScoreBoard().put(2L, 2L);
+                        when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
+                        doNothing().when(SpotifyService.class);
+                        SpotifyService.pausePlayback(any(), any());
 
-                    gameService.removePlayerFromGame(testGame.getGameId());
+                        gameService.removePlayerFromGame(testGame.getGameId());
 
-                    verify(userService, times(testGame.getPlayers().size()+1)).setPlayerState(Mockito.any(), Mockito.any());
-                    verify(inMemoryGameRepository).deleteById(Mockito.any());
-                    verify(eventPublisher, times(2)).publishEvent(Mockito.any());
-                    verify(statsService, times(testGame.getPlayers().size())).saveStats(Mockito.any());
+                        verify(userService, times(testGame.getPlayers().size() + 1)).setPlayerState(Mockito.any(), Mockito.any());
+                        verify(inMemoryGameRepository).deleteById(Mockito.any());
+                        verify(eventPublisher, times(2)).publishEvent(Mockito.any());
+                        verify(statsService, times(testGame.getPlayers().size())).saveStats(Mockito.any());
+                    }
                 }
             }
         }
@@ -451,23 +459,27 @@ public class GameServiceTest {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try (MockedStatic<UserRepository> mockedUserRepository = mockStatic(UserRepository.class)) {
-                    // set users
-                    testUser.setState(UserStatus.INGAME);
-                    testOpponent.setState(UserStatus.INGAME);
-                    when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
+                    try(MockedStatic<SpotifyService> mockedSpotifyService = mockStatic(SpotifyService.class)) {
+                        // set users
+                        testUser.setState(UserStatus.INGAME);
+                        testOpponent.setState(UserStatus.INGAME);
+                        when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
 
-                    // set games (testOpponent as host)
-                    testGame.getPlayers().add(testOpponent);
-                    testGame.setHostId(testOpponent.getUserId());
-                    when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
+                        // set games (testOpponent as host)
+                        testGame.getPlayers().add(testOpponent);
+                        testGame.setHostId(testOpponent.getUserId());
+                        when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
+                        doNothing().when(SpotifyService.class);
+                        SpotifyService.pausePlayback(any(), any());
 
-                    gameService.removePlayerFromGame(testGame.getGameId());
+                        gameService.removePlayerFromGame(testGame.getGameId());
 
-                    assertEquals(1, testGame.getPlayers().size());
-                    assertEquals(testOpponent, testGame.getPlayers().get(testGame.getPlayers().size()-1));
-                    verify(userService).setPlayerState(testUser, UserStatus.ONLINE);
-                    verify(inMemoryGameRepository).save(Mockito.any());
-                    verify(eventPublisher, times(2)).publishEvent(Mockito.any());
+                        assertEquals(1, testGame.getPlayers().size());
+                        assertEquals(testOpponent, testGame.getPlayers().get(testGame.getPlayers().size() - 1));
+                        verify(userService).setPlayerState(testUser, UserStatus.ONLINE);
+                        verify(inMemoryGameRepository).save(Mockito.any());
+                        verify(eventPublisher, times(2)).publishEvent(Mockito.any());
+                    }
                 }
             }
         }
@@ -478,28 +490,32 @@ public class GameServiceTest {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try (MockedStatic<UserRepository> mockedUserRepository = mockStatic(UserRepository.class)) {
-                    // set users
-                    testUser.setState(UserStatus.INGAME);
-                    testOpponent.setState(UserStatus.INGAME);
-                    when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
+                    try(MockedStatic<SpotifyService> mockedSpotifyService = mockStatic(SpotifyService.class)) {
+                        // set users
+                        testUser.setState(UserStatus.INGAME);
+                        testOpponent.setState(UserStatus.INGAME);
+                        when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
 
-                    // set games (testOpponent as host, and ONPLAY)
-                    testGame.getPlayers().add(testOpponent);
-                    testGame.setHostId(testOpponent.getUserId());
-                    testGame.setGameState(GameState.ONPLAY);
-                    testGame.getScoreBoard().put(1L, 2L);
-                    testGame.getScoreBoard().put(2L, 2L);
-                    when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
-                    when(statsService.saveStats(Mockito.any())).thenReturn(new Stats());
+                        // set games (testOpponent as host, and ONPLAY)
+                        testGame.getPlayers().add(testOpponent);
+                        testGame.setHostId(testOpponent.getUserId());
+                        testGame.setGameState(GameState.ONPLAY);
+                        testGame.getScoreBoard().put(1L, 2L);
+                        testGame.getScoreBoard().put(2L, 2L);
+                        when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
+                        when(statsService.saveStats(Mockito.any())).thenReturn(new Stats());
+                        doNothing().when(SpotifyService.class);
+                        SpotifyService.pausePlayback(any(), any());
 
-                    gameService.removePlayerFromGame(testGame.getGameId());
+                        gameService.removePlayerFromGame(testGame.getGameId());
 
-                    assertEquals(1, testGame.getPlayers().size());
-                    assertEquals(testOpponent, testGame.getPlayers().get(testGame.getPlayers().size()-1));
-                    verify(userService).setPlayerState(testUser, UserStatus.ONLINE);
-                    verify(inMemoryGameRepository).save(Mockito.any());
-                    verify(eventPublisher, times(2)).publishEvent(Mockito.any());
-                    verify(statsService, times(1)).saveStats(Mockito.any());
+                        assertEquals(1, testGame.getPlayers().size());
+                        assertEquals(testOpponent, testGame.getPlayers().get(testGame.getPlayers().size() - 1));
+                        verify(userService).setPlayerState(testUser, UserStatus.ONLINE);
+                        verify(inMemoryGameRepository).save(Mockito.any());
+                        verify(eventPublisher, times(2)).publishEvent(Mockito.any());
+                        verify(statsService, times(1)).saveStats(Mockito.any());
+                    }
                 }
             }
         }
@@ -576,18 +592,19 @@ public class GameServiceTest {
                                 private int count = 0;
                                 @Override
                                  public User answer(InvocationOnMock invocationOnMock) throws Throwable {
-                                     return testGame.getPlayers().get(count++);
+                                     return testGame.getPlayers().get(count++ % 2);
                                  }
                              });
                             doNothing().when(SpotifyService.class);
                             SpotifyService.setSong(any(), any(), any());
+                            SpotifyService.pausePlayback(any(), any());
 
                             gameService.runTurn(testGame.getGameId(), testCard.getCardId());
 
                             assertEquals(testOpponent.getUserId(), testGame.getActivePlayer());
                             verify(inMemoryGameRepository, times(2)).save(Mockito.any());
                             verify(eventPublisher, times(2)).publishEvent(Mockito.any());
-                            verify(userService, times(2)).findUserByUserId(Mockito.any());
+                            verify(userService, times(6)).findUserByUserId(Mockito.any());
 
                         }
                         catch (InterruptedException e) {

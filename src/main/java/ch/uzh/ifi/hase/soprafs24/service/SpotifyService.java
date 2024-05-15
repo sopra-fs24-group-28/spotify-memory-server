@@ -174,9 +174,21 @@ public class SpotifyService {
 
         try {
             startResumeUsersPlaybackRequest.execute(); // also starts execution
-            pauseUsersPlaybackRequest.execute(); // pauses execution
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 5)!\n" + e.getMessage());
+        }
+    }
+
+    public static void pausePlayback(String accessToken, String deviceId) {
+
+        final SpotifyApi spotifyApi = new SpotifyApi.Builder().setAccessToken(accessToken).build();
+
+        final PauseUsersPlaybackRequest pauseUsersPlaybackRequest = spotifyApi.pauseUsersPlayback().device_id(deviceId).build();
+
+        try {
+            pauseUsersPlaybackRequest.execute(); // pauses execution
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 6)!\n" + e.getMessage());
         }
     }
 
@@ -200,7 +212,7 @@ public class SpotifyService {
             }
             return songs;
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 6)!\n" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 7)!\n" + e.getMessage());
         }
     }
 
@@ -216,7 +228,7 @@ public class SpotifyService {
             final Track track = trackRequest.execute();
             trackAlbumCover = track.getAlbum().getImages()[0].getUrl();
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 7)!\n" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 8)!\n" + e.getMessage());
         }
         return trackAlbumCover;
     }
@@ -236,7 +248,7 @@ public class SpotifyService {
             }
             return return_image;
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 8)!\n" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "Something went wrong (Code 9)!\n" + e.getMessage());
         }
     }
 }
