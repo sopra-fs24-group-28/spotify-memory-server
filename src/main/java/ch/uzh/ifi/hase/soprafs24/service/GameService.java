@@ -268,6 +268,7 @@ public class GameService {
             setGameInCalcStatus(currentGame.getGameId(), true);
             try {
                 if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)) {
+                    pausePlaybackAllPlayers(currentGame);
                     runActiveTurn(currentGame, cardId);
                     inMemoryGameRepository.save(currentGame);
                 }
