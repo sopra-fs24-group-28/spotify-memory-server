@@ -604,7 +604,7 @@ public class GameServiceTest {
                             assertEquals(testOpponent.getUserId(), testGame.getActivePlayer());
                             verify(inMemoryGameRepository, times(2)).save(Mockito.any());
                             verify(eventPublisher, times(2)).publishEvent(Mockito.any());
-                            verify(userService, times(4)).findUserByUserId(Mockito.any());
+                            verify(userService, times(6)).findUserByUserId(Mockito.any());
 
                         }
                         catch (InterruptedException e) {
