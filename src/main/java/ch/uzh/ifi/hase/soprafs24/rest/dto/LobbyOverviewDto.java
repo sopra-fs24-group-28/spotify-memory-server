@@ -8,8 +8,6 @@ import lombok.Setter;
 import java.util.HashMap;
 
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class LobbyOverviewDto {
     private HashMap<Integer, LobbyGameDto> games = new HashMap<>();

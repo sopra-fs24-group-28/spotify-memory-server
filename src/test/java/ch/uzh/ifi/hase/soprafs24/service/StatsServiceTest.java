@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.PersistenceException;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,6 +26,7 @@ public class StatsServiceTest {
     private StatsService statsService;
 
     private Stats testStats;
+    private Stats testStatsFull;
 
     private User testUser;
 
@@ -36,6 +38,14 @@ public class StatsServiceTest {
         testStats = new Stats();
         testUser = new User();
         testUser.setUserId(1L);
+
+        testStatsFull = new Stats();
+        testStatsFull.setUserId(1L);
+        testStatsFull.setGameId(1);
+        testStatsFull.setSetsWon(4L);
+        testStatsFull.setWin(true);
+        testStatsFull.setLoss(false);
+        testStatsFull.setAborted(false);
 
         when(statsRepository.saveAndFlush(Mockito.any())).thenReturn(testStats);
     }
@@ -52,9 +62,16 @@ public class StatsServiceTest {
 
     @Test
     public void saveStats_success() {
-        Stats returnValue = statsService.saveStats(testStats);
+        when(statsRepository.saveAndFlush(Mockito.any())).thenReturn(testStatsFull);
+        Stats returnValue = statsService.saveStats(testStatsFull);
         // assert user status
-        assertEquals(testStats, returnValue);
+        assertEquals(testStatsFull, returnValue);
+        assertEquals(1L, testStatsFull.getUserId());
+        assertEquals(1, testStatsFull.getGameId());
+        assertEquals(4L, testStatsFull.getSetsWon());
+        assertEquals(true, testStatsFull.getWin());
+        assertEquals(false, testStatsFull.getLoss());
+        assertEquals(false, testStatsFull.getAborted());
     }
 
     @Test

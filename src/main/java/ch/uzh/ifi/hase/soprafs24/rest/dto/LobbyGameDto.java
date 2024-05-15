@@ -10,7 +10,6 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-@Setter
 public class LobbyGameDto {
     private GameParameters gameParameters;
     private List<PlayerDTO> playerList;
