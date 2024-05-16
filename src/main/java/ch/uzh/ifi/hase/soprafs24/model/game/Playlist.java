@@ -6,7 +6,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class Playlist {
 
     private String playlistId;

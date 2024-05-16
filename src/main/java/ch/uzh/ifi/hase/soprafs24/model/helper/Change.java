@@ -6,7 +6,6 @@ import lombok.Setter;
 import java.util.Optional;
 
 @Getter
-@Setter
 public class Change<T> {
     private boolean changed;
     private Optional<T> value;

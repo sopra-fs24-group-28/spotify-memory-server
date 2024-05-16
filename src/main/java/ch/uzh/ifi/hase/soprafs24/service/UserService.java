@@ -31,11 +31,7 @@ public class UserService {
   private UserRepository userRepository;
   private SpotifyJWTRepository spotifyJWTRepository;
 
-  public List<User> getUsers() {
-    return this.userRepository.findAll();
-  }
-
-  public User createUser(User newUser) {
+    public User createUser(User newUser) {
     newUser.setState(UserStatus.OFFLINE);
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
