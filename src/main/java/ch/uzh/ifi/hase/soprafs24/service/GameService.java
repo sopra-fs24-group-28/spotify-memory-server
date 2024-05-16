@@ -12,6 +12,7 @@ import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
 import ch.uzh.ifi.hase.soprafs24.model.game.Card;
 import ch.uzh.ifi.hase.soprafs24.model.game.CardCollection;
+import ch.uzh.ifi.hase.soprafs24.model.helper.Change;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
@@ -184,7 +185,7 @@ public class GameService {
          User newUser = UserContextHolder.getCurrentUser();
          Game game = inMemoryGameRepository.findById(gameId);
          List<User> users = addPlayerToGame(game, newUser);
-         sendPlayersChangedWsDto(gameId, users);
+         sendPlayersChangedWsDto(game, users);
      }
 
      public void removePlayerFromGame(Integer gameId) {
@@ -206,15 +207,16 @@ public class GameService {
                      recordAbortedPlayer(game, user);
                  }
              }
-             inMemoryGameRepository.deleteById(gameId);
              sendGameStateChangedWsDto(gameId, GameState.FINISHED);
+             inMemoryGameRepository.deleteById(gameId);
          } else {
              game.getPlayers().removeIf(u -> u.getUserId().equals(userToRemove.getUserId()));
              List<User> users = inMemoryGameRepository.save(game).getPlayers();
              if (Objects.equals(game.getGameState(),GameState.ONPLAY)){
                  recordAbortedPlayer(game, userToRemove);
+                 game.getScoreBoard().remove(userToRemove.getUserId());
              }
-             sendPlayersChangedWsDto(gameId, users);
+             sendPlayersChangedWsDto(game, users);
          }
      }
 
@@ -548,16 +550,22 @@ public class GameService {
      * HELPER METHODS FOR WEBSOCKET UPDATES
      * */
 
-    private void sendPlayersChangedWsDto(Integer gameId, List<User> users) {
+    private void sendPlayersChangedWsDto(Game game, List<User> users) {
         List<PlayerDTO> players = userService.getPlayerDTOListFromListOfUsers(users);
+        Integer gameId = game.getGameId();
 
         eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, gameId, players));
 
 
-        WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
-                .gameChangesDto(WSGameChanges.builder().playerList(players).build()).build();
+        WSGameChangesDto.WSGameChangesDtoBuilder wsGameChangesDtoBuilder = WSGameChangesDto.builder()
+                .gameChangesDto(WSGameChanges.builder().playerList(players).build());
 
-        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
+        if (game.getGameState() == GameState.ONPLAY) {
+            WSScoreBoardChanges wsScoreBoardChanges = new WSScoreBoardChanges(game.getScoreBoard());
+            wsGameChangesDtoBuilder.scoreBoard(wsScoreBoardChanges);
+        }
+
+        eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDtoBuilder.build()));
     }
 
     private void sendGameStateChangedWsDto(Integer gameId, GameState gameState) {
