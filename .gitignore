@@ -42,3 +42,5 @@ local.properties
 .vscode
 
 /bin
+
+/src/main/resources/application.properties
