@@ -88,6 +88,7 @@ public class UserService {
       user.setSessionToken(null);
       user.setSpotifyJWT(null);
       user.setSpotifyDeviceId(null);
+      user.setCurrentGameId(null);
       user = userRepository.save(user);
       userRepository.flush();
       return user;

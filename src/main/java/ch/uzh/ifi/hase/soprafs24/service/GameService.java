@@ -60,8 +60,8 @@ public class GameService {
     public Game createGame(GameParameters gameParameters) {
 
         User host = UserContextHolder.getCurrentUser();
-        if (host.getState().equals(UserStatus.INGAME)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a game");
+        if (host.getCurrentGameId() != null || host.getState().equals(UserStatus.INGAME)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in a game." + host.getCurrentGameId());
         }
         Game newGame = new Game(gameParameters, host);
         Game game = inMemoryGameRepository.save(newGame);
@@ -193,6 +193,7 @@ public class GameService {
      public void removePlayerFromGame(Integer gameId) {
          User userToRemove = UserContextHolder.getCurrentUser();
          removePlayerHelper(gameId, userToRemove);
+         pausePlaybackHelper(userToRemove);
      }
 
      private void removePlayerHelper(Integer gameId, User userToRemove) {
@@ -270,6 +271,7 @@ public class GameService {
             setGameInCalcStatus(currentGame.getGameId(), true);
             try {
                 if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)) {
+                    pausePlaybackAllPlayers(currentGame);
                     runActiveTurn(currentGame, cardId);
                     inMemoryGameRepository.save(currentGame);
                 }
@@ -340,15 +342,18 @@ public class GameService {
         User inactivePlayer = UserContextHolder.getCurrentUser();
         Game currentGame = inMemoryGameRepository.findById(gameId);
 
+
         int historySize = currentGame.getHistory().size();
 
         // We need to ensure that a correct selection at the very end of a turn does not in a wrongful change of Turn
         if (historySize > 1 &&
                 (currentGame.getHistory().get(historySize - 1).getPicks().isEmpty()
                         && currentGame.getHistory().get(historySize - 2).getUserId() == currentGame.getActivePlayer())) {return;}
+
         if (inactivePlayer.getUserId().equals(currentGame.getActivePlayer())) {
             setCardsFaceDown(currentGame, currentGame.getHistory().get(currentGame.getHistory().size()-1));
             initiateNewTurn(currentGame, false);
+            pausePlaybackAllPlayers(currentGame);
 
             inMemoryGameRepository.save(currentGame);
 
@@ -369,6 +374,25 @@ public class GameService {
                     fetchedPlayer.getSpotifyJWT().getAccessToken(),
                     fetchedPlayer.getSpotifyDeviceId(),
                     card.getSongId());
+        }
+    }
+
+    private void pausePlaybackAllPlayers(Game currentGame) {
+        if (currentGame.getGameParameters().getGameCategory() == GameCategory.STANDARDSONG) {
+            for (User player : currentGame.getPlayers()) {
+                User fetchedPlayer = userService.findUserByUserId(player.getUserId());
+                pausePlaybackHelper(fetchedPlayer);
+            }
+        }
+    }
+
+    private void pausePlaybackHelper(User userToPause) {
+        try {
+            SpotifyService.pausePlayback(
+                    userToPause.getSpotifyJWT().getAccessToken(),
+                    userToPause.getSpotifyDeviceId());
+        } catch (ResponseStatusException e) {
+            System.out.println("Couldn't pause playback for user " + userToPause.getUserId());
         }
     }
 
@@ -395,11 +419,13 @@ public class GameService {
     private Game handleMatch(Game currentGame, Turn currentTurn) {
         if (checkMatch(currentGame, currentTurn)) {
             if (isCompleteSet(currentGame, currentTurn)) {
+                pausePlaybackAllPlayers(currentGame);
                 winPoints(currentGame, currentTurn);
                 addMatchCount(currentGame);
                 initiateNewTurn(currentGame, true);
             }
         } else {
+            pausePlaybackAllPlayers(currentGame);
             setCardsFaceDown(currentGame, currentTurn);
             initiateNewTurn(currentGame, false);
         }
