@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.websocket.dto;
 
 import ch.uzh.ifi.hase.soprafs24.model.helper.Change;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardContent;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardContents;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSGameChanges;
