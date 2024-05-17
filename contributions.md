@@ -114,6 +114,10 @@
 * [#84](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/84) Streak Powerup implementation
 * Cleanup work
 
+### Week 8
+* [#174](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/174) Testing GameController + some more cleanup
+* [#175](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/175) Pause music on turn change and player leave
+
 ## Niklas
 ### Week 1
 * [#30] Log out functionality
