@@ -419,17 +419,15 @@ public class GameService {
     }
 
     private Game handleMatch(Game currentGame, Turn currentTurn) {
-        if (checkMatch(currentGame, currentTurn)) {
-            if (isCompleteSet(currentGame, currentTurn)) {
-                pausePlaybackAllPlayers(currentGame);
+        if (isCompleteSet(currentGame, currentTurn)) {
+            if (checkMatch(currentGame, currentTurn)) {
                 winPoints(currentGame, currentTurn);
                 addMatchCount(currentGame);
                 initiateNewTurn(currentGame, true);
+            } else {
+                setCardsFaceDown(currentGame, currentTurn);
+                initiateNewTurn(currentGame, false);
             }
-        } else {
-            pausePlaybackAllPlayers(currentGame);
-            setCardsFaceDown(currentGame, currentTurn);
-            initiateNewTurn(currentGame, false);
         }
         return inMemoryGameRepository.save(currentGame);
     }
