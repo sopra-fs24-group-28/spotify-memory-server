@@ -41,6 +41,9 @@ dependencies {
     implementation 'org.springframework:spring-messaging'
     implementation 'org.springframework:spring-websocket'
 
+    implementation 'org.hibernate.validator:hibernate-validator'
+    implementation 'jakarta.validation:jakarta.validation-api'
+
     // implementation for persistence
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
