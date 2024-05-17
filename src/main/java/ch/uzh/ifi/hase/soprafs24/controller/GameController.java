@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -27,7 +28,7 @@ public class GameController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public PostGameStartDTO createGame(@RequestBody GameParameters gameParameters) {
+    public PostGameStartDTO createGame(@Valid @RequestBody GameParameters gameParameters) {
         Game game = gameService.createGame(gameParameters);
 
         eventPublisher.publishEvent(new LobbyOverviewChangedEvent(this, game));
