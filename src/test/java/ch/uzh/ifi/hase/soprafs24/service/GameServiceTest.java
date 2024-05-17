@@ -549,7 +549,7 @@ class GameServiceTest {
 
                     gameService.runTurn(testGame.getGameId(), testCard.getCardId());
 
-                    assertEquals(testOpponent.getUserId(), testGame.getActivePlayer());
+                    assertEquals(testUser.getUserId(), testGame.getActivePlayer());
                     verify(inMemoryGameRepository, times(2)).save(Mockito.any());
                     verify(eventPublisher, times(3)).publishEvent(Mockito.any());
                     verify(userService, times(0)).findUserByUserId(Mockito.any());
@@ -602,10 +602,10 @@ class GameServiceTest {
 
                             gameService.runTurn(testGame.getGameId(), testCard.getCardId());
 
-                            assertEquals(testOpponent.getUserId(), testGame.getActivePlayer());
+                            assertEquals(testUser.getUserId(), testGame.getActivePlayer());
                             verify(inMemoryGameRepository, times(2)).save(Mockito.any());
                             verify(eventPublisher, times(3)).publishEvent(Mockito.any());
-                            verify(userService, times(6)).findUserByUserId(Mockito.any());
+                            verify(userService, times(4)).findUserByUserId(Mockito.any());
 
                         }
                         catch (InterruptedException e) {
