@@ -61,6 +61,10 @@
 ### Week 7
 * [...] Complete Turn Timer Backend and Frontend (Diyar)
 
+### Week 8
+* [...] Defer Requests in case of update conflicts
+* [...] Inactivity Testing
+
 ## Henry
 
 ### Week 1
