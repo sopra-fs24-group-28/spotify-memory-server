@@ -316,6 +316,7 @@ public class GameService {
         if (checkFinished(currentGame)){
             finishGame(currentGame);
             publishGamefinished(currentGame);
+            pausePlaybackAllPlayers(currentGame);
             Thread.sleep(GameConstant.getFinishSleep());
 
             resetGame(currentGame);
@@ -418,7 +419,7 @@ public class GameService {
         return cardsState;
     }
 
-    private Game handleMatch(Game currentGame, Turn currentTurn) {
+    private Game handleMatch(Game currentGame, Turn currentTurn) throws InterruptedException {
         if (isCompleteSet(currentGame, currentTurn)) {
             if (checkMatch(currentGame, currentTurn)) {
                 winPoints(currentGame, currentTurn);
@@ -428,6 +429,8 @@ public class GameService {
                 setCardsFaceDown(currentGame, currentTurn);
                 initiateNewTurn(currentGame, false);
             }
+            Thread.sleep(GameConstant.getViewSleep());
+            pausePlaybackAllPlayers(currentGame);
         }
         return inMemoryGameRepository.save(currentGame);
     }

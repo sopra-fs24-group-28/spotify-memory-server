@@ -3,7 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.model.game;
 public final class GameConstant {
     private static final Integer minPlayers = 2;
 
-    private static final Integer viewSleep = 2000;
+    private static final Integer viewSleep = 1000;
 
     private static final Integer finishSleep = 5000;
 
