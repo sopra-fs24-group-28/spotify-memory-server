@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import static org.mockito.Mockito.*;
 
-public class ManualSecurityFilterTest {
+class ManualSecurityFilterTest {
 
     @Mock
     private HttpServletRequest mockRequest;
@@ -34,7 +34,7 @@ public class ManualSecurityFilterTest {
     }
 
     @Test
-    public void whenPostAuthRequest_thenProceedWithoutAuthorization() throws Exception {
+    void whenPostAuthRequest_thenProceedWithoutAuthorization() throws Exception {
         when(mockRequest.getRequestURI()).thenReturn("/auth");
         when(mockRequest.getMethod()).thenReturn("POST");
 
@@ -45,7 +45,7 @@ public class ManualSecurityFilterTest {
     }
 
     @Test
-    public void whenAccessWsEndpoint_thenProceedWithoutAuthorization() throws Exception {
+    void whenAccessWsEndpoint_thenProceedWithoutAuthorization() throws Exception {
         when(mockRequest.getRequestURI()).thenReturn("/ws");
 
         manualSecurityFilter.doFilter(mockRequest, mockResponse, mockFilterChain);
@@ -55,7 +55,7 @@ public class ManualSecurityFilterTest {
     }
 
     @Test
-    public void whenUnauthorized_thenRespondWithUnauthorizedError() throws Exception {
+    void whenUnauthorized_thenRespondWithUnauthorizedError() throws Exception {
         when(mockRequest.getRequestURI()).thenReturn("/other");
         when(mockRequest.getHeader("Authorization")).thenReturn("Bearer invalidtoken");
 
@@ -68,7 +68,7 @@ public class ManualSecurityFilterTest {
     }
 
     @Test
-    public void whenAuthorized_thenProceedWithFilterChain() throws Exception {
+    void whenAuthorized_thenProceedWithFilterChain() throws Exception {
         User user = new User();
         user.setUserId(1L);
 
@@ -83,7 +83,7 @@ public class ManualSecurityFilterTest {
     }
 
     @Test
-    public void whenNoAuthHeader_thenRespondWithBadRequestError() throws Exception {
+    void whenNoAuthHeader_thenRespondWithBadRequestError() throws Exception {
         when(mockRequest.getRequestURI()).thenReturn("/other");
 
         manualSecurityFilter.doFilter(mockRequest, mockResponse, mockFilterChain);

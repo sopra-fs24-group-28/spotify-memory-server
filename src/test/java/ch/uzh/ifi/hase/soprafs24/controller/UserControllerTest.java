@@ -59,7 +59,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getUserProfile_returnProfile() throws Exception {
+    void getUserProfile_returnProfile() throws Exception {
         // set expected results
         PlayerDTO testUserDTO = new PlayerDTO(testUser);
         UserStatsDTO testStatsDTO = new UserStatsDTO(
@@ -80,7 +80,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getUserProfile_returnException() throws Exception {
+    void getUserProfile_returnException() throws Exception {
         // set expected results
         PlayerDTO testUserDTO = new PlayerDTO(testUser);
 

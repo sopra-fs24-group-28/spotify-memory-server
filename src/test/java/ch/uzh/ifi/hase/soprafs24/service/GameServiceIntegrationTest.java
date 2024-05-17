@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 
 @WebAppConfiguration
 @SpringBootTest
-public class GameServiceIntegrationTest {
+class GameServiceIntegrationTest {
     @Qualifier("userRepository")
     @Autowired
     private UserRepository userRepository;
@@ -57,7 +57,7 @@ public class GameServiceIntegrationTest {
     private HashMap<String, String> playlistMetadata = new HashMap<>();
 
     ArrayList<ArrayList<String>> playlistData = null;
-    private GameParameters gameParameters = new GameParameters(5,2,2, STANDARDALBUMCOVER, new Playlist("playlist"),10,1,10,15);
+    private GameParameters gameParameters = new GameParameters(5,2,2, STANDARDALBUMCOVER, new Playlist("playlist"),10,1,10);
 
     @BeforeEach
     public void setup() {
@@ -110,7 +110,7 @@ public class GameServiceIntegrationTest {
     }
 
     @Test
-    public void simulateGame() {
+    void simulateGame() {
         try (MockedStatic<SpotifyService> mocked = mockStatic(SpotifyService.class)) {
             // mock static SpotifyService functions
             when(SpotifyService.getPlaylistMetadata(Mockito.any(), Mockito.any())).thenReturn(playlistMetadata);
@@ -120,7 +120,7 @@ public class GameServiceIntegrationTest {
             UserContextHolder.setCurrentUser(userRepository.findBySpotifyUserId("id1"));
             Game game = gameService.createGame(gameParameters);
 
-            assertEquals(game.getGameState(), GameState.OPEN);
+            assertEquals(GameState.OPEN, game.getGameState());
 
             // user2 joins game
             UserContextHolder.setCurrentUser(userRepository.findBySpotifyUserId("id2"));
@@ -136,7 +136,7 @@ public class GameServiceIntegrationTest {
             if(Objects.equals(firstPlayer, "id1")){secondPlayer = "id2";} else {secondPlayer = "id1";}
 
             gameStatsId = game.getGameStatsId();
-            assertEquals(game.getGameState(), GameState.ONPLAY);
+            assertEquals( GameState.ONPLAY, game.getGameState());
             assertEquals(game.getScoreBoard().get(userRepository.findBySpotifyUserId(secondPlayer).getUserId()), 0);
             assertEquals(game.getScoreBoard().get(userRepository.findBySpotifyUserId(firstPlayer).getUserId()), 0);
 
@@ -163,14 +163,14 @@ public class GameServiceIntegrationTest {
             gameService.runTurn(game.getGameId(), firstCard2);
             gameService.runTurn(game.getGameId(), secondCard2);
 
-            assertEquals(game.getGameState(), GameState.ONPLAY);
+            assertEquals(GameState.ONPLAY, game.getGameState());
             assertEquals(game.getScoreBoard().get(userRepository.findBySpotifyUserId(secondPlayer).getUserId()), 2);
             assertEquals(game.getScoreBoard().get(userRepository.findBySpotifyUserId(firstPlayer).getUserId()), 0);
 
             gameService.runTurn(game.getGameId(), thirdCard2);
             gameService.runTurn(game.getGameId(), fourthCard2);
 
-            assertEquals(game.getGameState(), GameState.OPEN);
+            assertEquals(GameState.OPEN, game.getGameState());
             assertTrue(game.getScoreBoard().isEmpty());
 
         } catch (InterruptedException e) {

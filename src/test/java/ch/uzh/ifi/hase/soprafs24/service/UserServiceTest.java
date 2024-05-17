@@ -9,22 +9,17 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockedStatic;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserServiceTest {
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mockStatic;
+
+class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -52,7 +47,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void createUser_validInputs_success() {
+    void createUser_validInputs_success() {
         // create the user
         User createdUser = userService.createUser(testUser);
 
@@ -67,7 +62,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void createUser_duplicateUserId_throwsException() {
+    void createUser_duplicateUserId_throwsException() {
         // given -> a first user has already been created
         userService.createUser(testUser);
 
@@ -77,11 +72,11 @@ public class UserServiceTest {
         // then -> attempt to create second user with same username -> check that an error
         // is thrown
         ResponseStatusException thrown = assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser));
-        assertEquals(thrown.getStatus(), HttpStatus.BAD_REQUEST);
+        assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
     }
 
     @Test
-    public void updateUser_validInputs_success() {
+    void updateUser_validInputs_success() {
         // create the user
         User createdUser = userService.createUser(testUser);
         Mockito.when(userRepository.findBySpotifyUserId(Mockito.any())).thenReturn(testUser);
@@ -97,12 +92,12 @@ public class UserServiceTest {
 
         // assert user status
         assertEquals(updatedUser.getSpotifyUserId(), createdUser.getSpotifyUserId());
-        assertEquals(updatedUser.getUsername(), "newUsername");
-        assertEquals(updatedUser.getImageUrl(), "newImageUrl");
+        assertEquals("newUsername", updatedUser.getUsername());
+        assertEquals("newImageUrl", updatedUser.getImageUrl());
     }
 
     @Test
-    public void loginUser_validInputs_noLogout_success() {
+    void loginUser_validInputs_noLogout_success() {
         // mock repository functions
         SpotifyJWT spotifyJWT = new SpotifyJWT();
         spotifyJWT.setUser(testUser);
@@ -137,7 +132,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void loginUser_validInputs_withLogout_success() {
+    void loginUser_validInputs_withLogout_success() {
         // mock repository functions
         SpotifyJWT spotifyJWT = new SpotifyJWT();
         Mockito.when(userRepository.findBySpotifyUserId(Mockito.any())).thenReturn(testUser);
@@ -161,7 +156,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void logoutUser_validInputs_success() {
+    void logoutUser_validInputs_success() {
         // set some data manually & mock repository function
         SpotifyJWT spotifyJWT = new SpotifyJWT();
         testUser.setState(UserStatus.ONLINE);
@@ -184,7 +179,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void findUserByUserId_validInputs_success() {
+    void findUserByUserId_validInputs_success() {
         // mock repository functions & add data
         testUser.setSessionToken("sessionToken");
         Mockito.when(userRepository.findByUserId(Mockito.any())).thenReturn(testUser);
@@ -202,7 +197,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void userExists_validInputs_success() {
+    void userExists_validInputs_success() {
         // mock repository functions
         Mockito.when(userRepository.findBySpotifyUserId(Mockito.any())).thenReturn(testUser);
 
@@ -211,7 +206,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserBySessionToken_validInputs_success() {
+    void getUserBySessionToken_validInputs_success() {
         // mock repository functions
         Mockito.when(userRepository.findBySessionToken(Mockito.any())).thenReturn(testUser);
 
@@ -228,7 +223,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void setPlayerState_validInputs_success() {
+    void setPlayerState_validInputs_success() {
         // mock repository functions
         Mockito.when(userRepository.saveAndFlush(Mockito.any())).thenReturn(testUser);
 
@@ -241,11 +236,11 @@ public class UserServiceTest {
         // assert user status
         assertEquals(testUser.getSpotifyUserId(), updatedUser.getSpotifyUserId());
         assertEquals(testUser.getUsername(), updatedUser.getUsername());
-        assertEquals(updatedUser.getState(), UserStatus.INGAME);
+        assertEquals(UserStatus.INGAME, updatedUser.getState());
     }
 
     @Test
-    public void setSpotifyDeviceId_validInputs_success() {
+    void setSpotifyDeviceId_validInputs_success() {
         // mock repository functions
         Mockito.when(userRepository.findBySpotifyUserId(Mockito.any())).thenReturn(testUser);
 
@@ -257,11 +252,11 @@ public class UserServiceTest {
 
         // assert user status
         assertEquals(testUser.getSpotifyUserId(), updatedUser.getSpotifyUserId());
-        assertEquals(updatedUser.getSpotifyDeviceId(), "deviceId");
+        assertEquals("deviceId", updatedUser.getSpotifyDeviceId());
     }
 
     @Test
-    public void getPlayerDTOListFromListOfUsers_validInputs_success() {
+    void getPlayerDTOListFromListOfUsers_validInputs_success() {
         // prepare list of users
         List <User> users = new ArrayList<>();
         users.add(testUser);
@@ -279,7 +274,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getPlayerDTOForCurrentUser_validInputs_success() {
+    void getPlayerDTOForCurrentUser_validInputs_success() {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             // prepare currentUser
             Mockito.when(UserContextHolder.getCurrentUser()).thenReturn(testUser);

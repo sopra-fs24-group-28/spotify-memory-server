@@ -16,7 +16,7 @@ import java.util.Map;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserHandshakeInterceptorTest {
+class UserHandshakeInterceptorTest {
 
     @Mock
     private ServerHttpRequest mockRequest;
@@ -36,7 +36,7 @@ public class UserHandshakeInterceptorTest {
     }
 
     @Test
-    public void whenTokenPresent_thenAuthorizeHandshake() throws Exception {
+    void whenTokenPresent_thenAuthorizeHandshake() throws Exception {
         when(mockRequest.getURI()).thenReturn(new URI("https://mockedURL.com?token=validToken"));
 
         boolean result = interceptor.beforeHandshake(mockRequest, mockResponse, mockWsHandler, attributes);
@@ -46,7 +46,7 @@ public class UserHandshakeInterceptorTest {
     }
 
     @Test
-    public void whenTokenMissing_thenDenyHandshake() throws Exception {
+    void whenTokenMissing_thenDenyHandshake() throws Exception {
         when(mockRequest.getURI()).thenReturn(new URI("https://mockedURL.com"));
 
         boolean result = interceptor.beforeHandshake(mockRequest, mockResponse, mockWsHandler, attributes);
@@ -56,7 +56,7 @@ public class UserHandshakeInterceptorTest {
     }
 
     @Test
-    public void whenTokenMalformed_thenDenyHandshake() throws Exception {
+    void whenTokenMalformed_thenDenyHandshake() throws Exception {
         when(mockRequest.getURI()).thenReturn(new URI("https://mockedURL.com?token="));
 
         boolean result = interceptor.beforeHandshake(mockRequest, mockResponse, mockWsHandler, attributes);

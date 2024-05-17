@@ -1,11 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.constant.user.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.SpotifyJWT;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.repository.SpotifyJWTRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,17 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 public class AuthServiceTest {
-
-    /*@Mock
-    private UserRepository userRepository;*/
 
     @Mock
     private UserContextHolder userContextHolder;
@@ -59,7 +52,7 @@ public class AuthServiceTest {
 
 
     @Test
-    public void authenticateFromCode_validInputs_existingUser_success() throws Exception {
+    void authenticateFromCode_validInputs_existingUser_success() {
         try (MockedStatic<SpotifyService> mocked = mockStatic(SpotifyService.class)) {
             HashMap<String, String> spotifyUserData = new HashMap<>();
             spotifyUserData.put("id", "testSpotifyUserId");
@@ -78,7 +71,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void authenticateFromCode_validInputs_newUser_success() throws Exception {
+    void authenticateFromCode_validInputs_newUser_success() {
         try (MockedStatic<SpotifyService> mocked = mockStatic(SpotifyService.class)) {
             HashMap<String, String> spotifyUserData = new HashMap<>();
             spotifyUserData.put("id", "testSpotifyUserId");
@@ -97,7 +90,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void authenticateFromCode_noPremiumAccount_throwsError() throws Exception {
+    void authenticateFromCode_noPremiumAccount_throwsError() {
         try (MockedStatic<SpotifyService> mocked = mockStatic(SpotifyService.class)) {
             HashMap<String, String> spotifyUserData = new HashMap<>();
             spotifyUserData.put("id", "testId");
@@ -108,12 +101,12 @@ public class AuthServiceTest {
             when(SpotifyService.getUserData(Mockito.any())).thenReturn(spotifyUserData);
 
             ResponseStatusException thrown = assertThrows(ResponseStatusException.class, () -> authService.authenticateFromCode("code"));
-            assertEquals(thrown.getStatus(), HttpStatus.FORBIDDEN);
+            assertEquals(HttpStatus.FORBIDDEN, thrown.getStatus());
         }
     }
 
     @Test
-    public void getAccessToken_validInput_success() throws Exception {
+    void getAccessToken_validInput_success() {
         try (MockedStatic<UserContextHolder> mocked = mockStatic(UserContextHolder.class)) {
             // add spotifyJWT to testUser
             SpotifyJWT spotifyJWT = new SpotifyJWT();
@@ -127,7 +120,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void getAccessToken_missingJWT_error() throws Exception {
+    void getAccessToken_missingJWT_error() {
         try (MockedStatic<UserContextHolder> mocked = mockStatic(UserContextHolder.class)) {
             // add spotifyJWT to testUser as null
             testUser.setSpotifyJWT(null);
@@ -135,20 +128,12 @@ public class AuthServiceTest {
             Mockito.when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
 
             ResponseStatusException thrown = assertThrows(ResponseStatusException.class, () -> authService.getAccessToken());
-            assertEquals(thrown.getStatus(), HttpStatus.UNAUTHORIZED);
+            assertEquals(HttpStatus.UNAUTHORIZED, thrown.getStatus());
         }
     }
 
     @Test
-    public void logout_validInput_success() throws Exception {
-        try (MockedStatic<UserContextHolder> mocked = mockStatic(UserContextHolder.class)) {
-            Mockito.when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
-            authService.logout();
-        }
-    }
-
-    @Test
-    public void getUserBySessionToken_validInput_success() throws Exception {
+    void getUserBySessionToken_validInput_success() {
         try (MockedStatic<UserContextHolder> mocked = mockStatic(UserContextHolder.class)) {
             User foundUser = authService.getUserBySessionToken("header");
 

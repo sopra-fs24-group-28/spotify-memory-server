@@ -17,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public class SpotifyControllerTest {
     }
 
     @Test
-    public void givenValidToken_ReturnPlaylistCollectionDTO() throws Exception {
+    void givenValidToken_ReturnPlaylistCollectionDTO() throws Exception {
         try (MockedStatic<UserContextHolder> mocked_UCH = mockStatic(UserContextHolder.class)) {
             try (MockedStatic<SpotifyService> mocked_spotify = mockStatic(SpotifyService.class)) {
                 // prepare a user
@@ -82,7 +81,7 @@ public class SpotifyControllerTest {
     }
 
     @Test
-    public void givenValidDeviceId_ReturnOK() throws Exception {
+    void givenValidDeviceId_ReturnOK() throws Exception {
         try (MockedStatic<UserContextHolder> mocked_UCH = mockStatic(UserContextHolder.class)) {
             User testUser = new User();
             testUser.setUsername("testUsername");

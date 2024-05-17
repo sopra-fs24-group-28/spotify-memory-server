@@ -48,7 +48,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void givenValidCodeAndUser_ReturnAuthTokenDTO() throws Exception {
+    void givenValidCodeAndUser_ReturnAuthTokenDTO() throws Exception {
         User user = new User();
         user.setUsername("testUsername");
         user.setUserId(1L);
@@ -70,7 +70,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void whenGetAccessToken_thenReturnAccessTokenDTO() throws Exception {
+    void whenGetAccessToken_thenReturnAccessTokenDTO() throws Exception {
         GetAccessTokenDTO expectedResponse = new GetAccessTokenDTO();
         expectedResponse.setAccessToken("access-token-sample");
 
@@ -83,7 +83,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void whenRevokeSessionToken_thenReturnStatusOk() throws Exception {
+    void whenRevokeSessionToken_thenReturnStatusOk() throws Exception {
         doNothing().when(authService).logout();
 
         mockMvc.perform(delete("/auth/token")

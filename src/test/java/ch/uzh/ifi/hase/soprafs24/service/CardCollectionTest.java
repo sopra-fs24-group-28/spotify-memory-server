@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 
-public class CardCollectionTest {
+class CardCollectionTest {
 
     @Test
-    void testConstructorStandardsong() throws Exception {
+    void testConstructorStandardsong() {
         final int numOfSets = 3;
         final int numOfCardsPerSet = 3;
 
@@ -47,7 +47,7 @@ public class CardCollectionTest {
             // Mock the behavior of SpotifyService.getPlaylistData
             when(SpotifyService.getPlaylistData("accessToken", "playlist", 3)).thenReturn(returnArray);
 
-            GameParameters gameParameters = new GameParameters(5,numOfSets,numOfCardsPerSet, STANDARDSONG, testPlaylist,1,1,10,15);
+            GameParameters gameParameters = new GameParameters(5,numOfSets,numOfCardsPerSet, STANDARDSONG, testPlaylist,1,1,10);
             // Create a CardCollection instance
             CardCollection cardCollection = new CardCollection(gameParameters, "accessToken");
 
@@ -66,7 +66,7 @@ public class CardCollectionTest {
     }
 
     @Test
-    void testConstructorStandardalbumcover() throws Exception {
+    void testConstructorStandardalbumcover() {
         final int numOfSets = 3;
         final int numOfCardsPerSet = 3;
 
@@ -90,7 +90,7 @@ public class CardCollectionTest {
             // Mock the behavior of SpotifyService.getPlaylistData
             when(SpotifyService.getPlaylistData("accessToken", "playlist", 3)).thenReturn(returnArray);
 
-            GameParameters gameParameters = new GameParameters(5,numOfSets,numOfCardsPerSet, STANDARDALBUMCOVER,new Playlist("playlist"),1,1,10,15);
+            GameParameters gameParameters = new GameParameters(5,numOfSets,numOfCardsPerSet, STANDARDALBUMCOVER,new Playlist("playlist"),1,1,10);
             // Create a CardCollection instance
             CardCollection cardCollection = new CardCollection(gameParameters, "accessToken");
 
@@ -127,7 +127,7 @@ public class CardCollectionTest {
             // Mock the behavior of SpotifyService.getPlaylistData
             when(SpotifyService.getPlaylistData("accessToken", "playlist", 2)).thenReturn(returnArray);
 
-            GameParameters gameParameters = new GameParameters(5,2,2, STANDARDSONG,new Playlist("playlist"),1,1,10,15);
+            GameParameters gameParameters = new GameParameters(5,2,2, STANDARDSONG,new Playlist("playlist"),1,1,10);
             // Create a CardCollection instance
             CardCollection cardCollection = new CardCollection(gameParameters, "accessToken");
 
@@ -172,7 +172,7 @@ public class CardCollectionTest {
             // Mock the behavior of SpotifyService.getPlaylistData
             when(SpotifyService.getPlaylistData("accessToken", "playlist", 2)).thenReturn(returnArray);
 
-            GameParameters gameParameters = new GameParameters(5,2,2, STANDARDSONG,new Playlist("playlist"), 1,1,10,15);
+            GameParameters gameParameters = new GameParameters(5,2,2, STANDARDSONG,new Playlist("playlist"), 1,1,10);
             // Create a CardCollection instance
             CardCollection cardCollection = new CardCollection(gameParameters, "accessToken");
 

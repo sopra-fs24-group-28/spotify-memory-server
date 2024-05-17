@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-public class GameServiceTest {
+class GameServiceTest {
 
     @Mock
     private InMemoryGameRepository inMemoryGameRepository;
@@ -97,7 +97,7 @@ public class GameServiceTest {
         testOpponent.setUsername("testUsername2");
         testOpponent.setSpotifyJWT(new SpotifyJWT());
 
-        gameParameters = new GameParameters(2,2,2, STANDARDALBUMCOVER, new Playlist("playlist"),10,1,10,15);
+        gameParameters = new GameParameters(2,2,2, STANDARDALBUMCOVER, new Playlist("playlist"),10,1,10);
         playlist = new Playlist("testPlayerId");
         gameParameters.setPlaylist(playlist);
 
@@ -121,7 +121,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void createGame_validInputs_success() {
+    void createGame_validInputs_success() {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             try (MockedStatic<SpotifyService> mockedSpotifyService = mockStatic(SpotifyService.class)) {
                 // setup Host
@@ -143,7 +143,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void createGame_validInputs_listTooShort_success() {
+    void createGame_validInputs_listTooShort_success() {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             try (MockedStatic<SpotifyService> mockedSpotifyService = mockStatic(SpotifyService.class)) {
                 // setup Host
@@ -167,7 +167,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void createGame_HostAlreadyInGame_throwsException() {
+    void createGame_HostAlreadyInGame_throwsException() {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             try (MockedStatic<SpotifyService> mockedSpotifyService = mockStatic(SpotifyService.class)) {
                 // setup Host(INGAME)
@@ -182,13 +182,13 @@ public class GameServiceTest {
 
                 ResponseStatusException thrown = assertThrows(ResponseStatusException.class, () -> gameService.createGame(gameParameters));
 
-                assertEquals(thrown.getStatus(), HttpStatus.BAD_REQUEST);
+                assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
             }
         }
     }
 
     @Test
-    public void startGame_validInput_success() {
+    void startGame_validInput_success() {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             try (MockedConstruction<CardCollection> mockedCardCollections = mockConstruction(CardCollection.class)) {
                 try (MockedConstruction<Game> mockedNewGame = mockConstruction(Game.class, (mock, context) ->
@@ -206,7 +206,7 @@ public class GameServiceTest {
                     gameService.startGame(testGame.getGameId());
 
                     assertEquals(testGame.getMatchCount(), 0);
-                    assertEquals(testGame.getGameState(), GameState.ONPLAY);
+                    assertEquals(GameState.ONPLAY, testGame.getGameState());
                     verify(inMemoryGameRepository).save(testGame);
                     verify(eventPublisher, times(2)).publishEvent(Mockito.any());
                 }
@@ -215,7 +215,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void startGame_invalidPlayersSize_throwException() {
+    void startGame_invalidPlayersSize_throwException() {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             try (MockedConstruction<CardCollection> mockedCardCollections = mockConstruction(CardCollection.class)) {
                 // setup Game (with only 1 player)
@@ -225,13 +225,13 @@ public class GameServiceTest {
 
                 ResponseStatusException thrown = assertThrows(ResponseStatusException.class, () -> gameService.startGame(testGame.getGameId()));
 
-                assertEquals(thrown.getStatus(), HttpStatus.BAD_REQUEST);
+                assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
             }
         }
     }
 
     @Test
-    public void startGame_invalidHost_throwException() {
+    void startGame_invalidHost_throwException() {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             try (MockedConstruction<CardCollection> mockedCardCollections = mockConstruction(CardCollection.class)) {
                 // setup Game (testOpponent as host)
@@ -242,13 +242,13 @@ public class GameServiceTest {
 
                 ResponseStatusException thrown = assertThrows(ResponseStatusException.class, () -> gameService.startGame(testGame.getGameId()));
 
-                assertEquals(thrown.getStatus(), HttpStatus.BAD_REQUEST);
+                assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
             }
         }
     }
 
     @Test
-    public void getGames_validInput_success() {
+    void getGames_validInput_success() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             // set inMemoryGameRepository.findAll return
             List<Game> games = new ArrayList<>();
@@ -262,7 +262,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void getGameById_validInput_success() {
+    void getGameById_validInput_success() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             // set inMemoryGameRepository.findById return
             when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
@@ -274,7 +274,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void addPlayerToGame_validInput_success() {
+    void addPlayerToGame_validInput_success() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)){
                 // set Game (state.Open)
@@ -297,7 +297,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void addPlayerToGame_userWithCurrentGameId_throwException() {
+    void addPlayerToGame_userWithCurrentGameId_throwException() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)){
                 // set Game (state.Open)
@@ -310,13 +310,13 @@ public class GameServiceTest {
 
                 ResponseStatusException thrown = assertThrows(ResponseStatusException.class, () -> gameService.addPlayerToGame(testGame.getGameId()));
 
-                assertEquals(thrown.getStatus(), HttpStatus.BAD_REQUEST);
+                assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
             }
         }
     }
 
     @Test
-    public void addPlayerToGame_userINGAME_throwException() {
+    void addPlayerToGame_userINGAME_throwException() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)){
                 // set Game (state.Open)
@@ -329,13 +329,13 @@ public class GameServiceTest {
 
                 ResponseStatusException thrown = assertThrows(ResponseStatusException.class, () -> gameService.addPlayerToGame(testGame.getGameId()));
 
-                assertEquals(thrown.getStatus(), HttpStatus.BAD_REQUEST);
+                assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
             }
         }
     }
 
     @Test
-    public void addPlayerToGame_exceedPlayerLimit_throwException() {
+    void addPlayerToGame_exceedPlayerLimit_throwException() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)){
                 // set Game (state.Open but full)
@@ -349,13 +349,13 @@ public class GameServiceTest {
 
                 ResponseStatusException thrown = assertThrows(ResponseStatusException.class, () -> gameService.addPlayerToGame(testGame.getGameId()));
 
-                assertEquals(thrown.getStatus(), HttpStatus.BAD_REQUEST);
+                assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
             }
         }
     }
 
     @Test
-    public void addPlayerToGame_gameOnPlay_throwException() {
+    void addPlayerToGame_gameOnPlay_throwException() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)){
                 // set Game (state.ONPLAY)
@@ -368,13 +368,14 @@ public class GameServiceTest {
 
                 ResponseStatusException thrown = assertThrows(ResponseStatusException.class, () -> gameService.addPlayerToGame(testGame.getGameId()));
 
-                assertEquals(thrown.getStatus(), HttpStatus.BAD_REQUEST);
+                assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
+
             }
         }
     }
 
     @Test
-    public void addPlayerToGame_gameFinished_throwException() {
+    void addPlayerToGame_gameFinished_throwException() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 // set Game (state.FINISHED)
@@ -387,13 +388,13 @@ public class GameServiceTest {
 
                 ResponseStatusException thrown = assertThrows(ResponseStatusException.class, () -> gameService.addPlayerToGame(testGame.getGameId()));
 
-                assertEquals(thrown.getStatus(), HttpStatus.BAD_REQUEST);
+                assertEquals(HttpStatus.BAD_REQUEST, thrown.getStatus());
             }
         }
     }
 
     @Test
-    public void removePlayerFromGame_validInput_userIsHost_success() {
+    void removePlayerFromGame_validInput_userIsHost_success() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try (MockedStatic<UserRepository> mockedUserRepository = mockStatic(UserRepository.class)) {
@@ -422,7 +423,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void removePlayerFromGame_validInput_userIsHostAndAborted_success() {
+    void removePlayerFromGame_validInput_userIsHostAndAborted_success() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try (MockedStatic<UserRepository> mockedUserRepository = mockStatic(UserRepository.class)) {
@@ -455,7 +456,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void removePlayerFromGame_validInput_userIsNotHost_success() {
+    void removePlayerFromGame_validInput_userIsNotHost_success() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try (MockedStatic<UserRepository> mockedUserRepository = mockStatic(UserRepository.class)) {
@@ -486,7 +487,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void removePlayerFromGame_validInput_userIsNotHostAndAborted_success() {
+    void removePlayerFromGame_validInput_userIsNotHostAndAborted_success() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try (MockedStatic<UserRepository> mockedUserRepository = mockStatic(UserRepository.class)) {
@@ -522,7 +523,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void runTurn_validInput_STANDARDALBUMCOVER_success() {
+    void runTurn_validInput_STANDARDALBUMCOVER_success() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try(MockedStatic<ApplicationEventPublisher> mockedEventPublisher = mockStatic(ApplicationEventPublisher.class)) {
@@ -562,7 +563,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void runTurn_validInput_STANDARDSONG_success() {
+    void runTurn_validInput_STANDARDSONG_success() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try(MockedStatic<ApplicationEventPublisher> mockedEventPublisher = mockStatic(ApplicationEventPublisher.class)) {
@@ -591,7 +592,7 @@ public class GameServiceTest {
                             when(userService.findUserByUserId(Mockito.any())).thenAnswer(new Answer<User>() {
                                 private int count = 0;
                                 @Override
-                                 public User answer(InvocationOnMock invocationOnMock) throws Throwable {
+                                public User answer(InvocationOnMock invocationOnMock) throws Throwable {
                                      return testGame.getPlayers().get(count++ % 2);
                                  }
                              });
@@ -617,7 +618,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void runTurn_validInput_cardsMatched_success() {
+    void runTurn_validInput_cardsMatched_success() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try(MockedStatic<ApplicationEventPublisher> mockedEventPublisher = mockStatic(ApplicationEventPublisher.class)) {
@@ -664,7 +665,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void runTurn_validInput_gameFinished_success() {
+    void runTurn_validInput_gameFinished_success() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
                 try(MockedStatic<ApplicationEventPublisher> mockedEventPublisher = mockStatic(ApplicationEventPublisher.class)) {
@@ -700,7 +701,6 @@ public class GameServiceTest {
 
                     gameService.runTurn(testGame.getGameId(), testCard.getCardId());
 
-//                    assertEquals(4L, testGame.getScoreBoard().get(1L));
                     assertEquals(GameState.OPEN, testGame.getGameState());
                     assertNull(testGame.getCardCollection());
                     assertNull(testGame.getMatchCount());
@@ -720,10 +720,9 @@ public class GameServiceTest {
     }
 
     @Test
-    public void inactiveTurn_returnsWithoutChange_playerWasInTimeAndKeepsPlaying() {
+    void inactiveTurn_returnsWithoutChange_playerWasInTimeAndKeepsPlaying() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
-                Card testCard = mock(Card.class);
                 CardCollection testCardCollection = mock(CardCollection.class);
                 testGame.setCardCollection(testCardCollection);
 
@@ -745,7 +744,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void inactiveTurn_returnsWithChange() {
+    void inactiveTurn_returnsWithChange() {
         try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
             try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
 
