@@ -18,10 +18,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import ch.uzh.ifi.hase.soprafs24.websocket.dto.WSGameChangesDto;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardContent;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSCardsStates;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSGameChanges;
-import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.WSScoreBoardChanges;
+import ch.uzh.ifi.hase.soprafs24.websocket.dto.helper.*;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.GameChangesEvent;
 import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import lombok.AllArgsConstructor;
@@ -401,7 +398,7 @@ public class GameService {
     private void publishCardContents(Game currentGame, Card card){
 
         WSGameChangesDto wsGameChangesDto = WSGameChangesDto.builder()
-                .cardContent(new WSCardContent(card.getCardId(), card.getSongId(), card.getImageUrl()))
+                .cardContent(cardContentsHelper(currentGame))
                 .cardsStates(new WSCardsStates(mapCardsState(currentGame.getCardCollection())))
                 .build();
 
@@ -416,6 +413,22 @@ public class GameService {
             cardsState.put(card.getCardId(), card.getCardState());
         }
         return cardsState;
+    }
+
+    private WSCardContents cardContentsHelper(Game game) {
+
+        WSCardContents wsCardContents = WSCardContents.builder()
+                .cardContents(new ArrayList<>())
+                .build();
+
+        ArrayList<ArrayList<String>> cardContents = new ArrayList<>();
+        List<Integer> currentCards = game.getHistory().get(game.getHistory().size()-1).getPicks();
+
+        for (Integer cardId : currentCards) {
+            Card card = game.getCardCollection().getCardById(cardId);
+            wsCardContents.addCardContent(card.getCardId(), card.getSongId(), card.getImageUrl());
+        }
+        return wsCardContents;
     }
 
     private Game handleMatch(Game currentGame, Turn currentTurn) {
@@ -500,6 +513,7 @@ public class GameService {
             wsGameChangesDto = WSGameChangesDto.builder()
                     .cardsStates(
                             new WSCardsStates(mapCardsState(currentGame.getCardCollection())))
+                    .cardContent(cardContentsHelper(currentGame))
                     .scoreBoard(
                             new WSScoreBoardChanges(currentGame.getScoreBoard()))
                     .build();
