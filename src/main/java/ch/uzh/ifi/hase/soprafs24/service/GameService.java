@@ -313,6 +313,7 @@ public class GameService {
         if (checkFinished(currentGame)){
             finishGame(currentGame);
             publishGamefinished(currentGame);
+            pausePlaybackAllPlayers(currentGame);
             Thread.sleep(GameConstant.getFinishSleep());
 
             resetGame(currentGame);
@@ -415,6 +416,7 @@ public class GameService {
         return cardsState;
     }
 
+
     private WSCardContents cardContentsHelper(Game game) {
 
         WSCardContents wsCardContents = WSCardContents.builder()
@@ -431,18 +433,18 @@ public class GameService {
         return wsCardContents;
     }
 
-    private Game handleMatch(Game currentGame, Turn currentTurn) {
-        if (checkMatch(currentGame, currentTurn)) {
-            if (isCompleteSet(currentGame, currentTurn)) {
-                pausePlaybackAllPlayers(currentGame);
+    private Game handleMatch(Game currentGame, Turn currentTurn) throws InterruptedException {
+        if (isCompleteSet(currentGame, currentTurn)) {
+            if (checkMatch(currentGame, currentTurn)) {
                 winPoints(currentGame, currentTurn);
                 addMatchCount(currentGame);
                 initiateNewTurn(currentGame, true);
+            } else {
+                setCardsFaceDown(currentGame, currentTurn);
+                initiateNewTurn(currentGame, false);
             }
-        } else {
+            Thread.sleep(GameConstant.getViewSleep());
             pausePlaybackAllPlayers(currentGame);
-            setCardsFaceDown(currentGame, currentTurn);
-            initiateNewTurn(currentGame, false);
         }
         return inMemoryGameRepository.save(currentGame);
     }
