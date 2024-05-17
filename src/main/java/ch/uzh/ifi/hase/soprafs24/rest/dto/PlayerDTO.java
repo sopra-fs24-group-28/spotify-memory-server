@@ -4,7 +4,6 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
 public class PlayerDTO {
     private Long userId;

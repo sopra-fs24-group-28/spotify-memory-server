@@ -10,7 +10,6 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class GameParameters {
 
     @Min(2)

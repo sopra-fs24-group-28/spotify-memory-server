@@ -718,4 +718,66 @@ public class GameServiceTest {
             }
         }
     }
+
+    @Test
+    public void inactiveTurn_returnsWithoutChange_playerWasInTimeAndKeepsPlaying() {
+        try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
+            try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
+                Card testCard = mock(Card.class);
+                CardCollection testCardCollection = mock(CardCollection.class);
+                testGame.setCardCollection(testCardCollection);
+
+                Turn testTurn = new Turn(testUser.getUserId());
+                Turn newTestTurn = new Turn(testOpponent.getUserId());
+                testGame.getHistory().add(testTurn);
+                testGame.getHistory().add(newTestTurn);
+
+                testGame.setActivePlayer(testUser.getUserId());
+
+                when(inMemoryGameRepository.findById(Mockito.any())).thenReturn(testGame);
+                when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
+
+                gameService.handleInactivePlayer(testGame.getGameId());
+
+                assertEquals(testGame.getActivePlayer(), testUser.getUserId());
+            }
+        }
+    }
+
+    @Test
+    public void inactiveTurn_returnsWithChange() {
+        try (MockedStatic<InMemoryGameRepository> mockedGameRepository = mockStatic(InMemoryGameRepository.class)) {
+            try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
+
+                CardCollection testCardCollection = mock(CardCollection.class);
+                testGame.setCardCollection(testCardCollection);
+
+                // Set up the game history
+                Turn testTurn = new Turn(testUser.getUserId());
+                testGame.getHistory().add(testTurn);
+
+                // Set the active player
+                testGame.setActivePlayer(testUser.getUserId());
+
+                testGame.getPlayers().add(testOpponent);
+
+                // Mock the repository and context
+                when(inMemoryGameRepository.findById(Mockito.anyInt())).thenReturn(testGame);
+                when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
+
+                // Mock the event publisher
+                doNothing().when(eventPublisher).publishEvent(any());
+
+                // Validate initial game state
+                assertEquals(1, testGame.getHistory().size());
+                assertEquals(testUser.getUserId(), testGame.getActivePlayer());
+
+                // Execute the method under test
+                gameService.handleInactivePlayer(testGame.getGameId());
+
+                assertEquals(2, testGame.getHistory().size());
+                assertEquals(testOpponent.getUserId(), testGame.getActivePlayer());
+            }
+        }
+    }
 }

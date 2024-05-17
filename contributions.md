@@ -26,6 +26,14 @@
 * [client-#7](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/7) Provide an affordance for the host to restart the game in the game-over screen
 * [client-#62](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/62) Prevent observing players from making direct (card related) actions in the front-end
 
+### Week 7
+* [client-#11](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/11) Scoreboard in game-over screen
+* [client-#12](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/12) Updating scoreboard UI
+
+### Week 8
+* [client-#84](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/84) Bug: Reloading/Closing Tab in LobbyWaitingRoom
+* [client-#83](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/83) New Feature: Information Tab
+
 
 ## Elias
 ### Week 1
@@ -52,6 +60,10 @@
 
 ### Week 7
 * [...] Complete Turn Timer Backend and Frontend (Diyar)
+
+### Week 8
+* [...] Defer Requests in case of update conflicts
+* [...] Inactivity Testing
 
 ## Henry
 
@@ -113,6 +125,10 @@
 ### Week 7
 * [#84](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/84) Streak Powerup implementation
 * Cleanup work
+
+### Week 8
+* [#174](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/174) Testing GameController + some more cleanup
+* [#175](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/175) Pause music on turn change and player leave
 
 ## Niklas
 ### Week 1
