@@ -13,7 +13,6 @@ import ch.uzh.ifi.hase.soprafs24.model.game.GameParameters;
 import ch.uzh.ifi.hase.soprafs24.model.game.Turn;
 import ch.uzh.ifi.hase.soprafs24.model.game.Card;
 import ch.uzh.ifi.hase.soprafs24.model.game.CardCollection;
-import ch.uzh.ifi.hase.soprafs24.model.helper.Change;
 import ch.uzh.ifi.hase.soprafs24.repository.inMemory.InMemoryGameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.PlayerDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
@@ -327,7 +326,7 @@ public class GameService {
         if (isGameInCalc(gameId)) {
             deferredExecutionService.deferTask(gameId, () -> executeInactivePlayerLogic(gameId));
         } else {
-            executeInactivePlayerLogic(gameId);
+            updateOnInactivity(gameId);
         }
     }
 
@@ -339,16 +338,19 @@ public class GameService {
     }
 
     private void executeInactivePlayerLogic(Integer gameId) {
-        User inactivePlayer = UserContextHolder.getCurrentUser();
         Game currentGame = inMemoryGameRepository.findById(gameId);
-
 
         int historySize = currentGame.getHistory().size();
 
         // We need to ensure that a correct selection at the very end of a turn does not in a wrongful change of Turn
-        if (historySize > 1 &&
+        if (!(historySize > 1 &&
                 (currentGame.getHistory().get(historySize - 1).getPicks().isEmpty()
-                        && currentGame.getHistory().get(historySize - 2).getUserId() == currentGame.getActivePlayer())) {return;}
+                        && currentGame.getHistory().get(historySize - 2).getUserId() == currentGame.getActivePlayer()))) {updateOnInactivity(gameId);}
+    }
+
+    private void updateOnInactivity(Integer gameId){
+        User inactivePlayer = UserContextHolder.getCurrentUser();
+        Game currentGame = inMemoryGameRepository.findById(gameId);
 
         if (inactivePlayer.getUserId().equals(currentGame.getActivePlayer())) {
             setCardsFaceDown(currentGame, currentGame.getHistory().get(currentGame.getHistory().size()-1));
@@ -363,7 +365,6 @@ public class GameService {
                     .build();
 
             eventPublisher.publishEvent(new GameChangesEvent( this, gameId, wsGameChangesDto));
-
         }
     }
 
