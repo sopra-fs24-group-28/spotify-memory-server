@@ -8,17 +8,15 @@ import ch.uzh.ifi.hase.soprafs24.rest.webFilter.UserContextHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.PersistenceException;
-import java.util.Objects;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
-public class StatsServiceTest {
+class StatsServiceTest {
     @Mock
     private StatsRepository statsRepository;
 
@@ -51,7 +49,7 @@ public class StatsServiceTest {
     }
 
     @Test
-    public void getLatestGameId_success() {
+    void getLatestGameId_success() {
         // mock repository functions
         when(statsRepository.findMaxGameID()).thenReturn(1);
 
@@ -61,7 +59,7 @@ public class StatsServiceTest {
     }
 
     @Test
-    public void saveStats_success() {
+    void saveStats_success() {
         when(statsRepository.saveAndFlush(Mockito.any())).thenReturn(testStatsFull);
         Stats returnValue = statsService.saveStats(testStatsFull);
         // assert user status
@@ -75,7 +73,7 @@ public class StatsServiceTest {
     }
 
     @Test
-    public void getCurrentUserStats_validReturn_success() {
+    void getCurrentUserStats_validReturn_success() {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
             when(statsRepository.countByUserId(Mockito.any())).thenReturn(6);
@@ -97,7 +95,7 @@ public class StatsServiceTest {
     }
 
     @Test
-    public void getCurrentUserStats_invalidReturn_exceptionThrown() {
+    void getCurrentUserStats_invalidReturn_exceptionThrown() {
         try (MockedStatic<UserContextHolder> mockedUserContext = mockStatic(UserContextHolder.class)) {
             when(UserContextHolder.getCurrentUser()).thenReturn(testUser);
             when(statsRepository.countByUserId(Mockito.any())).thenReturn(5);
@@ -107,7 +105,7 @@ public class StatsServiceTest {
             when(statsRepository.sumSetsWonByUserId(Mockito.any())).thenReturn(10L);
 
             PersistenceException thrown = assertThrows(PersistenceException.class, () -> statsService.getCurrentUserStats());
-            assertEquals(thrown.getMessage(),"Error in the number of games");
+            assertEquals("Error in the number of games", thrown.getMessage());
         }
     }
 }

@@ -20,7 +20,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -28,7 +27,6 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -65,8 +63,8 @@ public class GameControllerTest {
         user.setUserId(1L);
         user.setSessionToken("token");
 
-        game1 = new Game(new GameParameters(2,2,2, GameCategory.STANDARDALBUMCOVER, new Playlist("id"), 1,1,10,10), user);
-        game2 = new Game(new GameParameters(2,2,2, GameCategory.STANDARDALBUMCOVER, new Playlist("id"), 1,1,10,10), user);
+        game1 = new Game(new GameParameters(2,2,2, GameCategory.STANDARDALBUMCOVER, new Playlist("id"), 1,1,10), user);
+        game2 = new Game(new GameParameters(2,2,2, GameCategory.STANDARDALBUMCOVER, new Playlist("id"), 1,1,10), user);
 
         game1.setGameId(0);
         game2.setGameId(1);
@@ -74,7 +72,7 @@ public class GameControllerTest {
         games = new ArrayList<>();
         games.add(game1);
 
-        gameParameters = new GameParameters(2,2,2, GameCategory.STANDARDALBUMCOVER, new Playlist("id"), 1,1,10,10);
+        gameParameters = new GameParameters(2,2,2, GameCategory.STANDARDALBUMCOVER, new Playlist("id"), 1,1,10);
 
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
@@ -89,7 +87,7 @@ public class GameControllerTest {
     }
 
     @Test
-    public void getGames_returns_lobbyOverviewDto() throws Exception {
+    void getGames_returns_lobbyOverviewDto() throws Exception {
 
         MockHttpServletRequestBuilder getRequest = get("/games")
                 .contentType(MediaType.APPLICATION_JSON);
@@ -108,7 +106,7 @@ public class GameControllerTest {
     }
 
     @Test
-    public void putPlayer_returns_OK() throws Exception {
+    void putPlayer_returns_OK() throws Exception {
 
         MockHttpServletRequestBuilder putRequest = put("/games/1/player")
                 .contentType(MediaType.APPLICATION_JSON);
@@ -118,7 +116,7 @@ public class GameControllerTest {
     }
 
     @Test
-    public void deletePlayer_returns_NoContent() throws Exception {
+    void deletePlayer_returns_NoContent() throws Exception {
 
         MockHttpServletRequestBuilder deleteRequest = delete("/games/1/player")
                 .contentType(MediaType.APPLICATION_JSON);
@@ -128,7 +126,7 @@ public class GameControllerTest {
     }
 
     @Test
-    public void getGame_returns_lobbyGameDto() throws Exception {
+    void getGame_returns_lobbyGameDto() throws Exception {
 
         MockHttpServletRequestBuilder getRequest = get("/games/1")
                 .contentType(MediaType.APPLICATION_JSON);
@@ -141,7 +139,7 @@ public class GameControllerTest {
     }
 
     @Test
-    public void startGame_returns_OK() throws Exception {
+    void startGame_returns_OK() throws Exception {
 
         MockHttpServletRequestBuilder postRequest = post("/games/1/start")
                 .contentType(MediaType.APPLICATION_JSON);
@@ -151,7 +149,7 @@ public class GameControllerTest {
     }
 
     @Test
-    public void putInactivePlayer_returns_OK() throws Exception {
+    void putInactivePlayer_returns_OK() throws Exception {
 
         MockHttpServletRequestBuilder putRequest = put("/games/1/inactive")
                 .contentType(MediaType.APPLICATION_JSON);

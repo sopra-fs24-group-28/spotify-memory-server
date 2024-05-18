@@ -39,7 +39,4 @@ public class GameParameters {
     @Min(10)
     @Max(60)
     private int timePerTurn = 10;
-
-    private int timePerTurnPowerUp = 2;
-
 }

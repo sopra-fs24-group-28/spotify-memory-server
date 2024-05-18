@@ -9,10 +9,10 @@ import java.io.IOException;
 
 import static org.mockito.Mockito.*;
 
-public class PreflightCorsFilterTest {
+class PreflightCorsFilterTest {
 
     @Test
-    public void whenOptionsRequest_thenSetCorsHeadersAndStatusOK() throws IOException, ServletException {
+    void whenOptionsRequest_thenSetCorsHeadersAndStatusOK() throws IOException, ServletException {
 
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);

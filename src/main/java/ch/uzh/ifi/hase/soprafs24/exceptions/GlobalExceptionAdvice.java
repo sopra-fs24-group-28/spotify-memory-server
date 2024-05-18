@@ -1,11 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.exceptions;
 
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 @ControllerAdvice(annotations = RestController.class)
 public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
@@ -29,7 +32,7 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(TransactionSystemException.class)
   public ResponseStatusException handleTransactionSystemException(Exception ex, HttpServletRequest request) {
-    log.error("Request: {} raised {}", request.getRequestURL(), ex);
+    log.error("Request: raised {}", request.getRequestURL(), ex);
     return new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage(), ex);
   }
 
@@ -39,5 +42,12 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
   public ResponseStatusException handleException(Exception ex) {
     log.error("Default Exception Handler -> caught:", ex);
     return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
+  }
+
+  @Override
+  @NonNull
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(@NonNull MethodArgumentNotValidException ex, @NonNull HttpHeaders headers, @NonNull HttpStatus status, @NonNull WebRequest request) {
+
+    return new ResponseEntity<>("Failed Game Parameter Validation: " + Objects.requireNonNull(ex.getFieldError()).getField().toUpperCase(), HttpStatus.BAD_REQUEST);
   }
 }

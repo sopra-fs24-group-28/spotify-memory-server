@@ -22,12 +22,11 @@ public class WebSocketController {
 
     @MessageMapping("/overview")
     @SendTo("/topic/overview")
-    public void lobbyOverview() {
-    }
+    public void lobbyOverview() {}
 
     @MessageMapping("/games/{gameId}")
     @SendTo("/queue/games/{gameId}")
-    public void gameOverview(@DestinationVariable Integer gameId, IncomingCardId incomingCardId, SimpMessageHeaderAccessor headerAccessor) {
+    public void gameOverview(@DestinationVariable Integer gameId, IncomingCardId incomingCardId, SimpMessageHeaderAccessor headerAccessor) throws InterruptedException {
         // since we avoid using spring security and implement security and the security context manually
         // we do not use the Spring Security Principal Model, rather set a session attribute upon handshake with the websocket
 
@@ -35,8 +34,6 @@ public class WebSocketController {
             User user = authService.getUserBySessionToken((String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("token"));
             UserContextHolder.setCurrentUser(user);
             gameService.runTurn(gameId, incomingCardId.getCardId());
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         } finally {
             UserContextHolder.clear();
         }
