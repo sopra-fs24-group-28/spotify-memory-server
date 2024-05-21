@@ -9,6 +9,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.service.AuthService;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
+import ch.uzh.ifi.hase.soprafs24.websocket.events.LobbyOverviewChangedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -74,16 +76,33 @@ public class GameControllerTest {
 
         gameParameters = new GameParameters(2,2,2, GameCategory.STANDARDALBUMCOVER, new Playlist("id"), 1,1,10);
 
+        game1.getPlayers().add(user);
+
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 
         Mockito.when(gameService.getGames()).thenReturn(games);
+        Mockito.when(gameService.createGame(Mockito.any())).thenReturn(game1);
         Mockito.when(gameService.getGameById(Mockito.any())).thenReturn(game1);
         doNothing().when(gameService).addPlayerToGame(Mockito.any());
         doNothing().when(gameService).removePlayerFromGame(Mockito.any());
         doNothing().when(gameService).startGame(Mockito.any());
         doNothing().when(gameService).handleInactivePlayer(Mockito.any());
         doNothing().when(eventPublisher).publishEvent(Mockito.any());
+    }
+
+    @Test
+    void postGameParameters_returns_PostGameStartDTO() throws Exception {
+
+        MockHttpServletRequestBuilder postRequest = post("/games")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"playerLimit\":2,\"numOfSets\":5,\"numOfCardsPerSet\":2,\"gameCategory\":\"STANDARDALBUMCOVER\",\"playlist\":\"37i9dQZF1EIdFa1mD9SkGv\",\"streakStart\":2,\"streakMultiplier\":3,\"timePerTurn\":15}");
+
+        PostGameStartDTO expectedResponse = new PostGameStartDTO(game1.getGameId(), game1.getGameParameters());
+
+        mockMvc.perform(postRequest)
+                .andExpect(status().isCreated())
+                .andExpect(content().json(asJsonString(expectedResponse)));
     }
 
     @Test
