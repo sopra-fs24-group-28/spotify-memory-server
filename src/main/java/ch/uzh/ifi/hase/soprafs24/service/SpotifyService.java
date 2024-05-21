@@ -86,7 +86,10 @@ public class SpotifyService {
 
     public static HashMap<String, String> getPlaylistMetadata(String accessToken, String playlistId) {
 
-        SpotifyApi spotifyApi = new SpotifyApi.Builder().setAccessToken(accessToken).build();
+        SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                .setAccessToken(accessToken)
+                .setHttpManager(new SpotifyHttpManager.Builder().build())
+                .build();
 
         final GetPlaylistRequest playlistRequest = spotifyApi.getPlaylist(playlistId).build();
 
