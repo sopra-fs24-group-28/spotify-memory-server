@@ -76,7 +76,7 @@ public class GameService {
         Game currentGame = inMemoryGameRepository.findById(gameId);
         User host = UserContextHolder.getCurrentUser();
         Long hostId = host.getUserId();
-        if (currentGame.getPlayers().size() >= GameConstant.getMinPlayers() && Objects.equals(currentGame.getHostId(), hostId)){
+        if (currentGame.getPlayers().size() >= GameConstant.getMinPlayers() && Objects.equals(currentGame.getHostId(), hostId) && currentGame.getGameState() == GameState.OPEN){
             currentGame.setGameState(GameState.ONPLAY);
             currentGame.setGameStatsId(setNewGameStatsId());
 
@@ -103,10 +103,11 @@ public class GameService {
                     .build();
 
             eventPublisher.publishEvent(new GameChangesEvent(this, gameId, wsGameChangesDto));
-
-
+        } else if (currentGame.getGameState() == GameState.ONPLAY) {
+            // this tries to ensure that double-clicking "Start" doesn't start the game multiple times
+            System.out.println("Game " + currentGame.getGameId() + " is already ONPLAY!");
         } else {
-         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to start the game.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to start the game.");
         }
     }
 
