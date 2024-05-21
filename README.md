@@ -24,7 +24,7 @@ The app can only be used by people which fulfill both of the following:
 The back-end is implemented in Java with the Spring Boot framework, utilizing JPA for data persistence. The application is deployed on Google Cloud, and communication between the server and client is handled via REST and WebSockets, with STOMP employed as an additional messaging protocol for WebSockets.
 
 ## Components - High-level overview
-The [controller classes](https://github.com/sopra-fs24-group-28/spotify-memory-server/tree/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller) receive all REST calls and pass them onto the Services. The core logic of the game is implemented within GameService, utilizing SpotifyService for all Spotify related communication.
+The [controller classes](https://github.com/sopra-fs24-group-28/spotify-memory-server/tree/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller) receive all REST calls and pass them onto the Services. The core logic of the game is implemented within [GameService](https://github.com/sopra-fs24-group-28/spotify-memory-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/service/GameService.java), utilizing [SpotifyService](https://github.com/sopra-fs24-group-28/spotify-memory-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/service/SpotifyService.java) for all Spotify related communication.
 
 ## Launch & Development
 
