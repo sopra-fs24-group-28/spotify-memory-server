@@ -550,7 +550,7 @@ class GameServiceTest {
                     gameService.runTurn(testGame.getGameId(), testCard.getCardId());
 
                     assertEquals(testUser.getUserId(), testGame.getActivePlayer());
-                    verify(inMemoryGameRepository, times(2)).save(Mockito.any());
+                    verify(inMemoryGameRepository, times(1)).save(Mockito.any());
                     verify(eventPublisher, times(3)).publishEvent(Mockito.any());
                     verify(userService, times(0)).findUserByUserId(Mockito.any());
 
@@ -603,7 +603,7 @@ class GameServiceTest {
                             gameService.runTurn(testGame.getGameId(), testCard.getCardId());
 
                             assertEquals(testUser.getUserId(), testGame.getActivePlayer());
-                            verify(inMemoryGameRepository, times(2)).save(Mockito.any());
+                            verify(inMemoryGameRepository, times(1)).save(Mockito.any());
                             verify(eventPublisher, times(3)).publishEvent(Mockito.any());
                             verify(userService, times(4)).findUserByUserId(Mockito.any());
 
@@ -653,7 +653,7 @@ class GameServiceTest {
 
                     assertEquals(4L, testGame.getScoreBoard().get(1L));
                     assertEquals(testUser.getUserId(), testGame.getActivePlayer());
-                    verify(inMemoryGameRepository, times(3)).save(Mockito.any());
+                    verify(inMemoryGameRepository, times(1)).save(Mockito.any());
                     verify(eventPublisher, times(3)).publishEvent(Mockito.any());
 
                 }
@@ -707,7 +707,7 @@ class GameServiceTest {
                     assertTrue(testGame.getScoreBoard().isEmpty());
                     assertNull(testGame.getActivePlayer());
                     assertTrue(testGame.getHistory().isEmpty());
-                    verify(inMemoryGameRepository, times(5)).save(Mockito.any());
+                    verify(inMemoryGameRepository, times(1)).save(Mockito.any());
                     verify(eventPublisher, times(3)).publishEvent(any(GameChangesEvent.class));
                     verify(eventPublisher, times(1)).publishEvent(any(LobbyOverviewChangedEvent.class));
                     verify(statsService, times(2)).saveStats(Mockito.any());
