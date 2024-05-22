@@ -207,8 +207,8 @@ public class GameService {
                      recordAbortedPlayer(game, user);
                  }
              }
-             sendGameStateChangedWsDto(gameId, GameState.FINISHED);
              inMemoryGameRepository.deleteById(gameId);
+             sendGameStateChangedWsDto(gameId, GameState.FINISHED);
          } else {
              game.getPlayers().removeIf(u -> u.getUserId().equals(userToRemove.getUserId()));
              List<User> users = inMemoryGameRepository.save(game).getPlayers();
