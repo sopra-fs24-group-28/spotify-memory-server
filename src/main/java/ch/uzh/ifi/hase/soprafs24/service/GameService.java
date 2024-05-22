@@ -272,7 +272,9 @@ public class GameService {
                 if (checkActivePlayer(currentGame) && checkActiveCard(currentGame, cardId)) {
                     pausePlaybackAllPlayers(currentGame);
                     runActiveTurn(currentGame, cardId);
-                    inMemoryGameRepository.save(currentGame);
+                    if (inMemoryGameRepository.findById(currentGame.getGameId()) != null) {
+                        inMemoryGameRepository.save(currentGame);
+                    }
                 }
             } finally {
                 setGameInCalcStatus(currentGame.getGameId(), false);
@@ -308,16 +310,17 @@ public class GameService {
         Thread.sleep(GameConstant.getViewSleep());
         // set sleep for all card flips.
 
-        currentGame = handleMatch(currentGame, currentTurn);
+        handleMatch(currentGame, currentTurn);
 
         if (checkFinished(currentGame)){
             finishGame(currentGame);
             publishGamefinished(currentGame);
             pausePlaybackAllPlayers(currentGame);
-            Thread.sleep(GameConstant.getFinishSleep());
 
             resetGame(currentGame);
-            sendGameStateChangedWsDto(currentGame.getGameId(), currentGame.getGameState());
+            if (inMemoryGameRepository.findById(currentGame.getGameId()) != null) {
+                sendGameStateChangedWsDto(currentGame.getGameId(), currentGame.getGameState());
+            }
         } else {
         publishOnPlayState(currentGame);
         }
@@ -435,7 +438,7 @@ public class GameService {
         return wsCardContents;
     }
 
-    private Game handleMatch(Game currentGame, Turn currentTurn) throws InterruptedException {
+    private void handleMatch(Game currentGame, Turn currentTurn) throws InterruptedException {
         if (isCompleteSet(currentGame, currentTurn)) {
             if (checkMatch(currentGame, currentTurn)) {
                 winPoints(currentGame, currentTurn);
@@ -448,7 +451,6 @@ public class GameService {
             Thread.sleep(GameConstant.getViewSleep());
             pausePlaybackAllPlayers(currentGame);
         }
-        return inMemoryGameRepository.save(currentGame);
     }
 
 
@@ -495,7 +497,6 @@ public class GameService {
         matchCount++;
 
         currentGame.setMatchCount(matchCount);
-        inMemoryGameRepository.save(currentGame);
     }
 
     private void publishOnPlayState(Game currentGame){
@@ -534,7 +535,6 @@ public class GameService {
         currentGame.setGameState(GameState.OPEN);
         recordGameStatistics(currentGame);
         //resetGame(currentGame);
-        inMemoryGameRepository.save(currentGame);
     }
 
     private void recordGameStatistics(Game currentGame){
@@ -575,8 +575,6 @@ public class GameService {
         currentGame.setGameStatsId(null);
         currentGame.setQuickTurn(new HashMap<>());
         currentGame.setQuickTurnActive(false);
-
-        inMemoryGameRepository.save(currentGame);
     }
 
     private void publishGamefinished(Game currentGame){
