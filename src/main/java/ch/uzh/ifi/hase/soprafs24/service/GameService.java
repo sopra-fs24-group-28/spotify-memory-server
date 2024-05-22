@@ -531,7 +531,7 @@ public class GameService {
     }
 
     private void finishGame(Game currentGame){
-        currentGame.setGameState(GameState.FINISHED);
+        currentGame.setGameState(GameState.OPEN);
         recordGameStatistics(currentGame);
         //resetGame(currentGame);
         inMemoryGameRepository.save(currentGame);
