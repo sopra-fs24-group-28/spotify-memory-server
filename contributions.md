@@ -69,6 +69,10 @@
 * [...] Defer Requests in case of update conflicts
 * [...] Inactivity Testing
 
+### Week 9
+* [...] Misc Bug Fixes
+* [...] Misc Refactoring
+
 ## Henry
 
 ### Week 1
