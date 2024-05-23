@@ -26,14 +26,18 @@
 * [client-#7](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/7) Provide an affordance for the host to restart the game in the game-over screen
 * [client-#62](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/62) Prevent observing players from making direct (card related) actions in the front-end
 
-### Week 7
+### Week 7
 * [client-#11](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/11) Scoreboard in game-over screen
 * [client-#12](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/12) Updating scoreboard UI
 
-### Week 8
+### Week 8
 * [client-#84](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/84) Bug: Reloading/Closing Tab in LobbyWaitingRoom
 * [client-#83](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/83) New Feature: Information Tab
 
+### Week 9
+* [client-#195](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/195) Administrative work for deliverables, including report, presentation and README.
+* Cleaning up GitHub board. 
+* Miscellaneous bug fixes. 
 
 ## Elias
 ### Week 1
