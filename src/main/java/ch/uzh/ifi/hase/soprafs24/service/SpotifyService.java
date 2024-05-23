@@ -181,7 +181,10 @@ public class SpotifyService {
 
     public static void pausePlayback(String accessToken, String deviceId) {
 
-        final SpotifyApi spotifyApi = new SpotifyApi.Builder().setAccessToken(accessToken).build();
+        final SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                .setAccessToken(accessToken)
+                .setHttpManager(new SpotifyHttpManager.Builder().build())
+                .build();
 
         final PauseUsersPlaybackRequest pauseUsersPlaybackRequest = spotifyApi.pauseUsersPlayback().device_id(deviceId).build();
 
