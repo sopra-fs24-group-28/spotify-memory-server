@@ -130,6 +130,10 @@
 * [#174](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/174) Testing GameController + some more cleanup
 * [#175](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/175) Pause music on turn change and player leave
 
+### Week 9
+* [#189](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/189) Fix failed dependency when start button is clicked twice
+* [#196](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/196) Server Readme
+* 
 ## Niklas
 ### Week 1
 * [#30] Log out functionality

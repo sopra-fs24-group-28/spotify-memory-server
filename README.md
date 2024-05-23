@@ -1,4 +1,4 @@
-# Spotify Memory (Sopra Group 28)
+# Spotymemory (Sopra Group 28)
 [![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-orange.svg)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
 
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=sopra-fs24-group-28_spotify-memory-server)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
@@ -10,7 +10,7 @@
 ## Introduction
 While music streaming services have transformed the listening experience of everybody over the past decade, they have also deteriorated the social aspects of music enjoyment. In the era of streaming, it is difficult to discover, share and enjoy music with friends.
 
-This project intends to provide a playful shared listening experience in the form of a Spotify based memory game. Memory is a game in which players take turns to collect points by matching pairs of face-down cards. In our game, Spotify Memory, the cards represent elements of music, such as snippets of a song or album art, depending on the game mode.
+This project intends to provide a playful shared listening experience in the form of a Spotify based memory game. Memory is a game in which players take turns to collect points by matching pairs of face-down cards. In our game, Spotymemory, the cards represent elements of music, such as snippets of a song or album art, depending on the game mode.
 
 Through this game, players have the chance to discover new music with friends. This game is also a great web application project for this course, as it takes advantage of the powerful Spotify API and presents a broad range of design possibilities. 
 
@@ -28,7 +28,7 @@ The [controller classes](https://github.com/sopra-fs24-group-28/spotify-memory-s
 
 ## Launch & Development
 
-**Setup required:** Save "clientSecret", "redirectURL" (for Spotify), as well as "GCP_SERVICE_CREDENTIALS" in the system environment variables.
+**Setup required:** Save "clientSecret", "redirectURL" (for Spotify), as well as "GCP_SERVICE_CREDENTIALS" (for google cloud) in the system environment variables.
 
 ### Build
 
