@@ -165,6 +165,22 @@
 * [...] Game Screen Impl
 
 ### Week 6
-* [...] Redisign Game Interface and Misc
+* [...] Redesign Game Interface and Misc
 * [...] Reciverfunction corrected and optimized
 * [...] UX elements (toaster, responsiveness)
+
+### Week 7
+* Refresh Design on whole Application.
+* Include Frontend only Tipps from other group
+* Updated Recieverfunction to conform to new standard
+* Please refer to week 7 board for a detailed view.
+
+### Week 8
+* Solved most front-end related bugs that came to surface when stress-testing.
+* These were related to different parts of the whole application. Please refer to week 8 board for a detailed view. 
+* Stress-testing
+
+### Week 9 
+* Creating the readme for the frontend.
+* Bugfixing and cleaning up code in the frontend.
+* Optimizing production build.
