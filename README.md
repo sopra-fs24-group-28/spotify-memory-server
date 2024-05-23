@@ -1,42 +1,34 @@
-# SoPra RESTful Service Template FS24
+# Spotymemory (Sopra Group 28)
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-orange.svg)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
 
-## Group 28: Necessary Additional Setup
-To run the server locally, following things need to be done:
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=sopra-fs24-group-28_spotify-memory-server)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
 
-* System Env Variables: Save the clientSecret and the redirectURL in the system environment variables so that it can be extracted by SpotifyService
-* Make sure that your spotify account is listed in the Spotify "App" (maintained by Nicolas)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sopra-fs24-group-28_spotify-memory-server&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sopra-fs24-group-28_spotify-memory-server&metric=coverage)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=sopra-fs24-group-28_spotify-memory-server&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
 
-## Getting started with Spring Boot
--   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
--   Guides: http://spring.io/guides
-    -   Building a RESTful Web Service: http://spring.io/guides/gs/rest-service/
-    -   Building REST services with Spring: https://spring.io/guides/tutorials/rest/
+## Introduction
+While music streaming services have transformed the listening experience of everybody over the past decade, they have also deteriorated the social aspects of music enjoyment. In the era of streaming, it is difficult to discover, share and enjoy music with friends.
 
-## Setup this Template with your IDE of choice
-Download your IDE of choice (e.g., [IntelliJ](https://www.jetbrains.com/idea/download/), [Visual Studio Code](https://code.visualstudio.com/), or [Eclipse](http://www.eclipse.org/downloads/)). Make sure Java 17 is installed on your system (for Windows, please make sure your `JAVA_HOME` environment variable is set to the correct version of Java).
+This project intends to provide a playful shared listening experience in the form of a Spotify based memory game. Memory is a game in which players take turns to collect points by matching pairs of face-down cards. In our game, Spotymemory, the cards represent elements of music, such as snippets of a song or album art, depending on the game mode.
 
-### IntelliJ
-If you consider to use IntelliJ as your IDE of choice, you can make use of your free educational license [here](https://www.jetbrains.com/community/education/#students).
-1. File -> Open... -> SoPra server template
-2. Accept to import the project as a `gradle project`
-3. To build right click the `build.gradle` file and choose `Run Build`
+Through this game, players have the chance to discover new music with friends. This game is also a great web application project for this course, as it takes advantage of the powerful Spotify API and presents a broad range of design possibilities. 
 
-### VS Code
-The following extensions can help you get started more easily:
--   `vmware.vscode-spring-boot`
--   `vscjava.vscode-spring-initializr`
--   `vscjava.vscode-spring-boot-dashboard`
--   `vscjava.vscode-java-pack`
+**Disclaimer: Limitations imposed by the Spotify API**
 
-**Note:** You'll need to build the project first with Gradle, just click on the `build` command in the _Gradle Tasks_ extension. Then check the _Spring Boot Dashboard_ extension if it already shows `soprafs24` and hit the play button to start the server. If it doesn't show up, restart VS Code and check again.
+The app can only be used by people which fulfill both of the following:
+* Have a valid spotify premium subscription.
+* Have their account registered for usage in this app (contact the admin).
 
-## Building with Gradle
-You can use the local Gradle Wrapper to build the application.
--   macOS: `./gradlew`
--   Linux: `./gradlew`
--   Windows: `./gradlew.bat`
+## Technologies
+The back-end is implemented in Java with the Spring Boot framework, utilizing JPA for data persistence. The application is deployed on Google Cloud, and communication between the server and client is handled via REST and WebSockets, with STOMP employed as an additional messaging protocol for WebSockets.
 
-More Information about [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) and [Gradle](https://gradle.org/docs/).
+## Components - High-level overview
+The [controller classes](https://github.com/sopra-fs24-group-28/spotify-memory-server/tree/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller) receive all REST calls and pass them onto the Services. The core logic of the game is implemented within [GameService](https://github.com/sopra-fs24-group-28/spotify-memory-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/service/GameService.java), utilizing [SpotifyService](https://github.com/sopra-fs24-group-28/spotify-memory-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/service/SpotifyService.java) for all Spotify related communication.
+
+## Launch & Development
+
+**Setup required:** Save "clientSecret", "redirectURL" (for Spotify), as well as "GCP_SERVICE_CREDENTIALS" (for google cloud) in the system environment variables.
 
 ### Build
 
@@ -50,44 +42,25 @@ More Information about [Gradle Wrapper](https://docs.gradle.org/current/userguid
 ./gradlew bootRun
 ```
 
-You can verify that the server is running by visiting `localhost:8080` in your browser.
-
 ### Test
 
 ```bash
 ./gradlew test
 ```
 
-### Development Mode
-You can start the backend in development mode, this will automatically trigger a new build and reload the application
-once the content of a file has been changed.
+## Roadmap
 
-Start two terminal windows and run:
+Following extensions are planned for the future:
+* Additional Game Mode: Two different Songs of one Artist
+* Obtain Quota Extension (thereafter, the app can used publicly without registration)
+* Leaderboard across all players
 
-`./gradlew build --continuous`
+## Authors & Acknowledgements
 
-and in the other one:
+Group 28 consists of [Diyar Taskiran](https://github.com/DTaskiran), [Elias Müller](https://github.com/EliasWJMuller), [Hyeongseok Kim](https://github.com/hs-kim1990), [Nicolas Schuler](https://github.com/NicSchuler), and [Niklas Schmidt](https://github.com/niklasschm1dt).
 
-`./gradlew bootRun`
+Furthermore, we want to thank our TA Cedric von Rauscher for the valuable inputs throughout the semester, as well as the whole teaching team.
 
-If you want to avoid running all tests with every change, use the following command instead:
+## License
 
-`./gradlew build --continuous -xtest`
-
-## API Endpoint Testing with Postman
-We recommend using [Postman](https://www.getpostman.com) to test your API Endpoints.
-
-## Debugging
-If something is not working and/or you don't know what is going on. We recommend using a debugger and step-through the process step-by-step.
-
-To configure a debugger for SpringBoot's Tomcat servlet (i.e. the process you start with `./gradlew bootRun` command), do the following:
-
-1. Open Tab: **Run**/Edit Configurations
-2. Add a new Remote Configuration and name it properly
-3. Start the Server in Debug mode: `./gradlew bootRun --debug-jvm`
-4. Press `Shift + F9` or the use **Run**/Debug "Name of your task"
-5. Set breakpoints in the application where you need it
-6. Step through the process one step at a time
-
-## Testing
-Have a look here: https://www.baeldung.com/spring-boot-testing
+See [LICENSE](https://github.com/sopra-fs24-group-28/spotify-memory-server/blob/main/LICENSE)
