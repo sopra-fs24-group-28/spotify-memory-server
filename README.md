@@ -1,8 +1,6 @@
 # Spotymemory (Sopra Group 28)
 [![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-orange.svg)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=sopra-fs24-group-28_spotify-memory-server)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sopra-fs24-group-28_spotify-memory-server&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sopra-fs24-group-28_spotify-memory-server&metric=coverage)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=sopra-fs24-group-28_spotify-memory-server&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=sopra-fs24-group-28_spotify-memory-server)
 
