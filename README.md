@@ -64,7 +64,7 @@ The [controller classes](https://github.com/sopra-fs24-group-28/spotify-memory-s
 
 SoPra FS24 – Group 28 consists of [Diyar Taskiran](https://github.com/DTaskiran), [Elias Müller](https://github.com/EliasWJMuller), [Henry Kim](https://github.com/hs-kim1990), [Niklas Schmidt](https://github.com/niklasschm1dt) and [Nicolas Schuler](https://github.com/NicSchuler).
 
-We want to thank our teaching assistant [Cedric von Rausch](https://github.com/cedric-vr) for his guidance during the project.
+We want to thank our teaching assistant [Cedric von Rauscher](https://github.com/cedric-vr) for his guidance during the project.
 
 ## License
 
