@@ -98,7 +98,10 @@
 ### Week 7
 * [...] Unit tests for GameService Finished
 * [...](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/165) Reset Game back to open after finished
-  
+
+### Week 8
+* [#178](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/178) Update Scoreboard on player leave
+* [#179](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/179) Full Content List for each FACEUP card
 
 ## Nicolas
 ### Week 1
