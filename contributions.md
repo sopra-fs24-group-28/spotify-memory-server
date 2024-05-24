@@ -49,32 +49,43 @@
 
 ### Week 3
 * [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) websocket for lobby overview somewhat works
-
+* [#58](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/58) game state updates
+* [#41](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/41) Open a WebSocket connection from the back-end
+* [#50](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/50) Add user to lobby in the back-end and send confirmation of success, connect WebSocket
+  
 ### Week 4
+* [#61](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/61) card handling
 * [#74](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/74#issue-2203802887) If the host has left the lobby, close the game and WebSocket
 * [#73](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/73#issue-2203802872) If the user leaves the game, remove user from Game
 * [#41](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/41#issue-2203432033) Open a WebSocket connection from the back-end
 * [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) lobby overview websocket deployed (with Diyar & Niklas)
 
 ### Week 5
-* [...] Controller Unit Tests
-* [...] WS Testing
-* [...] WS Game BE&FE (Diyar & Niklas)
-
+* [#119](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/119) game websocket finalised
+* [client-#17](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/17) send game update over websocket to server (pair programming diyar)
+* [...] WS Testing & Controller Unit Tests
+ 
 ### Week 6
+* [#79](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/179) Game Restart
+* [#145](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/145) WS Game BE&FE (Diyar & Niklas)
 * [...] Solved async issues in game updates (race condition through WS)
-* [...] Timing functionality per turn
+* [#177](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/177) Setup turn Timer
 
 ### Week 7
-* [...] Complete Turn Timer Backend and Frontend (Diyar)
+* [client-#11](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/11) Scoreboard in game-over screen
+* [client-#12](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/12) Updating scoreboard UI
 
 ### Week 8
-* [...] Defer Requests in case of update conflicts
-* [...] Inactivity Testing
+* [#173](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/173) Defer Requests in case of update conflicts
+* [#182](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/182) Inactivity Testing
+* [#177](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/177) Complete Turn Timer Backend and Frontend 
+* [#176](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/176) Web Filter NPE fix and restructure
 
 ### Week 9
-* [...] Misc Bug Fixes
-* [...] Misc Refactoring
+* [#192](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/192) Param Validation (issue #200)
+* [#193](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/193) Game leave forcing turn changes
+* [#190](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/190) Inactivity on last card
+
 
 ## Henry
 
