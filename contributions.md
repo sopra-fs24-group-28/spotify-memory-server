@@ -82,29 +82,34 @@
 * [#88](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/88) Create and persist the user object
 
 ### Week 3
-* [#55] Prepare game state (e.g. Scoreboard, Turn object) (IN progress)
-* [#56] Upon valid request to start game, close lobby to new players and start Game (IN Progress)
+* [#55](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/55) Prepare game state (e.g. Scoreboard, Turn object) (IN progress)
+* [#56](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/56) Upon valid request to start game, close lobby to new players and start Game (IN Progress)
 
 ### Week 4
 * [#88](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/88) Persistance with Google cloud SQL
 * [#55](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/55) Prepare game state (e.g. Scoreboard, Turn object) (In Progress with helper functions)
-* [#56] Upon valid request to start game, close lobby to new players and start Game (pull request)
+* [#56](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/56) Upon valid request to start game, close lobby to new players and start Game (pull request)
 
 ### Week 5
-* [...] Apply game logics within GameService
-* [...] Unit tests for GameService
+* [#122](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/122) Apply game logics within GameService
+* [#159](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/159) Unit tests for GameService
 
 ### Week 6
-* [#71] update the players game statisticsand persit it in the database
-* [...] Unit tests for GameService
+* [#150](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/150) update the players game statistics and persit it in the database
+* [#159](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/159) Unit tests for GameService
 
 ### Week 7
-* [...] Unit tests for GameService Finished
-* [...](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/165) Reset Game back to open after finished
+* [#159](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/159) Unit tests for GameService Finished
+* [#165](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/165) Reset Game back to open after finished
 
 ### Week 8
 * [#178](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/178) Update Scoreboard on player leave
 * [#179](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/179) Full Content List for each FACEUP card
+
+### Week 9
+* [#205](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/205) error fix on host leave while STANDARDSONG
+* [#207](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/207) bug fix - game persists after host leave upon game over
+
 
 ## Nicolas
 ### Week 1
