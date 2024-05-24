@@ -139,6 +139,7 @@
 
 ### Week 4
 * [#63](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/63) Helper functions SpotifyService.setSong() and CardCollection.checkMatch()
+* [#134](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/134) Integration Test for full game
 * Wrote tests for CardCollection functions
 * Helped to implement Persistance & get user Playlists
 
@@ -146,16 +147,16 @@
 * Unit tests for UserService
 * Unit tests for AuthService
 * Unit tests for AuthController
-* Integration test for running full game
 * [#113](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/113) Several minor improvements (Card-Content, Playlist name and Playlist url)
 * [#138](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/138) Create POST /spotify/user/deviceid
 
 ### Week 6
 * [#148](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/148) Collect and save profile pictures
-* Improve SpotifyService Error Handling & Update Username/Pictures at login
+* [#151](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/151) Improve SpotifyService Error Handling (playlist length) & Update Username/Pictures at login
 
 ### Week 7
 * [#84](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/84) Streak Powerup implementation
+* [#168](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/168) Highest Resolution Profile picture
 * Cleanup work
 
 ### Week 8
@@ -165,7 +166,7 @@
 ### Week 9
 * [#189](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/189) Fix failed dependency when start button is clicked twice
 * [#196](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/196) Server Readme
-* 
+
 ## Niklas
 ### Week 1
 * [#30] Log out functionality
