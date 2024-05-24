@@ -169,47 +169,62 @@
 
 ## Niklas
 ### Week 1
-* [#30] Log out functionality
-* [#37] create front-end nav-bar component
+* [#30](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/30) Log out functionality
+* [#37](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/37) create front-end nav-bar
 
 ### Week 2
-* [#25] redirect the host to the created lobby after its creation (still in progress)
-* [#27] create affordance for the instantiation of a new lobby in the front end
+* [#25](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/25)redirect the host to the created lobby after its creation (still in progress)
+* [#27](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/27) create affordance for the instantiation of a new lobby in the front end
 
 ### Week 3
+* [#26](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/26)
+* [#22](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/22) Route user to the lobby upon successful addition to lobby, remain in lobby overview and display error message otherwise
 * combine frontend with backend such that endpoints work coherently
 * merge dev branch into main (client)
 
 ### Week 4
+*[#15](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/15)
 * no issue: made whole allplication responsive
 * collaborated with elias on getting websockets running for the overview
-* [#18] implemented the Gamescreen including the Gamecards
-* implemented logic in inbetween state of games
-* [#13 / #15] implemented scoreboard
+* [#18](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/18) implemented the Gamescreen including the Gamecards
+* no issue: implemented logic in inbetween state of games
 * no issue: resolved old legacy bugs in frontend
 
 ### Week 5
+* [#23](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/23)
+* [#13](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/13) Scoeboard view in frontend
 * [...] Playback SDK implementation
 * [...] Playback Integration in Game
 * [...] Game Screen Impl
 
 ### Week 6
-* [...] Redesign Game Interface and Misc
-* [...] Reciverfunction corrected and optimized
-* [...] UX elements (toaster, responsiveness)
+* [13](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/13) extended  and redone
+* [#14](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/14)
+* [#90](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/90) card flipped bug
+* no issue: Redesign Game Interface and Misc
+* no issue: Reciverfunction corrected and optimized
+* no issue: UX elements (toaster, responsiveness)
 
 ### Week 7
+* [#70](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/14)Create profile page and relevant components in front-end
+[#71](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/71)
+[#3](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/3)
 * Refresh Design on whole Application.
 * Include Frontend only Tipps from other group
 * Updated Recieverfunction to conform to new standard
-* Please refer to week 7 board for a detailed view.
 
 ### Week 8
-* Solved most front-end related bugs that came to surface when stress-testing.
-* These were related to different parts of the whole application. Please refer to week 8 board for a detailed view. 
+[#82](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/82) bug volume button
+[#81] https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/81)
+[#91](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/91) Info that Host Closed the game
+[#80](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/80) mirrored album covers.
 * Stress-testing
 
 ### Week 9 
+* [#89](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/89)
+* [#114](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/114)
+* [#108](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/108)
+* [#107](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/107)
 * Creating the readme for the frontend.
 * Bugfixing and cleaning up code in the frontend.
 * Optimizing production build.
