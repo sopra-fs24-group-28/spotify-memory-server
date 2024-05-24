@@ -75,13 +75,13 @@
 * [client-#11](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/11) Scoreboard in game-over screen
 * [client-#12](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/12) Updating scoreboard UI
 
-### Week 8
+### Week 8
 * [#173](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/173) Defer Requests in case of update conflicts
 * [#182](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/182) Inactivity Testing
 * [#177](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/177) Complete Turn Timer Backend and Frontend 
 * [#176](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/176) Web Filter NPE fix and restructure
 
-### Week 9
+### Week 9
 * [#192](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/192) Param Validation (issue #200)
 * [#193](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/193) Game leave forcing turn changes
 * [#190](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/190) Inactivity on last card
