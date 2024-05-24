@@ -91,15 +91,17 @@
 
 ### Week 1
 * [#88](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/88) Create and persist the user object
+* [...] Data persistance on repository (e.g. MongoDB)
 
 ### Week 3
 * [#55](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/55) Prepare game state (e.g. Scoreboard, Turn object) (IN progress)
 * [#56](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/56) Upon valid request to start game, close lobby to new players and start Game (IN Progress)
 
 ### Week 4
-* [#88](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/88) Persistance with Google cloud SQL
-* [#55](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/55) Prepare game state (e.g. Scoreboard, Turn object) (In Progress with helper functions)
+* [#88](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/88) Persistance with Google cloud SQL (with Google Cloud)
+* [#55](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/55) Prepare game state (e.g. Scoreboard, Turn object) (Modified with helper functions)
 * [#56](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/56) Upon valid request to start game, close lobby to new players and start Game (pull request)
+* [#132](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/132) reorder game finishing logic
 
 ### Week 5
 * [#122](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/122) Apply game logics within GameService
