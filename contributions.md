@@ -91,6 +91,7 @@
 
 ### Week 1
 * [#88](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/88) Create and persist the user object
+* [#38](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/38) Ensure user data is persisted in back-end and user is set to logged out, respond with appropriate confirmation to front-end
 * [...] Data persistance on repository (e.g. MongoDB)
 
 ### Week 3
@@ -108,10 +109,11 @@
 * [#159](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/159) Unit tests for GameService
 
 ### Week 6
-* [#150](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/150) update the players game statistics and persit it in the database
+* [#71](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/71) update the players game statistics and persit it in the database
 * [#159](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/159) Unit tests for GameService
 
 ### Week 7
+* [#158](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/158) Handle request and return profile data
 * [#159](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/159) Unit tests for GameService Finished
 * [#165](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/165) Reset Game back to open after finished
 
@@ -120,7 +122,8 @@
 * [#179](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/179) Full Content List for each FACEUP card
 
 ### Week 9
-* [#205](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/205) error fix on host leave while STANDARDSONG
+* [#188](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/188) game leave (in game over screen) -> still in game
+* [#191](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/191) check game logic (how many cards can be picked)
 * [#207](https://github.com/sopra-fs24-group-28/spotify-memory-server/pull/207) bug fix - game persists after host leave upon game over
 
 
