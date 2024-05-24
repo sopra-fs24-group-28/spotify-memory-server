@@ -9,6 +9,7 @@
 
 ### Week 3
 * [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) websocket for lobby overview somewhat works
+* [client-#28](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/28) lobby overview rest request consumed and displayed
 
 ### Week 4
 * [#48](https://github.com/sopra-fs24-group-28/spotify-memory-server/issues/48) lobby overview websocket data works and is deployable
