@@ -33,11 +33,13 @@
 ### Week 8
 * [client-#84](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/84) Bug: Reloading/Closing Tab in LobbyWaitingRoom
 * [client-#83](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/83) New Feature: Information Tab
+* [client-#88](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/88) Bug: "FULL" button upon leaving and game end before manual reload
 
 ### Week 9
 * [client-#195](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/195) Administrative work for deliverables, including report, presentation and README.
+* [[client-#125](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/125), [client-#112](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/112), [client-#111](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/111), [client-#109](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/109), [client-#106](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/106), [client-#113](https://github.com/sopra-fs24-group-28/spotify-memory-client/issues/113)] Miscellaneous bug fixes. 
 * Cleaning up GitHub board. 
-* Miscellaneous bug fixes. 
+
 
 ## Elias
 ### Week 1
